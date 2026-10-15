@@ -60,4 +60,20 @@ class HeadingMathTest {
         val next = smoother.next(10f)
         assertTrue("expected ~353, got $next", next > 350f && next < 360f)
     }
+
+    @Test
+    fun signedDeltaIsTheShortestTurn() {
+        assertEquals(20f, signedDelta(350f, 10f), 0.001f)
+        assertEquals(-20f, signedDelta(10f, 350f), 0.001f)
+        assertEquals(-90f, signedDelta(90f, 0f), 0.001f)
+        assertEquals(180f, signedDelta(0f, 180f), 0.001f)
+    }
+
+    @Test
+    fun turnDirectionPointsTowardTheTarget() {
+        assertEquals(TurnDirection.Left, turnDirection(90f, 0f))
+        assertEquals(TurnDirection.Right, turnDirection(270f, 0f))
+        assertEquals(null, turnDirection(5f, 0f))
+        assertEquals(null, turnDirection(null, 0f))
+    }
 }

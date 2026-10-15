@@ -70,3 +70,18 @@ class AzimuthSmoother(private val alpha: Float = 0.15f) {
         return normalizeDegrees(Math.toDegrees(atan2(sinAcc.toDouble(), cosAcc.toDouble())).toFloat())
     }
 }
+
+/** Signed shortest turn from [from] to [to], in (-180, 180]; positive = clockwise (turn right). */
+fun signedDelta(from: Float, to: Float): Float {
+    val delta = ((to - from) % 360f + 540f) % 360f - 180f
+    return if (delta == -180f) 180f else delta
+}
+
+enum class TurnDirection { Left, Right }
+
+/** Which way to turn to face [target]; null when the heading is unknown or already aligned. */
+fun turnDirection(azimuth: Float?, target: Float): TurnDirection? = when {
+    azimuth == null || isAligned(azimuth, target) -> null
+    signedDelta(azimuth, target) > 0f -> TurnDirection.Right
+    else -> TurnDirection.Left
+}
