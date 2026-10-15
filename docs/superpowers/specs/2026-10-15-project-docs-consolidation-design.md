@@ -41,6 +41,7 @@ docs/
     0003-docs-first-reference-folder.md
     0004-web-demo-external.md
     0005-chant-phrasing-and-text.md
+    0006-ritual-heading-per-demon.md
   superpowers/specs/2026-10-15-project-docs-consolidation-design.md   # this file
 reference/                     # git mv from assets/ (history preserved)
   README.md                    # "generated input, NOT canonical"
@@ -61,10 +62,10 @@ Anything in `reference/` that disagrees with the canon is wrong by definition.
 ## 4. PRODUCT.md — content
 
 ### 4.1 Pitch
-"Summon Demons Safely": a small Android game where the player summons cute chibi Goetic demons by facing North and chanting a Latin incantation into the microphone.
+"Summon Demons Safely": a small Android game where the player summons cute chibi Goetic demons by facing each demon's required direction (North for the first two) and chanting a Latin incantation into the microphone.
 
 ### 4.2 Core loop
-Grimoire → tap demon → Ritual (face North + chant) → Profile (doubles as success screen) → back to Grimoire.
+Grimoire → tap demon → Ritual (face the demon's required direction + chant) → Profile (doubles as success screen) → back to Grimoire.
 
 ### 4.3 Reconciled rules
 
@@ -72,15 +73,15 @@ Grimoire → tap demon → Ritual (face North + chant) → Profile (doubles as s
 |---|---|
 | Home | `Scaffold` with top bar "My Grimoire"; `LazyVerticalGrid` of demon cards. |
 | Lock state | Both demons start **locked**. Locked card: grey tint, silhouette, **Summon** → Ritual. Unlocked card: theme-color tint/border, illustration, **View** → Profile. Unlock state is in-memory only. |
-| Ritual setup | Large faint sigil; text "Hold the phone with both hands and face North". |
-| North gate | Ritual is *Active* only while azimuth ∈ [340°, 360°) ∪ [0°, 20°]. Leaving the range **resets progress to 0**. |
+| Ritual setup | Large faint sigil; text "Hold the phone with both hands and face {direction}", where {direction} comes from the demon's required heading (North for both MVP demons). |
+| Heading gate | The required heading is a **per-demon property** (`ritualHeading`, compass degrees, tolerance ±20°). Ritual is *Active* only while the device azimuth is within tolerance of it — for North that is [340°, 360°) ∪ [0°, 20°]. Leaving the range **resets progress to 0**. Future demons may require South, East, etc.; nothing in the rules may hard-code North. |
 | Chant | Incantation shown as **exactly 4 phrases**, grey until reached. Sustained mic volume above threshold for **2 s** while Active advances one phrase and highlights it in the demon's color. |
 | Sigil | Opacity 0.10 at start, then 0.25 / 0.50 / 0.75 / 1.00 after phrases 1–4. |
 | Success | At phrase 4: sigil fully glows, then navigate to Profile with `isNewSummon = true`. |
 | Profile (new summon) | `RibbonBanner` "New Demon Received!", rotating sunburst, bouncing demon, "Tada!" sound, pinned button **Awesome!** → Grimoire. |
 | Profile (view) | Same layout without banner and sound; button **Back**. |
 | Profile content | Image, name, title, description, quote. No stats. |
-| Debug aids | "Simulate North" and "Hold to Chant" controls exist in **debug builds only**. |
+| Debug aids | "Simulate heading" (snaps to the demon's required heading) and "Hold to Chant" controls exist in **debug builds only**. |
 | Permissions | `RECORD_AUDIO` requested on entering the Ritual; if denied, explain and offer retry. |
 
 ### 4.4 Demon data
@@ -89,6 +90,7 @@ Grimoire → tap demon → Ritual (face North + chant) → Profile (doubles as s
 |---|---|---|
 | Title | Lord of Arithmetic & Hidden Wealth | Duke of Past, Present & Future |
 | Accent | gold (DESIGN.md `demon-asmodeus`) | magenta (DESIGN.md `demon-astaroth`) |
+| Ritual heading | North (0°, ±20°) | North (0°, ±20°) |
 | Quote | "Three heads are better than one—especially when two want your soul!" | "I know your past, your future, and that you didn't read the terms of service." |
 | Description | Teaches arithmetic, astronomy, geometry, and invincibility. Answers all questions—if you can stand the smugness. | Detects secret desires and grants protection to the great. Will explain his own fall at length if asked. |
 
@@ -117,7 +119,7 @@ Follows the design-md skill format (frontmatter tokens + prose).
 - **Color tokens:** full Material 3 set from `reference/stitch/summoner_s_grimoire_tactical_rpg/DESIGN.md` (e.g. `surface #0B1326`, `primary #FFC174`, `primary-container #F59E0B`, `secondary #7BD0FF`, `tertiary #FCB4FF`), each mapped to its Compose `colorScheme` slot. Extras: `demon-asmodeus #FFD54F`, `demon-astaroth #E040FB`, `ritual-safe #4ADE80`.
 - **Typography:** Cinzel (display/headlines), Inter (body/labels, tabular numbers); fallbacks `FontFamily.Serif` / `FontFamily.SansSerif` until fonts are bundled.
 - **Shapes:** small 12dp, medium 16dp, large 24dp, full pill for buttons.
-- **Component contracts** (names, purpose, states — no code): `PrimaryActionButton`, `DemonCardBase` (locked/unlocked), `RibbonBanner`, `RotatingSunburstBackground`, `SigilView` (opacity 0–1, theme color), `CompassIndicator` (aligned/not aligned, degrees).
+- **Component contracts** (names, purpose, states — no code): `PrimaryActionButton`, `DemonCardBase` (locked/unlocked), `RibbonBanner`, `RotatingSunburstBackground`, `SigilView` (opacity 0–1, theme color), `CompassIndicator` (current azimuth, target heading, aligned/not aligned).
 - **Rule:** composables use `MaterialTheme` tokens only; no hardcoded colors or ad-hoc dimensions.
 
 ### 5.1 Asset catalog
@@ -150,7 +152,7 @@ Non-Stitch gap: `tada.ogg` (short fanfare) — source from a CC0 library or gene
 2. Source-of-truth order (§3).
 3. Repo map.
 4. Commands: `./gradlew assembleDebug`, `./gradlew testDebugUnitTest`, `./gradlew installDebug`; web demo: `cd ../mdweb && npm install && npm run dev` (port 3000).
-5. Conventions: Kotlin + Jetpack Compose, MAD; sensor and audio logic behind a ViewModel exposing `StateFlow`; theme tokens only; package `com.summondemons.safely`.
+5. Conventions: Kotlin + Jetpack Compose, MAD; ritual parameters (heading, phrases, color) are demon data, not constants; sensor and audio logic behind a ViewModel exposing `StateFlow`; theme tokens only; package `com.summondemons.safely`.
 6. Current state: `app/` is still the XML "Basic Views Activity" template; the Compose port is the next spec.
 7. Rules for agents: never edit `reference/`; when a decision changes, update PRODUCT/DESIGN and add an ADR.
 
@@ -165,6 +167,7 @@ Format: title, date, status, Context / Decision / Consequences, ~15 lines each.
 - **0003** Docs-first and the `reference/` folder (D1, D6).
 - **0004** Web demo stays external (D5).
 - **0005** Chant phrasing: 4 phrases per demon so the 25% rule holds; "LOVIS" kept verbatim, open question.
+- **0006** Ritual heading is per-demon data (North for the MVP pair; other directions for future demons), never a hard-coded rule.
 
 ## 8. Verification
 
