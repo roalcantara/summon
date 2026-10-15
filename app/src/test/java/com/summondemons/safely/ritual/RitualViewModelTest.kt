@@ -129,6 +129,22 @@ class RitualViewModelTest {
     }
 
     @Test
+    fun restartingThePipelineForgetsTheOldHeading() = runTest(dispatcher) {
+        var subscriptions = 0
+        val vm = RitualViewModel(demon, { flow { if (subscriptions++ == 0) emit(0f) } }, FakeVolume(level = 0.0))
+        val first = backgroundScope.launch { vm.uiState.collect {} }
+        runCurrent()
+        assertTrue(vm.uiState.value.aligned)
+
+        first.cancel()
+        advanceTimeBy(6_000); runCurrent() // past WhileSubscribed(5_000): pipeline stops
+        backgroundScope.launch { vm.uiState.collect {} }
+        runCurrent()
+        assertNull(vm.uiState.value.azimuth)
+        assertFalse(vm.uiState.value.aligned)
+    }
+
+    @Test
     fun headingChangesDoNotRestartTheMic() = runTest(dispatcher) {
         val heading = FakeHeading()
         val volume = FakeVolume(level = 5_000.0)

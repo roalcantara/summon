@@ -3208,7 +3208,7 @@ Run each check and note the result in the PR / hand-over:
 
 1. Launcher shows the game logo icon and the label "Summon Demons Safely".
 2. Grimoire: both cards locked (dark silhouette, lock, "Sealed", **Summon**).
-3. Tap **Summon** on Asmodeus → mic permission dialog appears once. Deny → the rationale card with "Allow microphone" appears. Leave and re-enter the ritual → **no** automatic dialog. Deny again until permanently denied → the button reads "Open settings" and opens app settings. Grant there, return → the card disappears.
+3. Tap **Summon** on Asmodeus → mic permission dialog appears once. Deny → the rationale card with "Allow microphone" appears. Rotate or background-and-return inside the same ritual → **no** new dialog (re-entering the ritual from the Grimoire asks again, per PRODUCT.md). Dismissing the dialog by tapping outside → still "Allow microphone". Deny twice ("Don't allow" again) → the button reads "Open settings" and opens app settings. Grant there, return → the card disappears.
 4. Header reads "…face North"; compass arrow and readout move with the device (emulator: Extended controls → Virtual sensors → rotate). Green within ±20° of North, red outside.
 5. Asmodeus sigil is the Canvas fallback in gold; Astaroth uses the sigil image in magenta.
 6. Debug build: **Simulate heading** turns the compass green; **Hold to Chant** (press and hold) fills the bar; every 2 s one phrase lights up and opacity steps 10 → 25 → 50 → 75 → 100 %. Release mid-phrase → bar drains slowly. Untoggle Simulate (no real North) → progress resets.

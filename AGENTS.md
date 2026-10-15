@@ -48,12 +48,14 @@ cd ../mdweb && npm install && npm run dev   # http://localhost:3000
 ```
 
 ## Current state
+
 - `app/` is the Compose port (package `com.summondemons.safely`): Grimoire,
   Ritual and Profile per `PRODUCT.md`. Design:
   `docs/superpowers/specs/2026-10-15-compose-port-design.md`.
 - Open items: DESIGN.md art gaps (`sigil_asmodeus`, `demon_astaroth_full`,
   cut-outs, `avatar_astaroth`), a real `tada` sound, bundling Cinzel/Inter, and
   the "LOVIS" question in ADR-0005.
+
 ## Conventions
 
 - Kotlin + Jetpack Compose, Modern Android Development guidelines.

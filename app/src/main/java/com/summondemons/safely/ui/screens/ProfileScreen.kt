@@ -22,7 +22,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,8 +64,10 @@ fun ProfileScreen(
 
     if (isNewSummon) {
         val context = LocalContext.current
+        // Saved so activity recreation (font scale, locale) doesn't replay the fanfare.
+        var tadaPlayed by rememberSaveable { mutableStateOf(false) }
         DisposableEffect(Unit) {
-            val player = TadaPlayer.play(context)
+            val player = if (tadaPlayed) null else TadaPlayer.play(context).also { tadaPlayed = true }
             onDispose { player?.release() }
         }
     }

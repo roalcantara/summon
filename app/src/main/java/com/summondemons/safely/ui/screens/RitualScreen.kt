@@ -75,10 +75,14 @@ fun RitualScreen(
     // Ask once; re-check on every resume (e.g. after returning from Settings).
     var requested by rememberSaveable { mutableStateOf(false) }
     var permanentlyDenied by rememberSaveable { mutableStateOf(false) }
+    var deniedBefore by rememberSaveable { mutableStateOf(false) }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         viewModel.onMicPermission(granted)
-        permanentlyDenied = !granted && activity != null &&
+        // A first denial or a dismissed dialog also reports "no rationale"; only a repeat
+        // denial without rationale means "don't ask again".
+        permanentlyDenied = !granted && deniedBefore && activity != null &&
             !ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.RECORD_AUDIO)
+        if (!granted) deniedBefore = true
     }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==

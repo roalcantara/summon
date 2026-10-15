@@ -59,6 +59,8 @@ class RitualViewModel(
         .flatMapLatest { granted -> if (granted == true) micTicks() else silentTicks() }
 
     val uiState: StateFlow<RitualUiState> = channelFlow {
+        // On (re)start the sensors restart too: forget the last reading so ticks never run on a stale heading.
+        state.update { if (it.simulateHeading) it else it.copy(azimuth = null, aligned = false) }
         launch {
             azimuths.collect { az ->
                 state.update { it.copy(azimuth = az, aligned = isAligned(az, demon.ritualHeading)) }
