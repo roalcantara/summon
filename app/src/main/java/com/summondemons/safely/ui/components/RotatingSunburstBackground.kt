@@ -20,14 +20,19 @@ import kotlin.math.max
 private const val ROTATION_MS = 28_000
 
 @Composable
-fun RotatingSunburstBackground(color: Color, modifier: Modifier = Modifier, beamCount: Int = 16) {
-    val transition = rememberInfiniteTransition(label = "sunburst")
-    val rotation by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(tween(ROTATION_MS, easing = LinearEasing), RepeatMode.Restart),
-        label = "sunburstRotation",
-    )
+fun RotatingSunburstBackground(color: Color, modifier: Modifier = Modifier, beamCount: Int = 16, rotating: Boolean = true) {
+    val rotation = if (rotating) {
+        val transition = rememberInfiniteTransition(label = "sunburst")
+        val angle by transition.animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            animationSpec = infiniteRepeatable(tween(ROTATION_MS, easing = LinearEasing), RepeatMode.Restart),
+            label = "sunburstRotation",
+        )
+        angle
+    } else {
+        0f
+    }
     Canvas(modifier = modifier) {
         val center = Offset(size.width / 2f, size.height / 2f)
         val radius = max(size.width, size.height) * 1.2f

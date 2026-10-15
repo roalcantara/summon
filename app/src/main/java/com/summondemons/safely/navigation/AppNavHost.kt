@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.summondemons.safely.BuildConfig
 import com.summondemons.safely.platform.AndroidHeadingSource
 import com.summondemons.safely.platform.AndroidPcmSource
 import com.summondemons.safely.ritual.RitualViewModel
@@ -79,6 +80,14 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                                 demon = demon,
                                 isNewSummon = route.isNewSummon,
                                 onDone = dropUnlessResumed { navController.popBackStack<Grimoire>(inclusive = false) },
+                                onUnsummon = if (BuildConfig.DEBUG && !route.isNewSummon) {
+                                    dropUnlessResumed {
+                                        demonViewModel.lock(demon.id)
+                                        navController.popBackStack<Grimoire>(inclusive = false)
+                                    }
+                                } else {
+                                    null
+                                },
                             )
                         }
                     }
