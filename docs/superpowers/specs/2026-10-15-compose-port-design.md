@@ -189,10 +189,12 @@ fun interface VolumeSource  { fun rmsLevels(): Flow<Double> } // one value per ~
   treats an ended mic flow as "silent").
 
 **RitualViewModel**
-- Constructor: `(savedStateHandle, catalog lookup, headingSource, volumeSource)`;
-  `demonId` from `savedStateHandle.toRoute<Ritual>()`. Built with a
-  `viewModelFactory { initializer { … } }` in `AppNavHost`; sources created from
-  the application context.
+- Constructor: `(demon: Demon, headingSource, volumeSource)`. `AppNavHost` reads
+  `demonId` with `backStackEntry.toRoute<Ritual>()`, resolves the `Demon` via
+  `DemonViewModel` (popping back if unknown) and builds the VM with a
+  `viewModelFactory { initializer { … } }`; sources are created from the
+  application context. (Not `SavedStateHandle.toRoute`, which needs `Bundle` and
+  would break JVM unit tests.)
 - Inputs (MutableStateFlows): `micGranted: Boolean?` (null = not checked yet),
   `simulateHeading: Boolean`, `holdToChant: Boolean`.
 - Pipeline (the only place the ritual runs):
@@ -215,6 +217,11 @@ fun interface VolumeSource  { fun rmsLevels(): Flow<Double> } // one value per ~
   thread.
 
 ### Screens
+
+UI copy (labels, buttons, rationale) lives in `res/values/strings.xml` and is read
+with `stringResource`; demon text (names, chants, quotes) stays in `DemonCatalog`.
+Buttons that must not fire twice during a transition (Summon, View, Abort,
+Awesome!/Back) wrap their navigation in `dropUnlessResumed`.
 
 **AppNavHost**: start destination `Grimoire`.
 - Grimoire → locked card **Summon** → `Ritual(id)`; unlocked card **View** →
@@ -273,6 +280,8 @@ button **View**.
   (`displaySmall`, `headlineLarge`, `headlineMedium`, `titleLarge`, `bodyLarge`,
   `bodyMedium`, `bodySmall`, `labelMedium`, `labelSmall`); body/label numbers use
   `fontFeatureSettings = "tnum"`. No colors baked into text styles.
+  `PrimaryActionButton` labels use `titleLarge` (Cinzel role), so no extra
+  `labelLarge` size is invented.
 - `Shape.kt`: small 12, medium 16, large 24 dp; `Pill = RoundedCornerShape(50)`.
 - `Spacing.kt`: `Spacing(xs 4, sm 8, md 12, lg 16, xl 24)` via `LocalSpacing`,
   read as `MaterialTheme.spacing` extension.
@@ -280,12 +289,15 @@ button **View**.
 
 ## Assets
 
-- PNGs copied from `reference/stitch/` to `app/src/main/res/drawable-nodpi/` under
-  the DESIGN.md catalog names (`nodpi` because 1024 px sources in `drawable/`
-  would be upscaled 3× on xxhdpi). Only the drawables the catalog uses:
-  `ic_game_logo`, `avatar_asmodeus`, `demon_asmodeus_full`, `demon_asmodeus_card`,
-  `demon_astaroth_card`, `sigil_astaroth`. (`avatar_astaroth` is skipped until
-  regenerated — gap 4 — and avatars are not used by any screen yet.)
+- Source PNGs from `reference/stitch/` are converted with `cwebp -q 85` to lossy
+  WebP in `app/src/main/res/drawable-nodpi/` under the DESIGN.md catalog names
+  (`nodpi` because 1024 px sources in `drawable/` would be upscaled 3× on xxhdpi;
+  WebP because the six PNGs total ~10 MB). Only drawables a screen uses:
+  `ic_game_logo`, `demon_asmodeus_full`, `demon_asmodeus_card`,
+  `demon_astaroth_card`, `sigil_astaroth`. Avatars are not used by any screen yet
+  and are skipped (`avatar_astaroth` also needs regenerating — gap 4).
+- `res/drawable/ic_lock.xml`: Material "lock" vector (Apache-2.0 path data) for
+  locked cards, since material3 no longer pulls in the icons library.
 - Launcher: `mipmap-anydpi-v26/ic_launcher(_round).xml` adaptive icon with
   background color `#0b1326` and foreground `<inset>` of `ic_game_logo`
   (inset 18 % so the baked logo stays in the safe zone); legacy
