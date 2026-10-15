@@ -9,6 +9,8 @@ import com.summondemons.safely.data.Demon
 import com.summondemons.safely.ritual.RitualConfig.FRAME_MS
 import com.summondemons.safely.ritual.RitualConfig.HOLD_TO_CHANT_ONSET_FRAMES
 import com.summondemons.safely.ritual.RitualConfig.HOLD_TO_CHANT_RMS
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -24,6 +26,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
@@ -54,6 +57,7 @@ class RitualViewModel(
     private val demon: Demon,
     private val headingSource: HeadingSource,
     private val pcmSource: PcmSource,
+    private val analysisDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(
@@ -121,6 +125,7 @@ class RitualViewModel(
             emit(current.analyze(frame.samples, frame.count))
         }
     }
+        .flowOn(analysisDispatcher)
         .onStart { state.update { it.copy(micUnavailable = false) } }
         .catch { }
         .onCompletion { cause ->

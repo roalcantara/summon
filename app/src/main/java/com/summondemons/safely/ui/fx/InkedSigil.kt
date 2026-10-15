@@ -74,7 +74,7 @@ fun rememberSigil(@RawRes res: Int): LoadedSigil {
 /**
  * The demon's vector sigil (ADR-0009). [inkProgress] inks the glyph group by group;
  * [ringProgress] draws the double ring and rim letters ([rimText]); the glow widens and
- * brightens with [micLevel]; [flicker] scales the alpha (drift warning).
+ * brightens with [micLevel].
  */
 @Composable
 fun InkedSigil(
@@ -85,7 +85,6 @@ fun InkedSigil(
     modifier: Modifier = Modifier,
     ringProgress: Float = 1f,
     micLevel: Float = 0f,
-    flicker: Float = 1f,
     ghostAlpha: Float = 0f,
 ) {
     val loaded = rememberSigil(sigil)
@@ -95,12 +94,12 @@ fun InkedSigil(
     val textMeasurer = rememberTextMeasurer()
     val letterStyle = MaterialTheme.typography.titleLarge
     val blurSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-    val glowAlpha = (GLOW_ALPHA + GLOW_MIC_ALPHA * micLevel) * flicker * if (blurSupported) 1f else UNBLURRED_GLOW_ALPHA_SCALE
+    val glowAlpha = (GLOW_ALPHA + GLOW_MIC_ALPHA * micLevel) * if (blurSupported) 1f else UNBLURRED_GLOW_ALPHA_SCALE
     val glow = accent.copy(alpha = glowAlpha)
     val glowWidth = STROKE * (GLOW_WIDTH + GLOW_MIC_WIDTH * micLevel)
     val glowStroke = if (blurSupported) glowWidth else minOf(glowWidth, UNBLURRED_GLOW_MAX_WIDTH)
     val ghost = accent.copy(alpha = accent.alpha * ghostAlpha)
-    val core = accent.copy(alpha = accent.alpha * flicker)
+    val core = accent
     Box(modifier) {
         val glowModifier = if (blurSupported) Modifier.fillMaxSize().blur(GlowBlur, BlurredEdgeTreatment.Unbounded) else Modifier.fillMaxSize()
         Canvas(glowModifier) {

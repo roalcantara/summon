@@ -1,7 +1,7 @@
 # 0005 — Chant phrasing and text
 
 - Date: 2026-10-15
-- Status: Accepted (one open question)
+- Status: Accepted (one open question); sigil opacity steps superseded by ADR-0009
 
 ## Context
 Prompt 1 says each 2 s of sustained chanting raises sigil opacity by 25%, which

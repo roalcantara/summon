@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -187,6 +188,7 @@ private fun RitualContent(
     val spacing = MaterialTheme.spacing
     val reduceMotion = LocalReduceMotion.current
     val inClimax = ritual.phase == RitualPhase.Climax || ritual.phase == RitualPhase.Done
+    BackHandler(enabled = inClimax) {}
     val chromeAlpha = 1f - segment(ritual.climaxFraction, 0f, 0.3f)
     val ringProgress by animateFloatAsState(
         if (ritual.phase in SEALED_PHASES) 1f else 0f,

@@ -1,5 +1,6 @@
 package com.summondemons.safely.ritual
 
+import com.summondemons.safely.data.Demon
 import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.ritual.RitualConfig.FRAME_MS
 import com.summondemons.safely.ritual.RitualEffect.ClimaxStart
@@ -67,6 +68,9 @@ class RitualViewModelTest {
 
     private fun TestScope.observe(vm: RitualViewModel) = backgroundScope.launch { vm.uiState.collect {} }
 
+    private fun newVm(demon: Demon, heading: HeadingSource, pcm: PcmSource) =
+        RitualViewModel(demon, heading, pcm, dispatcher)
+
     @Before
     fun setUp() = Dispatchers.setMain(dispatcher)
 
@@ -76,7 +80,7 @@ class RitualViewModelTest {
     @Test
     fun holdToChantWithSimulatedHeadingCompletesTheRitual() = runTest(dispatcher) {
         val pcm = silentPcm()
-        val vm = RitualViewModel(demon, { emptyFlow() }, pcm)
+        val vm = newVm(demon, { emptyFlow() }, pcm)
         observe(vm)
         val effects = mutableListOf<RitualEffect>()
         backgroundScope.launch { vm.effects.collect { effects += it } }
@@ -96,7 +100,7 @@ class RitualViewModelTest {
 
     @Test
     fun voicedMicLightsSyllables() = runTest(dispatcher) {
-        val vm = RitualViewModel(demon, { emptyFlow() }, chantingPcm())
+        val vm = newVm(demon, { emptyFlow() }, chantingPcm())
         observe(vm)
         vm.onMicPermission(true)
         vm.setSimulateHeading(true)
@@ -109,7 +113,7 @@ class RitualViewModelTest {
 
     @Test
     fun silentMicLocksButDoesNotChant() = runTest(dispatcher) {
-        val vm = RitualViewModel(demon, { emptyFlow() }, silentPcm())
+        val vm = newVm(demon, { emptyFlow() }, silentPcm())
         observe(vm)
         vm.onMicPermission(true)
         vm.setSimulateHeading(true)
@@ -121,7 +125,7 @@ class RitualViewModelTest {
     @Test
     fun driftLosesTheCurrentPhraseOnlyAfterTheGrace() = runTest(dispatcher) {
         val heading = FakeHeading()
-        val vm = RitualViewModel(demon, heading, silentPcm())
+        val vm = newVm(demon, heading, silentPcm())
         observe(vm)
         vm.onMicPermission(false)
         vm.setHoldToChant(true)
@@ -143,7 +147,7 @@ class RitualViewModelTest {
 
     @Test
     fun simulateHeadingAlignsWithoutASensor() = runTest(dispatcher) {
-        val vm = RitualViewModel(demon, { emptyFlow() }, silentPcm())
+        val vm = newVm(demon, { emptyFlow() }, silentPcm())
         observe(vm)
         runCurrent()
         assertNull(vm.uiState.value.azimuth)
@@ -161,7 +165,7 @@ class RitualViewModelTest {
     @Test
     fun restartingThePipelineForgetsTheOldHeading() = runTest(dispatcher) {
         var subscriptions = 0
-        val vm = RitualViewModel(demon, { flow { if (subscriptions++ == 0) emit(0f) } }, silentPcm())
+        val vm = newVm(demon, { flow { if (subscriptions++ == 0) emit(0f) } }, silentPcm())
         val first = backgroundScope.launch { vm.uiState.collect {} }
         runCurrent()
         assertEquals(0f, vm.uiState.value.azimuth)
@@ -175,7 +179,7 @@ class RitualViewModelTest {
 
     @Test
     fun micThatEndsImmediatelyIsReportedUnavailableAndTheRitualStillTicks() = runTest(dispatcher) {
-        val vm = RitualViewModel(demon, { emptyFlow() }, { emptyFlow() })
+        val vm = newVm(demon, { emptyFlow() }, { emptyFlow() })
         observe(vm)
         vm.onMicPermission(true)
         runCurrent()
@@ -189,7 +193,7 @@ class RitualViewModelTest {
 
     @Test
     fun micThatThrowsIsReportedUnavailable() = runTest(dispatcher) {
-        val vm = RitualViewModel(demon, { emptyFlow() }, { flow { throw IllegalStateException("mic busy") } })
+        val vm = newVm(demon, { emptyFlow() }, { flow { throw IllegalStateException("mic busy") } })
         observe(vm)
         vm.onMicPermission(true)
         runCurrent()
@@ -198,7 +202,7 @@ class RitualViewModelTest {
 
     @Test
     fun workingMicIsNotReportedUnavailable() = runTest(dispatcher) {
-        val vm = RitualViewModel(demon, { emptyFlow() }, chantingPcm())
+        val vm = newVm(demon, { emptyFlow() }, chantingPcm())
         observe(vm)
         vm.onMicPermission(true)
         advanceTimeBy(1_000); runCurrent()
@@ -209,7 +213,7 @@ class RitualViewModelTest {
     fun headingChangesDoNotRestartTheMic() = runTest(dispatcher) {
         val heading = FakeHeading()
         val pcm = chantingPcm()
-        val vm = RitualViewModel(demon, heading, pcm)
+        val vm = newVm(demon, heading, pcm)
         observe(vm)
         vm.onMicPermission(true)
         heading.readings.emit(0f); advanceTimeBy(300); runCurrent()
@@ -220,7 +224,7 @@ class RitualViewModelTest {
 
     @Test
     fun headingAvailabilityComesFromTheSource() = runTest(dispatcher) {
-        assertTrue(RitualViewModel(demon, FakeHeading(available = false), silentPcm()).uiState.value.headingUnavailable)
-        assertFalse(RitualViewModel(demon, FakeHeading(available = true), silentPcm()).uiState.value.headingUnavailable)
+        assertTrue(newVm(demon, FakeHeading(available = false), silentPcm()).uiState.value.headingUnavailable)
+        assertFalse(newVm(demon, FakeHeading(available = true), silentPcm()).uiState.value.headingUnavailable)
     }
 }

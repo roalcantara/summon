@@ -107,7 +107,7 @@ dark palette carries the RPG feel.
   `DemonColors`) only. No hardcoded colors or ad-hoc dimensions.
 - A demon's accent comes from its data, never from a `when (id)` in UI code.
 - Motion respects `LocalReduceMotion` (system animator scale 0): no particles,
-  parallax, floating or shimmer.
+  parallax, floating, shimmer, sunburst rotation or climax flash.
 
 ## Components (contracts)
 
@@ -116,7 +116,7 @@ dark palette carries the RPG feel.
 | `PrimaryActionButton` | Main CTA (Summon, View, Awesome!, Back) | `text`, `onClick`, `enabled`, `tone`; gold container, bold label, soft glow |
 | `RibbonBanner` | "New Demon Received!" header on Profile | `text`; primary container color |
 | `RotatingSunburstBackground` | Rays behind the demon on Profile | `color`, `rotating` |
-| `InkedSigil` | The demon's vector sigil | `sigil` (raw), `inkProgress` 0–1, `ringProgress` 0–1, `rimText`, `accent`, `micLevel` (glow), `flicker` |
+| `InkedSigil` | The demon's vector sigil | `sigil` (raw), `inkProgress` 0–1, `ringProgress` 0–1, `rimText`, `accent`, `micLevel` (glow), `ghostAlpha` (faint full-glyph underlay); glow blurred on API 31+, dimmed and narrowed below |
 | `CompassArc` | Heading ring around the sigil | `azimuth`, `target`, `mode` (Seeking / Locked / Wavering), `graceFraction` |
 | `KaraokeLine` | Current chant phrase | `text`, `lit` syllables, `accent`, `dim` |
 | `DemonCutout` | Cut-out art with accent rim glow | `art`, `accent`, `silhouette` 0–1 |
@@ -135,7 +135,7 @@ large sources are not density-scaled and the APK stays small.
 | `ic_game_logo` | `summon_demons_safely_game_logo/screen.png` | 1024×1024, opaque |
 | `avatar_asmodeus` | `hero_wars_style_mobile_rpg_avatar_icon_portrait_of_cute_funny_chibi_demon_1/screen.png` | 1024×1024, opaque; circle-clipped |
 | `avatar_astaroth` | `hero_wars_style_mobile_rpg_avatar_icon_portrait_of_cute_funny_chibi_demon/screen.png` | 1024×1024, opaque; circle-clipped |
-| `demon_asmodeus_full` | previous `full_body_…_demon_1/screen.png` (git history before Task 2) | 896×1200 scene, already shipped |
+| `demon_asmodeus_full` | previous `full_body_…_demon_1/screen.png` (git history before commit 3b17683) | 896×1200 scene, already shipped |
 | `demon_astaroth_full` | `full_body_…_demon_1/screen.png` | 896×1200 scene |
 | `demon_asmodeus_cutout` | `full_body_…_demon_2/screen.png` | 896×1200, alpha |
 | `demon_astaroth_cutout` | `full_body_…_demon_3/screen.png` | 896×1200, alpha |
