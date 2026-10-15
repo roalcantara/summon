@@ -37,7 +37,7 @@ One spec, one plan, delivered in phases that each build and run (see "Phases").
 The ritual is a state machine driven by one input per **20 ms tick**:
 `RitualInput(azimuth: Float?, voice: VoiceFrame)`. The ViewModel pairs each mic frame
 with the latest azimuth; if the mic is unavailable it emits silent ticks at the same
-rate. `dt` is always `RitualConfig.TICK_MS = 20`.
+rate. `dt` is always `RitualConfig.FRAME_MS = 20` (the old 100 ms `TICK_MS` is removed).
 
 Phases (`RitualPhase`):
 
@@ -57,7 +57,7 @@ Phases (`RitualPhase`):
    Unvoiced frames pause; nothing decays. When `lit == syllableCount`:
    `PhraseComplete(phrase)`, `phrase += 1`, `lit = 0`. After the 4th phrase → **Climax**.
 4. **Wavering** — leaving tolerance during Chanting. `DriftWarning` on entry. Voice is
-   ignored. Returning within `DRIFT_GRACE_MS = 1500` → back to Chanting, unchanged.
+   ignored. Returning within `DRIFT_GRACE_MS = 1500` → `Resumed`, back to Chanting, unchanged.
    At 1500 ms → `PhraseLost`, `lit = 0`, phase **Seeking** (completed phrases kept).
 5. **Climax** — `ClimaxStart` on entry; all input ignored; after `CLIMAX_MS = 2500`
    → `Summoned`, phase **Done**. The UI derives its animation from
@@ -85,8 +85,12 @@ Frames are 20 ms (`sampleRate * 0.02` samples: 320 at 16 kHz, 882 at 44.1 kHz).
 - **voiced** — `rms > VOICE_RMS_FLOOR` (1 200) **and** the normalized
   autocorrelation peak over lags for 70–400 Hz is ≥ `VOICING_MIN_CORRELATION` (0.5).
   Rejects claps, taps, wind and breath (aperiodic) while accepting speech and humming.
-- **onset** — `voiced` **and** `rms ≥ ONSET_RATIO` (1.8) × the minimum RMS over the
-  previous 5 frames (100 ms). Detects each new syllable's energy rise.
+- **onset** — `voiced`, the detector is **armed**, and `rms ≥ ONSET_RATIO` (1.8) × the
+  minimum RMS over the previous 5 frames (100 ms; 0 if there are none). Firing disarms
+  the detector; it re-arms once a frame is unvoiced or drops below
+  `ONSET_REARM_RATIO` (0.6) × the peak RMS since the last onset. One onset per syllable.
+- Periodicity is computed over the last two frames (40 ms) so 70 Hz voices fit; at
+  sample rates above 16 kHz the autocorrelation strides samples to keep the cost flat.
 
 All thresholds live in `RitualConfig`; they are global tuning (ADR-0008), not demon data.
 
@@ -185,7 +189,7 @@ Phase hint below (Cinzel title):
 | Seeking | "Turn left" / "Turn right" toward {direction} |
 | Locking | "Hold steady…" |
 | Chanting | "Chant!" |
-| Wavering | "Return {direction}!" |
+| Wavering | "Face {direction} again!" |
 | Mic denied / unavailable | existing rationale / banner copy |
 
 Chant stack: completed phrases small and accent-coloured; the current phrase large
@@ -213,7 +217,8 @@ Grimoire **View** also uses the shared element, Grimoire cut-out → Profile cut
 
 `LocalReduceMotion` = `Settings.Global.ANIMATOR_DURATION_SCALE == 0`. When true:
 no particles, parallax, float, shimmer, sunburst rotation or climax particles; the
-climax collapses to a 500 ms fade; ink and karaoke still update.
+climax keeps its 2.5 s but shows no particles or flash — the cut-out simply fades in;
+ink and karaoke still update.
 
 ## 6. Audio
 
@@ -251,7 +256,8 @@ Effect → feedback (`platform/RitualFeedback`, collects `RitualViewModel.effect
 | `SyllableLit` | syllable | — |
 | `PhraseComplete(n)` | chime | `chime_{n+1}` |
 | `DriftWarning` | warn | bed ducks |
-| `PhraseLost` | warn | — |
+| `Resumed` | — | bed back to normal |
+| `PhraseLost` | warn | bed fades out (re-lock fades it in) |
 | `ClimaxStart` | crescendo | riser |
 | `Summoned` | success | boom |
 
@@ -277,7 +283,7 @@ Pure Kotlin (JVM-tested):
 |---|---|
 | `ritual/VoiceAnalyzer` | PCM frame → `VoiceFrame` |
 | `ritual/LatinSyllables` | syllable count and spans |
-| `ritual/RitualState`, `RitualPhase`, `RitualInput`, `RitualEffect` | data |
+| `ritual/RitualState`, `RitualPhase`, `RitualInput`, `RitualEffect` (incl. `Resumed`) | data |
 | `ritual/RitualEngine` | `step(state, input) → Step(state, effects)` |
 | `ritual/RitualConfig` | all tuning constants |
 | `sigil/SigilPaths` | parse raw sigil lines, group/stroke ordering, per-stroke ink fraction for a given `inkProgress` and stroke lengths |
@@ -347,12 +353,12 @@ without; humming vs chanting vs clapping; mic denial; reduced motion; API 24 emu
 ## Phases
 
 1. Canon: ADRs, PRODUCT.md, DESIGN.md, AGENTS.md.
-2. Assets: commit Stitch art, WebP conversion, fonts, `gen_audio.py`, vector sigils + `sigil_to_raw.py`.
+2. Assets: commit Stitch art, WebP conversion, fonts, `gen_audio.py`, vector sigils + `sigil_to_raw.py`, `Demon` data fields.
 3. Pure core (TDD): `LatinSyllables`, `VoiceAnalyzer`, `RitualEngine`, `SigilPaths`.
 4. Platform: `AndroidPcmSource`, `RitualViewModel`, `Haptics`, `RitualSounds`, `RitualFeedback`.
-5. Ritual screen: `InkedSigil`, `CompassArc`, `KaraokeLine`, `ParticleField`, climax.
-6. Grimoire pager, Profile, shared transitions, Unsummon.
-7. FX: `HeatShimmer`, `GyroParallax`, reduced motion; device checklist.
+5. FX primitives: reduced motion, `ParticleField`, `HeatShimmer`, `GyroParallax`, `InkedSigil`, `CompassArc`, `KaraokeLine`, shared-element plumbing.
+6. Screens: Ritual altar + climax, Grimoire pager, Profile, Unsummon.
+7. Cleanup (retired assets/code), final canon catalog check, device checklist.
 
 Each phase ends with `./gradlew testDebugUnitTest lint assembleDebug` green and a commit.
 
