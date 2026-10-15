@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +21,8 @@ import androidx.compose.ui.unit.dp
 
 private const val RIM_SCALE = 1.03f
 private const val RIM_ALPHA = 0.55f
+/** Below API 31 `blur` is a no-op, so the rim is dimmed instead. */
+private const val RIM_ALPHA_UNBLURRED = 0.2f
 private const val SILHOUETTE_ALPHA = 0.94f
 private val RimBlur = 10.dp
 
@@ -37,12 +40,14 @@ fun DemonCutout(
 ) {
     val shadow = MaterialTheme.colorScheme.surfaceContainerLowest
     val painter = painterResource(art)
+    val blurSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val rimAlpha = if (blurSupported) RIM_ALPHA else RIM_ALPHA_UNBLURRED
     Box(modifier, contentAlignment = Alignment.Center) {
         Image(
             painter = painter,
             contentDescription = null,
             contentScale = ContentScale.Fit,
-            colorFilter = ColorFilter.tint(accent.copy(alpha = RIM_ALPHA), BlendMode.SrcIn),
+            colorFilter = ColorFilter.tint(accent.copy(alpha = rimAlpha), BlendMode.SrcIn),
             modifier = Modifier
                 .fillMaxSize()
                 .graphicsLayer {

@@ -5,7 +5,6 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleStartEffect
 
 private val MaxParallax = 12.dp
 private const val SMOOTHING = 0.15f
@@ -31,12 +31,12 @@ fun rememberParallax(maxOffset: Dp = MaxParallax): State<Offset> {
     val reduceMotion = LocalReduceMotion.current
     val context = LocalContext.current
     val maxPx = with(LocalDensity.current) { maxOffset.toPx() }
-    DisposableEffect(reduceMotion, maxPx) {
+    LifecycleStartEffect(reduceMotion, maxPx, context) {
         val manager = context.getSystemService(SensorManager::class.java)
         val sensor = manager?.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR)
         if (reduceMotion || manager == null || sensor == null) {
             offset.value = Offset.Zero
-            return@DisposableEffect onDispose { }
+            return@LifecycleStartEffect onStopOrDispose { }
         }
         val matrix = FloatArray(9)
         val angles = FloatArray(3)
@@ -54,7 +54,7 @@ fun rememberParallax(maxOffset: Dp = MaxParallax): State<Offset> {
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
         }
         manager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_GAME)
-        onDispose { manager.unregisterListener(listener) }
+        onStopOrDispose { manager.unregisterListener(listener) }
     }
     return offset
 }

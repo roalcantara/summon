@@ -8,6 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
@@ -52,6 +54,8 @@ fun ParticleField(
             )
         }
     }
+    // Unit-radius gradient, scaled and tinted per particle instead of rebuilt every frame.
+    val smokeBrush = remember(color) { Brush.radialGradient(listOf(color.copy(alpha = 1f), Color.Transparent), center = Offset.Zero, radius = 1f) }
     val time by rememberFrameTimeMs()
     Canvas(modifier) {
         val t = time / 1_000f
@@ -64,11 +68,11 @@ fun ParticleField(
             val radius = (style.minRadius + style.radiusRange * p.size).toPx() * (1f - 0.5f * converge)
             when (style) {
                 ParticleStyle.Embers -> drawCircle(color.copy(alpha = alpha), radius, at)
-                ParticleStyle.Smoke -> drawCircle(
-                    Brush.radialGradient(listOf(color.copy(alpha = alpha), Color.Transparent), center = at, radius = radius),
-                    radius,
-                    at,
-                )
+                ParticleStyle.Smoke -> translate(at.x, at.y) {
+                    scale(radius, radius, pivot = Offset.Zero) {
+                        drawCircle(smokeBrush, 1f, Offset.Zero, alpha = alpha)
+                    }
+                }
             }
         }
     }

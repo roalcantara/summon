@@ -1,5 +1,6 @@
 package com.summondemons.safely.ui.fx
 
+import android.os.Build
 import androidx.annotation.RawRes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -32,6 +33,7 @@ import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.summondemons.safely.sigil.SigilPaths
 import com.summondemons.safely.sigil.SigilStroke
@@ -49,6 +51,9 @@ private const val GLOW_MIC_WIDTH = 3f
 private const val GLOW_ALPHA = 0.25f
 private const val GLOW_MIC_ALPHA = 0.45f
 private const val INK_ANIM_MS = 250
+/** Below API 31 `blur` is a no-op, so the glow pass is dimmed and narrowed instead of smeared. */
+private const val UNBLURRED_GLOW_ALPHA_SCALE = 0.3f
+private const val UNBLURRED_GLOW_MAX_WIDTH = 1.5f * STROKE
 private val GlowBlur = 6.dp
 
 @Immutable
@@ -81,19 +86,28 @@ fun InkedSigil(
     ringProgress: Float = 1f,
     micLevel: Float = 0f,
     flicker: Float = 1f,
+    ghostAlpha: Float = 0f,
 ) {
     val loaded = rememberSigil(sigil)
     val ink by animateFloatAsState(inkProgress, tween(INK_ANIM_MS), label = "sigilInk")
     val fractions = remember(loaded, ink) { SigilPaths.inkFractions(loaded.strokes, loaded.lengths, ink) }
+    val allInked = remember(loaded) { List(loaded.paths.size) { 1f } }
     val textMeasurer = rememberTextMeasurer()
     val letterStyle = MaterialTheme.typography.titleLarge
-    val glow = accent.copy(alpha = (GLOW_ALPHA + GLOW_MIC_ALPHA * micLevel) * flicker)
+    val blurSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val glowAlpha = (GLOW_ALPHA + GLOW_MIC_ALPHA * micLevel) * flicker * if (blurSupported) 1f else UNBLURRED_GLOW_ALPHA_SCALE
+    val glow = accent.copy(alpha = glowAlpha)
+    val glowWidth = STROKE * (GLOW_WIDTH + GLOW_MIC_WIDTH * micLevel)
+    val glowStroke = if (blurSupported) glowWidth else minOf(glowWidth, UNBLURRED_GLOW_MAX_WIDTH)
+    val ghost = accent.copy(alpha = accent.alpha * ghostAlpha)
     val core = accent.copy(alpha = accent.alpha * flicker)
     Box(modifier) {
-        Canvas(Modifier.fillMaxSize().blur(GlowBlur, BlurredEdgeTreatment.Unbounded)) {
-            drawSigil(loaded, fractions, glow, STROKE * (GLOW_WIDTH + GLOW_MIC_WIDTH * micLevel), ringProgress)
+        val glowModifier = if (blurSupported) Modifier.fillMaxSize().blur(GlowBlur, BlurredEdgeTreatment.Unbounded) else Modifier.fillMaxSize()
+        Canvas(glowModifier) {
+            drawSigil(loaded, fractions, glow, glowStroke, ringProgress)
         }
         Canvas(Modifier.fillMaxSize()) {
+            if (ghostAlpha > 0f) drawSigil(loaded, allInked, ghost, STROKE, 1f)
             drawSigil(loaded, fractions, core, STROKE, ringProgress)
             drawRim(textMeasurer, rimText, letterStyle, core, ringProgress)
         }
@@ -141,7 +155,7 @@ private fun DrawScope.drawRim(measurer: TextMeasurer, text: String, style: TextS
     val letters = text.filterNot { it.isWhitespace() }
     if (letters.isEmpty() || ringProgress <= 0f) return
     val unit = size.minDimension / VIEWBOX
-    val letterStyle = style.copy(fontSize = (RIM_LETTER_SIZE * unit).toSp())
+    val letterStyle = style.copy(fontSize = (RIM_LETTER_SIZE * unit).toSp(), lineHeight = TextUnit.Unspecified)
     letters.forEachIndexed { i, letter ->
         val alpha = (ringProgress * letters.length - i).coerceIn(0f, 1f)
         if (alpha <= 0f) return@forEachIndexed

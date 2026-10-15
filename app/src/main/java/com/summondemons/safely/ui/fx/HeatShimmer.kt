@@ -73,12 +73,13 @@ fun HeatShimmer(color: Color, modifier: Modifier = Modifier) {
 @Composable
 private fun ShaderHaze(color: Color, modifier: Modifier) {
     val shader = remember { RuntimeShader(HAZE_AGSL) }
+    val brush = remember(shader) { ShaderBrush(shader) }
     val time by rememberFrameTimeMs()
     Canvas(modifier) {
         shader.setFloatUniform("size", size.width, size.height)
         shader.setFloatUniform("time", time / 1_000f)
         shader.setColorUniform("tint", color.toArgb())
-        drawRect(ShaderBrush(shader))
+        drawRect(brush)
     }
 }
 
