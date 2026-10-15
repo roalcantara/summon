@@ -19,11 +19,6 @@ fun interface PcmSource {
     fun frames(): Flow<PcmFrame>
 }
 
-/** Cold flow of microphone RMS, one value per ~[RitualConfig.TICK_MS] window. Collecting opens the mic. */
-fun interface VolumeSource {
-    fun rmsLevels(): Flow<Double>
-}
-
 fun rms(samples: ShortArray, count: Int): Double {
     if (count <= 0) return 0.0
     var sum = 0.0

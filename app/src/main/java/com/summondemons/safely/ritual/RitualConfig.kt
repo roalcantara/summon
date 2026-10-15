@@ -34,12 +34,4 @@ object RitualConfig {
     // Debug "Hold to Chant"
     const val HOLD_TO_CHANT_RMS = 4_000.0
     const val HOLD_TO_CHANT_ONSET_FRAMES = 12
-
-    // Legacy engine (removed in Task 17)
-    const val PHRASE_SUSTAIN_MS = 2_000L
-    const val TICK_MS = 100L
-    const val SILENCE_DECAY_FACTOR = 0.5f
-    const val VOLUME_RMS_THRESHOLD = 1_800.0
-    const val SUCCESS_HOLD_MS = 800L
-    val OPACITY_STEPS: List<Float> = listOf(0.10f, 0.25f, 0.50f, 0.75f, 1.00f)
 }

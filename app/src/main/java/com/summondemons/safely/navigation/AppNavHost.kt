@@ -14,7 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.summondemons.safely.platform.AndroidHeadingSource
-import com.summondemons.safely.platform.AndroidVolumeSource
+import com.summondemons.safely.platform.AndroidPcmSource
 import com.summondemons.safely.ritual.RitualViewModel
 import com.summondemons.safely.ui.DemonViewModel
 import com.summondemons.safely.ui.screens.GrimoireScreen
@@ -43,7 +43,7 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                 return@composable
             }
             val factory = remember(demon) {
-                RitualViewModel.factory(demon, AndroidHeadingSource(appContext), AndroidVolumeSource())
+                RitualViewModel.factory(demon, AndroidHeadingSource(appContext), AndroidPcmSource())
             }
             RitualScreen(
                 viewModel = viewModel(factory = factory),

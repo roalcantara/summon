@@ -46,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.summondemons.safely.BuildConfig
 import com.summondemons.safely.R
 import com.summondemons.safely.platform.Haptics
+import com.summondemons.safely.ritual.RitualPhase
 import com.summondemons.safely.ritual.RitualUiState
 import com.summondemons.safely.ritual.RitualViewModel
 import com.summondemons.safely.ritual.headingLabel
@@ -96,8 +97,9 @@ fun RitualScreen(
         }
     }
 
-    LaunchedEffect(state.completed) {
-        if (state.completed) {
+    val done = state.ritual.phase == RitualPhase.Done
+    LaunchedEffect(done) {
+        if (done) {
             Haptics.success(context)
             onSummoned()
         }
@@ -161,11 +163,11 @@ private fun RitualContent(
                         color = colors.onSurfaceVariant,
                     )
                 }
-                CompassIndicator(azimuth = state.azimuth, target = demon.ritualHeading, aligned = state.aligned)
+                CompassIndicator(azimuth = state.azimuth, target = demon.ritualHeading, aligned = state.ritual.aligned)
             }
         }
 
-        SigilView(sigil = null, opacity = state.progress.sigilOpacity, accent = accent, modifier = Modifier.size(SigilSize))
+        SigilView(sigil = null, opacity = 0.1f + 0.9f * state.ritual.inkProgress, accent = accent, modifier = Modifier.size(SigilSize))
 
         Surface(shape = MaterialTheme.shapes.medium, color = colors.surfaceContainer, modifier = Modifier.fillMaxWidth()) {
             Column(
@@ -176,17 +178,17 @@ private fun RitualContent(
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(stringResource(R.string.chant_label), style = MaterialTheme.typography.labelMedium, color = accent)
                     Text(
-                        stringResource(R.string.chant_resonance, (state.progress.sigilOpacity * 100).roundToInt()),
+                        stringResource(R.string.chant_resonance, (state.ritual.inkProgress * 100).roundToInt()),
                         style = MaterialTheme.typography.labelMedium,
                         color = colors.primary,
                     )
                 }
                 demon.chantPhrases.forEachIndexed { index, phrase ->
-                    val reached = index < state.progress.phraseIndex
-                    val current = index == state.progress.phraseIndex
+                    val reached = index < state.ritual.phrase
+                    val current = index == state.ritual.phrase
                     val phraseColor: Color = when {
                         reached -> accent
-                        current && state.aligned -> accent.copy(alpha = CURRENT_PHRASE_ALPHA)
+                        current && state.ritual.aligned -> accent.copy(alpha = CURRENT_PHRASE_ALPHA)
                         else -> colors.outline
                     }
                     Text(
@@ -198,7 +200,7 @@ private fun RitualContent(
                     )
                 }
                 LinearProgressIndicator(
-                    progress = { state.progress.sustainFraction },
+                    progress = { if (state.ritual.phrase < 4) state.ritual.lit.toFloat() / state.ritual.syllables[state.ritual.phrase] else 1f },
                     color = accent,
                     trackColor = colors.surfaceContainerLowest,
                     modifier = Modifier.fillMaxWidth().padding(top = spacing.sm),
