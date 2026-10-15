@@ -44,8 +44,13 @@ class RitualSounds(context: Context, @RawRes bed: Int) {
     private var released = false
     private val audioManager: AudioManager? = appContext.getSystemService(AudioManager::class.java)
     private val focusListener = AudioManager.OnAudioFocusChangeListener { change ->
+        if (released) return@OnAudioFocusChangeListener
         when (change) {
-            AudioManager.AUDIOFOCUS_LOSS, AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+            AudioManager.AUDIOFOCUS_LOSS -> {
+                bedPlayer?.takeIf { it.isPlaying }?.pause()
+                abandonFocus() // also clears focusLost so a later fade re-requests focus
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
                 focusLost = true
                 bedPlayer?.takeIf { it.isPlaying }?.pause()
             }
@@ -108,6 +113,7 @@ class RitualSounds(context: Context, @RawRes bed: Int) {
     }
 
     private fun abandonFocus() {
+        focusLost = false
         val manager = audioManager ?: return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             focusRequest?.let { manager.abandonAudioFocusRequest(it) }
