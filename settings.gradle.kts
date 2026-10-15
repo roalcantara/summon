@@ -22,6 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "My Demon"
+rootProject.name = "Summon Demons Safely"
 include(":app")
  
