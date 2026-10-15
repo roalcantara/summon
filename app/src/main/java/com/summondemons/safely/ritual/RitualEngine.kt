@@ -1,5 +1,7 @@
 package com.summondemons.safely.ritual
 
+import com.summondemons.safely.ritual.RitualConfig.CLIMAX_MS
+import com.summondemons.safely.ritual.RitualConfig.DRIFT_GRACE_MS
 import com.summondemons.safely.ritual.RitualConfig.FRAME_MS
 import com.summondemons.safely.ritual.RitualConfig.LOCK_HOLD_MS
 import com.summondemons.safely.ritual.RitualConfig.ONSET_REFRACTORY_MS
@@ -68,9 +70,21 @@ object RitualEngine {
         return Step(reset.copy(phase = RitualPhase.Climax, phrase = phrase, lit = 0, phaseMs = 0L), effects)
     }
 
-    private fun waver(s: RitualState): Step = Step(s)
+    private fun waver(s: RitualState): Step {
+        if (s.aligned) {
+            return Step(s.copy(phase = RitualPhase.Chanting, phaseMs = 0L, voicedRunMs = 0L), listOf(RitualEffect.Resumed))
+        }
+        val elapsed = s.phaseMs + FRAME_MS
+        if (elapsed < DRIFT_GRACE_MS) return Step(s.copy(phaseMs = elapsed))
+        val lost = s.copy(phase = RitualPhase.Seeking, phaseMs = 0L, lit = 0, proximityBucket = null)
+        return Step(lost, listOf(RitualEffect.PhraseLost))
+    }
 
-    private fun climax(s: RitualState): Step = Step(s)
+    private fun climax(s: RitualState): Step {
+        val elapsed = s.phaseMs + FRAME_MS
+        if (elapsed < CLIMAX_MS) return Step(s.copy(phaseMs = elapsed))
+        return Step(s.copy(phase = RitualPhase.Done, phaseMs = CLIMAX_MS), listOf(RitualEffect.Summoned))
+    }
 
     private fun proximityBucket(distance: Float): Int? =
         if (distance <= PROXIMITY_RANGE_DEG) (distance / PROXIMITY_STEP_DEG).toInt() else null

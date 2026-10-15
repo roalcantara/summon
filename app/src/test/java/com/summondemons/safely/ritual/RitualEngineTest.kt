@@ -155,4 +155,67 @@ class RitualEngineTest {
         assertEquals(listOf(SyllableLit, PhraseComplete(3), ClimaxStart), step.effects)
         assertEquals(1f, step.state.inkProgress)
     }
+
+    // --- Wavering ---
+
+    @Test
+    fun driftingWarnsAndReturningInTimeKeepsProgress() {
+        val chanting = syllable(locked(listOf(3, 2, 2, 2))).state
+        val wavering = run(chanting, graceFrames, azimuth = off)
+        assertEquals(Wavering, wavering.state.phase)
+        assertEquals(listOf(DriftWarning), wavering.effects)
+        assertEquals(1, wavering.state.lit)
+
+        val back = run(wavering.state, 1)
+        assertEquals(Chanting, back.state.phase)
+        assertEquals(1, back.state.lit)
+        assertEquals(listOf(Resumed), back.effects)
+    }
+
+    @Test
+    fun voiceIsIgnoredWhileWavering() {
+        val wavering = run(syllable(locked(listOf(3, 2, 2, 2))).state, 1, azimuth = off).state
+        assertEquals(1, run(wavering, 20, azimuth = off, voice = onset).state.lit)
+    }
+
+    @Test
+    fun graceExpiryLosesOnlyTheCurrentPhrase() {
+        val secondPhrase = syllable(syllable(syllable(locked(listOf(2, 3, 2, 2))).state).state).state
+        assertEquals(1, secondPhrase.phrase)
+        assertEquals(1, secondPhrase.lit)
+
+        val lost = run(secondPhrase, graceFrames + 1, azimuth = off)
+        assertEquals(Seeking, lost.state.phase)
+        assertEquals(1, lost.state.phrase)
+        assertEquals(0, lost.state.lit)
+        assertTrue(PhraseLost in lost.effects)
+
+        val relocked = run(lost.state, lockFrames)
+        assertEquals(Chanting, relocked.state.phase)
+        assertTrue(Locked in relocked.effects)
+    }
+
+    // --- Climax and done ---
+
+    private val climaxStart = fresh().copy(phase = Climax, phrase = 4)
+
+    @Test
+    fun climaxIgnoresInputAndSummonsOnce() {
+        val almost = run(climaxStart, climaxFrames - 1, azimuth = off, voice = onset)
+        assertEquals(Climax, almost.state.phase)
+        assertTrue(almost.effects.isEmpty())
+        assertEquals(1f - 1f / climaxFrames, almost.state.climaxFraction, 0.0001f)
+
+        val done = run(climaxStart, climaxFrames, azimuth = off, voice = onset)
+        assertEquals(Done, done.state.phase)
+        assertEquals(listOf(Summoned), done.effects)
+    }
+
+    @Test
+    fun doneIsTerminal() {
+        val done = run(climaxStart, climaxFrames).state
+        val step = RitualEngine.step(done, RitualInput(on, onset))
+        assertSame(done, step.state)
+        assertTrue(step.effects.isEmpty())
+    }
 }
