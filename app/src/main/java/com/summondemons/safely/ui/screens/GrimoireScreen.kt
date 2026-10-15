@@ -4,7 +4,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,17 +14,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +43,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -145,7 +149,7 @@ private fun DemonHeroPage(entry: DemonEntry, topPadding: Dp, onSummon: () -> Uni
     val spacing = MaterialTheme.spacing
     val reduceMotion = LocalReduceMotion.current
     val parallax by rememberParallax()
-    val time by rememberFrameTimeMs()
+    val time by if (reduceMotion) remember { mutableLongStateOf(0L) } else rememberFrameTimeMs()
     val floatPx = with(LocalDensity.current) { FloatAmplitude.toPx() }
 
     Box(Modifier.fillMaxSize()) {
@@ -252,17 +256,23 @@ private fun AvatarRow(demons: List<DemonEntry>, selected: Int, onSelect: (Int) -
             val isSelected = index == selected
             val accent = MaterialTheme.demonColors.accent(entry.demon.accent)
             val size by animateDpAsState(if (isSelected) SelectedAvatarSize else AvatarSize, label = "avatarSize")
-            Image(
-                painter = painterResource(entry.demon.avatarArt),
-                contentDescription = entry.demon.name,
-                contentScale = ContentScale.Crop,
-                colorFilter = if (entry.unlocked) null else ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }),
-                modifier = Modifier
-                    .size(size)
-                    .clip(CircleShape)
-                    .border(AvatarRing, if (isSelected) accent else colors.outlineVariant, CircleShape)
-                    .clickable { onSelect(index) },
-            )
+            Box(
+                Modifier
+                    .minimumInteractiveComponentSize()
+                    .selectable(selected = isSelected, role = Role.Tab, onClick = { onSelect(index) }),
+                contentAlignment = Alignment.Center,
+            ) {
+                Image(
+                    painter = painterResource(entry.demon.avatarArt),
+                    contentDescription = entry.demon.name,
+                    contentScale = ContentScale.Crop,
+                    colorFilter = if (entry.unlocked) null else ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }),
+                    modifier = Modifier
+                        .size(size)
+                        .clip(CircleShape)
+                        .border(AvatarRing, if (isSelected) accent else colors.outlineVariant, CircleShape),
+                )
+            }
         }
     }
 }

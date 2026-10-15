@@ -14,6 +14,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -21,6 +22,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -31,7 +35,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,10 +45,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
@@ -56,7 +66,6 @@ import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
 import com.summondemons.safely.platform.RitualFeedback
 import com.summondemons.safely.ritual.RitualPhase
-import com.summondemons.safely.ritual.RitualState
 import com.summondemons.safely.ritual.RitualUiState
 import com.summondemons.safely.ritual.RitualViewModel
 import com.summondemons.safely.ritual.TurnDirection
@@ -82,6 +91,8 @@ import kotlin.math.sin
 
 private const val SIGIL_WIDTH_FRACTION = 0.86f
 private const val SIGIL_IN_ARC_FRACTION = 0.84f
+private const val SIGIL_MAX_HEIGHT_FRACTION = 0.45f
+private const val GHOST_ALPHA = 0.12f
 private const val CUTOUT_ASPECT = 896f / 1200f
 private const val CUTOUT_WIDTH_FRACTION = 0.8f
 private const val RING_ANIM_MS = 700
@@ -182,9 +193,12 @@ private fun RitualContent(
         tween(RING_ANIM_MS),
         label = "sigilRing",
     )
-    val flicker = flickerAlpha(ritual.phase == RitualPhase.Wavering, reduceMotion)
+    val wavering = ritual.phase == RitualPhase.Wavering
+    // The frame clock only runs while the sigil actually flickers; it is read in the layer, not in composition.
+    val frameTime = if (wavering && !reduceMotion) rememberFrameTimeMs() else null
 
-    Box(modifier.fillMaxSize().background(colors.background)) {
+    BoxWithConstraints(modifier.fillMaxSize().background(colors.background)) {
+        val sigilSide = minOf(maxWidth * SIGIL_WIDTH_FRACTION, maxHeight * SIGIL_MAX_HEIGHT_FRACTION)
         ParticleField(accent.copy(alpha = EMBER_ALPHA), ParticleStyle.Embers, Modifier.fillMaxSize())
         Column(
             modifier = Modifier
@@ -202,16 +216,18 @@ private fun RitualContent(
                     color = accent,
                     modifier = Modifier.weight(1f),
                 )
-                IconButton(onClick = onAbort) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_close),
-                        contentDescription = stringResource(R.string.action_abort),
-                        tint = colors.onSurfaceVariant,
-                    )
+                if (!inClimax) {
+                    IconButton(onClick = onAbort) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_close),
+                            contentDescription = stringResource(R.string.action_abort),
+                            tint = colors.onSurfaceVariant,
+                        )
+                    }
                 }
             }
 
-            Box(Modifier.fillMaxWidth(SIGIL_WIDTH_FRACTION).aspectRatio(1f), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(sigilSide), contentAlignment = Alignment.Center) {
                 CompassArc(
                     azimuth = state.azimuth,
                     target = demon.ritualHeading,
@@ -224,10 +240,12 @@ private fun RitualContent(
                     inkProgress = ritual.inkProgress,
                     accent = accent,
                     rimText = demon.name.uppercase(),
-                    modifier = Modifier.fillMaxSize(SIGIL_IN_ARC_FRACTION),
+                    modifier = Modifier.fillMaxSize(SIGIL_IN_ARC_FRACTION).graphicsLayer {
+                        if (wavering) alpha = flickerAlpha(frameTime)
+                    },
                     ringProgress = ringProgress,
                     micLevel = state.micLevel,
-                    flicker = flicker,
+                    ghostAlpha = GHOST_ALPHA,
                 )
             }
 
@@ -240,16 +258,19 @@ private fun RitualContent(
                     else -> colors.onSurface
                 },
                 textAlign = TextAlign.Center,
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
             )
 
             ChantStack(
                 phrases = demon.chantPhrases,
-                ritual = ritual,
+                phrase = ritual.phrase,
+                lit = ritual.lit,
+                chanting = ritual.phase == RitualPhase.Chanting,
                 accent = accent,
                 modifier = Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()),
             )
 
-            if (state.micGranted == false) {
+            if (!inClimax && state.micGranted == false) {
                 ErrorPanel(stringResource(R.string.mic_rationale)) {
                     PrimaryActionButton(
                         text = stringResource(if (permanentlyDenied) R.string.action_open_settings else R.string.action_retry),
@@ -258,10 +279,10 @@ private fun RitualContent(
                     )
                 }
             }
-            if (state.micGranted == true && state.micUnavailable) ErrorPanel(stringResource(R.string.mic_unavailable))
-            if (state.headingUnavailable && !state.simulateHeading) ErrorPanel(stringResource(R.string.heading_unavailable))
+            if (!inClimax && state.micGranted == true && state.micUnavailable) ErrorPanel(stringResource(R.string.mic_unavailable))
+            if (!inClimax && state.headingUnavailable && !state.simulateHeading) ErrorPanel(stringResource(R.string.heading_unavailable))
 
-            if (BuildConfig.DEBUG) {
+            if (BuildConfig.DEBUG && !inClimax) {
                 DebugControls(
                     simulateHeading = state.simulateHeading,
                     onSimulateHeadingChange = onSimulateHeadingChange,
@@ -279,12 +300,9 @@ private fun compassMode(phase: RitualPhase): CompassMode = when (phase) {
     RitualPhase.Chanting, RitualPhase.Climax, RitualPhase.Done -> CompassMode.Locked
 }
 
-/** Sigil alpha multiplier: a nervous flicker while Wavering, steady otherwise. */
-@Composable
-private fun flickerAlpha(active: Boolean, reduceMotion: Boolean): Float {
-    if (!active) return 1f
-    if (reduceMotion) return FLICKER_MIN
-    val time by rememberFrameTimeMs()
+/** Sigil alpha multiplier while Wavering: a nervous flicker, or a steady dim under reduced motion (null clock). */
+private fun flickerAlpha(frameTime: State<Long>?): Float {
+    val time = frameTime?.value ?: return FLICKER_MIN
     return FLICKER_MIN + (1f - FLICKER_MIN) * abs(sin(time * FLICKER_RATE))
 }
 
@@ -309,31 +327,40 @@ private fun phaseHint(state: RitualUiState): String {
 }
 
 @Composable
-private fun ChantStack(phrases: List<String>, ritual: RitualState, accent: Color, modifier: Modifier = Modifier) {
+private fun ChantStack(
+    phrases: List<String>,
+    phrase: Int,
+    lit: Int,
+    chanting: Boolean,
+    accent: Color,
+    modifier: Modifier = Modifier,
+) {
     val colors = MaterialTheme.colorScheme
-    val chanting = ritual.phase == RitualPhase.Chanting
+    val currentLine = remember { BringIntoViewRequester() }
+    LaunchedEffect(phrase) { currentLine.bringIntoView() }
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
     ) {
-        phrases.forEachIndexed { index, phrase ->
+        phrases.forEachIndexed { index, line ->
             when {
-                index < ritual.phrase -> Text(
-                    phrase,
+                index < phrase -> Text(
+                    line,
                     style = MaterialTheme.typography.bodyMedium,
                     color = accent.copy(alpha = COMPLETED_ALPHA),
                     textAlign = TextAlign.Center,
                 )
-                index == ritual.phrase -> KaraokeLine(
-                    text = phrase,
-                    lit = ritual.lit,
+                index == phrase -> KaraokeLine(
+                    text = line,
+                    lit = lit,
                     accent = accent,
                     dim = if (chanting) colors.onSurface else colors.outline,
                     style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.bringIntoViewRequester(currentLine),
                 )
                 else -> Text(
-                    phrase,
+                    line,
                     style = MaterialTheme.typography.bodyMedium,
                     color = colors.outline.copy(alpha = UPCOMING_ALPHA),
                     textAlign = TextAlign.Center,
@@ -364,7 +391,10 @@ private fun ClimaxOverlay(demon: Demon, accent: Color, fraction: Float, reduceMo
     val rise = if (reduceMotion) fraction else segment(fraction, 0.7f, 1f)
     val riseDistance = with(LocalDensity.current) { RiseDistance.toPx() }
     Box(
-        Modifier.fillMaxSize().background(colors.surfaceContainerLowest.copy(alpha = CLIMAX_SCRIM_ALPHA * dim)),
+        Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {} // swallow touches so nothing behind the overlay is tappable
+            .background(colors.surfaceContainerLowest.copy(alpha = CLIMAX_SCRIM_ALPHA * dim)),
         contentAlignment = Alignment.Center,
     ) {
         ParticleField(accent, ParticleStyle.Embers, Modifier.fillMaxSize(), count = CLIMAX_PARTICLES, converge = converge, seed = 29)
@@ -384,10 +414,11 @@ private fun ClimaxOverlay(demon: Demon, accent: Color, fraction: Float, reduceMo
                 .aspectRatio(CUTOUT_ASPECT)
                 .graphicsLayer {
                     alpha = rise
-                    val scale = lerp(RISE_START_SCALE, 1f, rise)
+                    // Reduced motion: the cut-out only fades in.
+                    val scale = if (reduceMotion) 1f else lerp(RISE_START_SCALE, 1f, rise)
                     scaleX = scale
                     scaleY = scale
-                    translationY = (1f - rise) * riseDistance
+                    translationY = if (reduceMotion) 0f else (1f - rise) * riseDistance
                 },
         ) {
             DemonCutout(demon.cutoutArt, demon.name, accent, Modifier.fillMaxSize(), silhouette = 1f - rise)

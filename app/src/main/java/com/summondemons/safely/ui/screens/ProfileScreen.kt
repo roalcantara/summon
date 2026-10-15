@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -95,7 +96,7 @@ fun ProfileScreen(
         bounce.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow))
     }
     val parallax by rememberParallax()
-    val time by rememberFrameTimeMs()
+    val time by if (reduceMotion) remember { mutableLongStateOf(0L) } else rememberFrameTimeMs()
     val floatPx = with(LocalDensity.current) { FloatAmplitude.toPx() }
 
     BoxWithConstraints(modifier.fillMaxSize().background(colors.background)) {
