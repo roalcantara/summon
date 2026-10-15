@@ -22,6 +22,12 @@ class AndroidHeadingSource(context: Context) : HeadingSource {
 
     private val sensorManager: SensorManager? = context.getSystemService(SensorManager::class.java)
 
+    override val available: Boolean = sensorManager?.let { manager ->
+        manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) != null ||
+            (manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null &&
+                manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null)
+    } ?: false
+
     override fun azimuths(): Flow<Float> = callbackFlow {
         val manager = sensorManager
         if (manager == null) {
