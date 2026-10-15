@@ -18,19 +18,20 @@ Profile (doubles as the success screen) → back to Grimoire.
 
 | Topic | Rule |
 |---|---|
-| Grimoire (Home) | `Scaffold` with top bar "My Grimoire"; `LazyVerticalGrid` of demon cards. |
-| Lock state | Both demons start **locked**. Locked card: grey tint, silhouette, **Summon** → Ritual. Unlocked card: theme-color tint/border, illustration, **View** → Profile. Unlock state is in-memory only. |
-| Ritual setup | Large faint sigil; text "Hold the phone with both hands and face {direction}", where {direction} comes from the demon's `ritualHeading` (North for both MVP demons). |
-| Heading gate | `ritualHeading` is a **per-demon property** (compass degrees, tolerance ±20°). The ritual is *Active* only while the device azimuth is within tolerance of it — for North that is [340°, 360°) ∪ [0°, 20°]. Leaving the range **resets progress to 0**. Future demons may require South, East, etc.; nothing may hard-code North. |
-| Chant | The incantation is shown as **exactly 4 phrases**, grey until reached. Sustained mic volume above threshold for **2 s** while Active advances one phrase and highlights it in the demon's color. Brief silences (between words) drain the 2 s counter at half speed instead of resetting it (ADR-0007). |
-| Sigil | Opacity 0.10 at start, then 0.25 / 0.50 / 0.75 / 1.00 after phrases 1–4. |
-| Success | After phrase 4 the sigil fully glows, then the app navigates to Profile with `isNewSummon = true`. |
-| Profile (new summon) | `RibbonBanner` "New Demon Received!", rotating sunburst, bouncing demon, "Tada!" sound, button **Awesome!** pinned to the bottom → Grimoire. |
+| Grimoire (Home) | `Scaffold` with top bar "My Grimoire"; a full-bleed `HorizontalPager`, one demon per page: darkened scene art, the demon's complete sigil, the cut-out art, name and CTA. The page indicator is a row of demon avatars. |
+| Lock state | Both demons start **locked**. Locked page: near-black silhouette with an accent rim light and drifting smoke, a faint sigil, "Sealed · Face {direction} to summon", **Summon** → Ritual. Unlocked page: full colour, title, **View** → Profile. Unlock state is in-memory only. |
+| Ritual setup | Full-bleed altar: the demon's (un-inked) sigil ringed by a compass arc, and a hint naming the demon's direction from `ritualHeading` (e.g. "Turn left · Face North"). |
+| Heading gate | `ritualHeading` is a **per-demon property** (compass degrees, tolerance ±20°). Staying within tolerance for **0.6 s** locks the ritual (haptic + sound); chanting only counts while locked. Drifting out while chanting starts a **1.5 s grace** (warning haptic, red compass, flickering sigil): returning in time loses nothing; otherwise the current phrase's progress is lost (completed phrases stay) and the player must lock again (ADR-0008). Nothing may hard-code North. |
+| Chant | The incantation is **exactly 4 phrases**: completed ones in the demon's color, the current one highlighted syllable by syllable (karaoke), upcoming ones dim. A syllable lights on each voiced syllable onset (≥ 120 ms apart) or after 350 ms of continuous voicing; sounds that aren't voice-like (claps, taps, wind) don't count. All syllables lit → phrase complete (chime + haptic). Silence pauses without penalty (ADR-0008). |
+| Sigil | Vector line art in the demon's accent that **inks itself** as the chant progresses: ink = (completed phrases + lit/syllables) / 4. The rings and rim letters ink on lock; the glow follows the live mic level (ADR-0009). |
+| Success | After phrase 4: a 2.5 s climax (screen dims, particles converge, rising sound and haptic crescendo, flash, the demon rises out of the sigil), then Profile with `isNewSummon = true`. The demon art carries over as a shared element. |
+| Profile (new summon) | `RibbonBanner` "New Demon Received!", rotating sunburst, floating cut-out hero art, "Tada!" sound, button **Awesome!** pinned to the bottom → Grimoire. |
 | Profile (view) | Same layout without banner and sound; button **Back**. |
-| Profile content | Image, name, title, description, quote. No stats. |
-| Debug aids | "Simulate heading" (snaps to the demon's `ritualHeading`) and "Hold to Chant" controls, **debug builds only**. |
+| Profile content | Cut-out art, name, title, description, quote. No stats. |
+| Debug aids | "Simulate heading" (snaps to the demon's `ritualHeading`), "Hold to Chant" (synthetic voiced syllables) and **Unsummon** on Profile (view), which re-locks the demon — **debug builds only**. |
 | Orientation | Portrait only (the compass reading assumes it). |
 | Permissions | `RECORD_AUDIO` requested on entering the Ritual only if not already granted; if denied, explain why and offer a retry (or a shortcut to app settings once the denial is permanent). |
+| Motion | If system animations are off, particles, parallax, floating and shimmer are skipped; the climax keeps its timing but the demon simply fades in. |
 
 ## Demons
 
@@ -65,6 +66,6 @@ Profile (doubles as the success screen) → back to Grimoire.
 - Levels, power, stars, stats, synergies.
 - Currencies, bottom navigation, reagents.
 - Containment-breach / failure screen.
-- Speech recognition (volume threshold only).
+- Word or speech recognition (only loudness, pitch periodicity and syllable onsets are measured).
 - Gemini / AI features.
 - Persistence across app restarts.

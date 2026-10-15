@@ -1,7 +1,7 @@
 # 0007 — Chant sustain tolerance and volume threshold
 
 - Date: 2026-10-15
-- Status: Accepted
+- Status: Superseded by ADR-0008
 
 ## Context
 PRODUCT.md requires mic volume "sustained above threshold for 2 s" per phrase.

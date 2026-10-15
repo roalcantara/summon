@@ -89,10 +89,10 @@ ships a dark scheme only. Extras that have no Material slot are exposed as a
 
 ## Typography
 
-- Cinzel for display, headlines and titles (names, banners, screen titles).
+- Cinzel for display, headlines and titles (names, banners, screen titles, sigil rim letters).
 - Inter for body and labels; numbers use tabular figures.
-- Until the fonts are bundled in `res/font/`, fall back to `FontFamily.Serif` and
-  `FontFamily.SansSerif`.
+- Both are bundled in `res/font/` as static, Latin-subset instances generated from the
+  Google Fonts variable fonts (SIL OFL 1.1; licences in `app/src/main/assets/licenses/`).
 
 ## Shapes
 
@@ -106,36 +106,61 @@ dark palette carries the RPG feel.
 - Composables read colors, type, shapes and spacing from `MaterialTheme` (and
   `DemonColors`) only. No hardcoded colors or ad-hoc dimensions.
 - A demon's accent comes from its data, never from a `when (id)` in UI code.
+- Motion respects `LocalReduceMotion` (system animator scale 0): no particles,
+  parallax, floating or shimmer.
 
-## Components (contracts for the port)
+## Components (contracts)
 
 | Component | Purpose | States / inputs |
 |---|---|---|
-| `PrimaryActionButton` | Main CTA (Summon, View, Awesome!, Back) | `text`, `onClick`, `enabled`; gold container, bold label, soft glow |
-| `DemonCardBase` | Grid card foundation | `locked` (grey tint, silhouette) / `unlocked` (accent border + tint) |
+| `PrimaryActionButton` | Main CTA (Summon, View, Awesome!, Back) | `text`, `onClick`, `enabled`, `tone`; gold container, bold label, soft glow |
 | `RibbonBanner` | "New Demon Received!" header on Profile | `text`; primary container color |
-| `RotatingSunburstBackground` | Rays behind the demon on Profile | `color`; infinite rotation |
-| `SigilView` | The demon's sigil on the Ritual screen | `opacity` 0–1, `accent`; image when available, Canvas fallback otherwise |
-| `CompassIndicator` | Heading feedback on the Ritual screen | current azimuth, target heading, aligned / not aligned |
+| `RotatingSunburstBackground` | Rays behind the demon on Profile | `color`, `rotating` |
+| `InkedSigil` | The demon's vector sigil | `sigil` (raw), `inkProgress` 0–1, `ringProgress` 0–1, `rimText`, `accent`, `micLevel` (glow), `flicker` |
+| `CompassArc` | Heading ring around the sigil | `azimuth`, `target`, `mode` (Seeking / Locked / Wavering), `graceFraction` |
+| `KaraokeLine` | Current chant phrase | `text`, `lit` syllables, `accent`, `dim` |
+| `DemonCutout` | Cut-out art with accent rim glow | `art`, `accent`, `silhouette` 0–1 |
+| `ParticleField` | Embers / smoke / converging climax sparks | `color`, `style`, `count`, `converge` 0–1 |
+| `HeatShimmer` | Rising heat haze | `color`; AGSL on API 33+, breathing gradient below |
+| `rememberParallax` | Gyro offset for art layers | max offset; `TYPE_GAME_ROTATION_VECTOR`, none if absent |
 
 ## Asset catalog
 
 Sources are under `reference/stitch/`. Target names are resource names; the app
-stores them in `res/drawable-nodpi/` as lossy WebP (`cwebp -q 85`) so large
-sources are not density-scaled and the APK stays small. Only drawables a screen
-uses are shipped (avatars are not yet).
+stores them in `res/drawable-nodpi/` as lossy WebP (`cwebp -q 85`, alpha kept) so
+large sources are not density-scaled and the APK stays small.
 
 | Drawable | Source | Notes |
 |---|---|---|
 | `ic_game_logo` | `summon_demons_safely_game_logo/screen.png` | 1024×1024, opaque |
-| `avatar_asmodeus` | `hero_wars_style_mobile_rpg_avatar_icon_portrait_of_cute_funny_chibi_demon_1/screen.png` | 1024×1024, opaque |
-| `avatar_astaroth` | `hero_wars_style_mobile_rpg_avatar_icon_portrait_of_cute_funny_chibi_demon_2/screen.png` | 1024×1024, background shows UI bleed — regenerate (gap 4) |
-| `demon_asmodeus_full` | `full_body_cute_funny_stylized_2d_cartoon_fantasy_rpg_character_artwork_of_demon_1/screen.png` | 896×1200, unframed |
-| `demon_asmodeus_card` | `full_body_cute_funny_stylized_2d_cartoon_fantasy_rpg_character_artwork_of_demon_2/screen.png` | 896×1200, framed with name plates |
-| `demon_astaroth_card` | `full_body_cute_funny_stylized_2d_cartoon_fantasy_rpg_character_artwork_of_demon_3/screen.png` | 896×1200, framed with name plates |
-| `sigil_astaroth` | `the_sacred_magical_sigil_of_astaroth_drawn_in_the_identical_style_as_the/screen.png` | 1024×1024, opaque |
+| `avatar_asmodeus` | `hero_wars_style_mobile_rpg_avatar_icon_portrait_of_cute_funny_chibi_demon_1/screen.png` | 1024×1024, opaque; circle-clipped |
+| `avatar_astaroth` | `hero_wars_style_mobile_rpg_avatar_icon_portrait_of_cute_funny_chibi_demon/screen.png` | 1024×1024, opaque; circle-clipped |
+| `demon_asmodeus_full` | previous `full_body_…_demon_1/screen.png` (git history before Task 2) | 896×1200 scene, already shipped |
+| `demon_astaroth_full` | `full_body_…_demon_1/screen.png` | 896×1200 scene |
+| `demon_asmodeus_cutout` | `full_body_…_demon_2/screen.png` | 896×1200, alpha |
+| `demon_astaroth_cutout` | `full_body_…_demon_3/screen.png` | 896×1200, alpha |
 
-All PNGs are RGB without an alpha channel (backgrounds baked in).
+`full_body_…` = `full_body_cute_funny_stylized_2d_cartoon_fantasy_rpg_character_artwork_of_demon`.
+Unused references: `the_sacred_magical_sigil_of_*` (superseded by vector sigils, ADR-0009).
+
+### Sigils
+
+| Raw | Source | Licence |
+|---|---|---|
+| `sigil_asmodeus` | `art/sigils/asmodeus.svg`, traced from Wikimedia Commons `File:Seal_of_Asmodeus.svg` | CC0 |
+| `sigil_astaroth` | `art/sigils/astaroth.svg`, traced from Wikimedia Commons `File:Astaroth_Seal.svg` | Public domain (Mathers & Crowley 1904) |
+
+Format: viewBox `0 0 100 100`, glyph within radius 37 of the centre, groups
+`ink-1`…`ink-4` in draw order, one contour per `<path>`. Regenerate with
+`python3 -I tools/sigil_to_raw.py art/sigils/<id>.svg app/src/main/res/raw/sigil_<id>.txt`.
+
+### Audio
+
+All sounds are original synthesized works (CC0) from `tools/gen_audio.py`, mono
+22.05 kHz WAV: `bed_asmodeus`, `bed_astaroth` (8 s seamless loops), `chime_1`…`chime_4`,
+`lock`, `riser`, `boom`, `tada`. Regenerate with
+`python3 -I tools/gen_audio.py app/src/main/res/raw`. To replace one with a recording,
+use a CC0 file of the same name and record its source URL and licence here.
 
 ### Screen mockups (visual reference only)
 
@@ -147,26 +172,6 @@ Use them for mood, color and composition. Ignore everything listed under
 Non-goals in `PRODUCT.md` (roster rail, stats, currencies, bottom nav, reagents,
 breach screen).
 
-## Gaps — request from Stitch
+## Gaps
 
-Paste each prompt into the same Stitch project so the style stays consistent.
-
-1. **`sigil_asmodeus`**
-   > Draw the sacred magical sigil of Asmodeus in the identical style as the existing Astaroth sigil: a glowing Solomonic seal of thin golden lines on a dark obsidian parchment background, outer double ring with Latin letters, centered composition, no text other than the seal's letters. Gold (#FFD54F) glow. Square, 1024×1024.
-
-2. **`demon_astaroth_full`**
-   > Full-body cute funny stylized 2D cartoon fantasy RPG character artwork of demon ASTAROTH, identical character design and art style to the existing Astaroth card art (chibi proportions, thick smooth line art, vibrant gradient cell shading, Hero Wars style): masquerade mask, dark feathered wings, glowing viper, riding a chubby miniature dragon. No frame, no name plates. Atmospheric dark fantasy altar background. 896×1200.
-
-3. **Transparent cut-outs: `demon_asmodeus_cutout`, `demon_astaroth_cutout`**
-   > Re-render the full-body Asmodeus artwork [then: Astaroth] exactly as before but isolated on a fully transparent background (PNG with alpha), no pedestal, no environment, soft outer glow allowed. 896×1200.
-
-4. **`avatar_astaroth` (regenerate)**
-   > Hero Wars style mobile RPG avatar icon portrait of cute funny chibi demon Astaroth wearing a violet mask and dark feathered wings, framed in an ornate circular golden RPG avatar frame with purple gems, on a plain solid #0B1326 background with no UI elements behind it. 1024×1024.
-
-### Non-Stitch gap
-
-- **`tada` sound**: a placeholder ships as `res/raw/tada.wav` (≈1.2 s rising
-  arpeggio + chord, 22.05 kHz mono), generated by `tools/gen_tada.py` — original
-  synthesized work, CC0. WAV instead of `.ogg` because no ogg encoder was
-  available. To replace it, use a ≤ 2 s CC0 fanfare (e.g. freesound.org filtered
-  by CC0) named `tada.*` in `res/raw/` and record its source URL and licence here.
+None open. Asmodeus has no new scene art; `demon_asmodeus_full` keeps the earlier render.

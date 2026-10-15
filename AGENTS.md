@@ -30,7 +30,8 @@ If two sources disagree, the higher one wins. Fix the lower one or note it in an
 | `reference/prompts/` | The two original Stitch prompts, verbatim |
 | `reference/stitch/` | Stitch mockups, character art, logo, sigil |
 | `reference/src/` | Draft Compose code (input for the port; does not compile as-is) |
-| `tools/` | Small generators (e.g. `gen_tada.py` for `res/raw/tada.wav`) |
+| `tools/` | Small generators (`gen_audio.py` for `res/raw/*.wav`, `sigil_to_raw.py` for sigils) |
+| `art/sigils/` | Stroke-only sigil sources (SVG), converted by `tools/sigil_to_raw.py` |
 
 ## Commands
 
@@ -49,12 +50,12 @@ cd ../mdweb && npm install && npm run dev   # http://localhost:3000
 
 ## Current state
 
-- `app/` is the Compose port (package `com.summondemons.safely`): Grimoire,
-  Ritual and Profile per `PRODUCT.md`. Design:
-  `docs/superpowers/specs/2026-10-15-compose-port-design.md`.
-- Open items: DESIGN.md art gaps (`sigil_asmodeus`, `demon_astaroth_full`,
-  cut-outs, `avatar_astaroth`), a real `tada` sound, bundling Cinzel/Inter, and
-  the "LOVIS" question in ADR-0005.
+- `app/` is the Compose port (package `com.summondemons.safely`) with Ritual 2.0:
+  lock-then-chant ritual, voiced-syllable detection, self-inking vector sigils,
+  climax with shared-element hand-off, hero-pager Grimoire. Design:
+  `docs/superpowers/specs/2026-10-15-ritual-2-design.md`.
+- Open items: the "LOVIS" question in ADR-0005; per-device tuning of the voice
+  thresholds (ADR-0008).
 
 ## Conventions
 
