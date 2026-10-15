@@ -15,25 +15,19 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
 
 /**
- * Mono 16 kHz PCM16 mic, one RMS value per [RitualConfig.TICK_MS] window.
- * Only collected after RECORD_AUDIO is granted (RitualViewModel). If the recorder
- * can't start, the flow just completes and the ritual treats it as silence.
+ * Mono PCM16 mic, one RMS value per [RitualConfig.TICK_MS] window. Tries 16 kHz, then
+ * 44.1 kHz (the only rate every device must support). Only collected after RECORD_AUDIO
+ * is granted (RitualViewModel). If no recorder starts, or reading fails, the flow just
+ * completes; RitualViewModel then reports the mic as unavailable.
  */
 class AndroidVolumeSource : VolumeSource {
 
-    @SuppressLint("MissingPermission") // Collected only once RECORD_AUDIO is granted.
     override fun rmsLevels(): Flow<Double> = flow {
-        val minBuffer = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL, ENCODING)
-        if (minBuffer <= 0) return@flow
-        val window = (SAMPLE_RATE * RitualConfig.TICK_MS / 1_000).toInt()
-        val recorder = try {
-            AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNEL, ENCODING, maxOf(minBuffer, window * 2))
-        } catch (e: SecurityException) {
-            return@flow
-        }
+        val recorder = openRecorder() ?: return@flow
         try {
-            if (recorder.state != AudioRecord.STATE_INITIALIZED) return@flow
             recorder.startRecording()
+            if (recorder.recordingState != AudioRecord.RECORDSTATE_RECORDING) return@flow
+            val window = windowSize(recorder.sampleRate)
             val buffer = ShortArray(window)
             while (currentCoroutineContext().isActive) {
                 val read = recorder.read(buffer, 0, window) // blocks ~TICK_MS
@@ -45,8 +39,28 @@ class AndroidVolumeSource : VolumeSource {
         }
     }.flowOn(Dispatchers.IO)
 
+    @SuppressLint("MissingPermission") // Collected only once RECORD_AUDIO is granted.
+    private fun openRecorder(): AudioRecord? {
+        for (rate in SAMPLE_RATES) {
+            val minBuffer = AudioRecord.getMinBufferSize(rate, CHANNEL, ENCODING)
+            if (minBuffer <= 0) continue
+            val recorder = try {
+                AudioRecord(MediaRecorder.AudioSource.MIC, rate, CHANNEL, ENCODING, maxOf(minBuffer, windowSize(rate) * 2))
+            } catch (e: SecurityException) {
+                return null
+            } catch (e: IllegalArgumentException) {
+                continue
+            }
+            if (recorder.state == AudioRecord.STATE_INITIALIZED) return recorder
+            recorder.release()
+        }
+        return null
+    }
+
+    private fun windowSize(sampleRate: Int): Int = (sampleRate * RitualConfig.TICK_MS / 1_000).toInt()
+
     private companion object {
-        const val SAMPLE_RATE = 16_000
+        val SAMPLE_RATES = listOf(16_000, 44_100)
         const val CHANNEL = AudioFormat.CHANNEL_IN_MONO
         const val ENCODING = AudioFormat.ENCODING_PCM_16BIT
     }

@@ -219,6 +219,16 @@ private fun RitualContent(
             }
         }
 
+        if (state.micGranted == true && state.micUnavailable) {
+            Surface(shape = MaterialTheme.shapes.medium, color = colors.errorContainer, contentColor = colors.onErrorContainer) {
+                Text(
+                    stringResource(R.string.mic_unavailable),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(spacing.lg),
+                )
+            }
+        }
+
         if (BuildConfig.DEBUG) {
             DebugControls(
                 simulateHeading = state.simulateHeading,

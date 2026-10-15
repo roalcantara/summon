@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import com.summondemons.safely.ritual.AzimuthSmoother
 import com.summondemons.safely.ritual.HeadingSource
+import com.summondemons.safely.ritual.azimuthFromRotationMatrix
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -14,7 +15,8 @@ import kotlinx.coroutines.flow.callbackFlow
 /**
  * Rotation-vector azimuth, falling back to accelerometer + magnetometer.
  * Emits nothing if the device has neither (the UI then shows "--°").
- * Assumes portrait (the activity is locked to it), so no axis remapping.
+ * The heading is where the phone's back points when held upright, or its top when
+ * held flat (see [azimuthFromRotationMatrix]). Assumes portrait (the activity is locked to it).
  */
 class AndroidHeadingSource(context: Context) : HeadingSource {
 
@@ -32,14 +34,11 @@ class AndroidHeadingSource(context: Context) : HeadingSource {
 
         val smoother = AzimuthSmoother()
         val rotationMatrix = FloatArray(9)
-        val orientation = FloatArray(3)
         var gravity: FloatArray? = null
         var geomagnetic: FloatArray? = null
 
         fun emitFromMatrix() {
-            SensorManager.getOrientation(rotationMatrix, orientation)
-            val degrees = Math.toDegrees(orientation[0].toDouble()).toFloat()
-            trySend(smoother.next(degrees))
+            trySend(smoother.next(azimuthFromRotationMatrix(rotationMatrix)))
         }
 
         val listener = object : SensorEventListener {

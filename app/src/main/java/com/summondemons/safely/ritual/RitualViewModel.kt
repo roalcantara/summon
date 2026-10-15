@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -35,6 +36,8 @@ data class RitualUiState(
     val micGranted: Boolean? = null,
     val simulateHeading: Boolean = false,
     val holdToChant: Boolean = false,
+    /** Mic was granted but stopped or never started (busy, unsupported); the ritual can't hear. */
+    val micUnavailable: Boolean = false,
     /** True [RitualConfig.SUCCESS_HOLD_MS] after the 4th phrase; navigate on it. */
     val completed: Boolean = false,
 )
@@ -97,11 +100,18 @@ class RitualViewModel(
 
     fun setHoldToChant(on: Boolean) = state.update { it.copy(holdToChant = on) }
 
-    /** Mic RMS → loud flag; if the mic dies (error or end), fall back to silent ticks. */
+    /** Mic RMS → loud flag; if the mic dies (error or end), flag it and fall back to silent ticks. */
     private fun micTicks(): Flow<Boolean> = volumeSource.rmsLevels()
+        .onStart { state.update { it.copy(micUnavailable = false) } }
         .map { it > RitualConfig.VOLUME_RMS_THRESHOLD }
         .catch { }
-        .onCompletion { cause -> if (cause == null) emitAll(silentTicks()) }
+        .onCompletion { cause ->
+            // cause != null only on cancellation (permission change, screen gone): not a mic failure.
+            if (cause == null) {
+                state.update { it.copy(micUnavailable = true) }
+                emitAll(silentTicks())
+            }
+        }
 
     private fun silentTicks(): Flow<Boolean> = flow {
         while (true) {

@@ -145,6 +145,39 @@ class RitualViewModelTest {
     }
 
     @Test
+    fun micThatEndsImmediatelyIsReportedUnavailable() = runTest(dispatcher) {
+        val vm = RitualViewModel(demon, { emptyFlow() }, { emptyFlow() })
+        backgroundScope.launch { vm.uiState.collect {} }
+        vm.onMicPermission(true)
+        runCurrent()
+        assertTrue(vm.uiState.value.micUnavailable)
+
+        // The ritual keeps ticking (debug hold-to-chant still works).
+        vm.setSimulateHeading(true)
+        vm.setHoldToChant(true)
+        advanceTimeBy(2_000 + TICK_MS); runCurrent()
+        assertEquals(1, vm.uiState.value.progress.phraseIndex)
+    }
+
+    @Test
+    fun micThatThrowsIsReportedUnavailable() = runTest(dispatcher) {
+        val vm = RitualViewModel(demon, { emptyFlow() }, { flow { throw IllegalStateException("mic busy") } })
+        backgroundScope.launch { vm.uiState.collect {} }
+        vm.onMicPermission(true)
+        runCurrent()
+        assertTrue(vm.uiState.value.micUnavailable)
+    }
+
+    @Test
+    fun workingMicIsNotReportedUnavailable() = runTest(dispatcher) {
+        val vm = RitualViewModel(demon, { emptyFlow() }, FakeVolume(level = 5_000.0))
+        backgroundScope.launch { vm.uiState.collect {} }
+        vm.onMicPermission(true)
+        advanceTimeBy(1_000); runCurrent()
+        assertFalse(vm.uiState.value.micUnavailable)
+    }
+
+    @Test
     fun headingChangesDoNotRestartTheMic() = runTest(dispatcher) {
         val heading = FakeHeading()
         val volume = FakeVolume(level = 5_000.0)

@@ -16,6 +16,7 @@
     <string name="mic_rationale">The ritual listens for how loudly you chant. Nothing is recorded or saved — the microphone only measures volume.</string>
     <string name="action_retry">Allow microphone</string>
     <string name="action_open_settings">Open settings</string>
+    <string name="mic_unavailable">The spirits can\'t hear you — the microphone wouldn\'t start. Close other apps using it, then abort and summon again.</string>
 
     <string name="debug_simulate_heading">Simulate heading</string>
     <string name="debug_hold_to_chant">Hold to Chant</string>
