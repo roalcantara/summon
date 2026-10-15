@@ -102,4 +102,57 @@ class RitualEngineTest {
         }
         assertEquals(listOf(false, true, false, true, false, true), ticks)
     }
+
+    // --- Chanting ---
+
+    @Test
+    fun anOnsetLightsASyllable() {
+        val step = run(locked(), 1, voice = onset)
+        assertEquals(1, step.state.lit)
+        assertEquals(listOf(SyllableLit), step.effects)
+    }
+
+    @Test
+    fun onsetsInsideTheRefractoryPeriodAreIgnored() {
+        val first = run(locked(listOf(5, 2, 2, 2)), 1, voice = onset).state
+        val tooSoon = run(run(first, refractoryFrames - 2).state, 1, voice = onset).state
+        assertEquals(1, tooSoon.lit)
+        val inTime = run(run(first, refractoryFrames - 1).state, 1, voice = onset).state
+        assertEquals(2, inTime.lit)
+    }
+
+    @Test
+    fun sustainedVoicingLightsASyllableEvery350ms() {
+        val start = locked(listOf(5, 2, 2, 2))
+        assertEquals(0, run(start, 17, voice = voiced).state.lit)
+        assertEquals(1, run(start, 18, voice = voiced).state.lit)
+        assertEquals(2, run(start, 36, voice = voiced).state.lit)
+    }
+
+    @Test
+    fun silencePausesWithoutDecay() {
+        val one = syllable(locked(listOf(3, 2, 2, 2))).state
+        val later = run(one, 500).state
+        assertEquals(Chanting, later.phase)
+        assertEquals(1, later.lit)
+    }
+
+    @Test
+    fun litSyllablesCompleteAPhrase() {
+        val step = syllable(syllable(locked()).state)
+        assertEquals(1, step.state.phrase)
+        assertEquals(0, step.state.lit)
+        assertTrue(PhraseComplete(0) in step.effects)
+        assertEquals(0.25f, step.state.inkProgress, 0.0001f)
+    }
+
+    @Test
+    fun theLastPhraseStartsTheClimax() {
+        var state = locked(listOf(1, 1, 1, 1))
+        repeat(3) { state = syllable(state).state }
+        val step = run(state, 1, voice = onset)
+        assertEquals(Climax, step.state.phase)
+        assertEquals(listOf(SyllableLit, PhraseComplete(3), ClimaxStart), step.effects)
+        assertEquals(1f, step.state.inkProgress)
+    }
 }
