@@ -1,0 +1,13 @@
+I have generated the Sacred Magical Sigil of Asmodeus (The sacred magical sigil of Asmodeus, created in the EXACT identical visual style, material rendering, framing, and composition as the reference sigil of Astaroth ({{DATA:IMAGE:IMAGE_16}}), based on the historical Solomonic seal pattern of Asmodeus shown in {{DATA:IMAGE:IMAGE_28}}.
+
+Key visual requirements:
+
+Composition & Seal Geometry: Centered occult circular seal. An outer double ring with circular inscribed letters forming the name 'A S M O D E U S' / 'A Y S M O D A Y' spaced around the perimeter rim. Inside the circle is the authentic Solomonic sigil geometry of Asmodeus: intricate interlocking vertical glyph with cross-arms, curved crescent loops, small circles/dots at terminals, and occult talisman line work.
+Color & Lighting: Rich glowing warm gold (#FFD54F), amber, and molten yellow magical energy glow. Fine, crisp luminous golden lines with subtle neon bloom and floating warm ember/spark motes.
+Texture & Background: Dark mystical obsidian stone / cracked black volcanic parchment slab with subtle ancient etched runic carvings in the dark background, identical depth, vignette, and stone texture to {{DATA:IMAGE:IMAGE_16}}.
+No text outside the seal's concentric border letters. Perfectly centered composition, top-down view, 1:1 square game icon asset.), styled to match the Astaroth sigil asset.
+Visual Design Breakdown:
+Geometry & Solomonic Glyphs: Incorporates the authentic historical sigil structure of Asmodeus from the grimoire lore reference, featuring the interlocking central vertical spine, curved loops, occult crossbars, and terminal dots framed within a concentric double ring.
+Palette & Lighting: Rendered with glowing warm gold (#FFD54F), amber, and molten yellow neon bloom against the dark backdrop, emitting subtle luminous floating embers.
+Material & Composition: Carved into a rough-hewn, cracked obsidian stone slab etched with faint background runes, precisely matching the perspective, framing, vignette, and 1:1 square asset format of Astaroth's sigil (The sacred magical sigil of Astaroth, drawn in the identical style as the reference sigil parchment from IMAGE_14. An intricate occult circular seal with five-pointed star pentagram geometry, looped crosses, angelic lines, and the name letters 'A S T A R O T H' inscribed around the rim. Rendered as a glowing magical talisman on dark mystical obsidian stone with vibrant violet, amethyst, and neon magenta magical energy glow, glowing arcane particles, and clean vector-like precision. Dark RPG ritual game asset, 1:1 square.).
+Clean Game Asset: Centered, top-down presentation with no extraneous labels or watermarks outside the circular seal rim.
