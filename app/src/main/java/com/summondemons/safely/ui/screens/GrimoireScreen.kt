@@ -117,7 +117,7 @@ private fun DemonGridItem(entry: DemonEntry, onSummon: () -> Unit, onView: () ->
             contentAlignment = Alignment.Center,
         ) {
             Image(
-                painter = painterResource(demon.cardArt),
+                painter = painterResource(demon.cutoutArt),
                 contentDescription = if (locked) null else demon.name,
                 contentScale = ContentScale.Crop,
                 colorFilter = if (locked) {

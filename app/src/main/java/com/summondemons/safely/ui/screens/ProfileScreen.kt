@@ -101,7 +101,7 @@ fun ProfileScreen(
             ) {
                 if (isNewSummon) RibbonBanner(stringResource(R.string.profile_banner))
                 Image(
-                    painter = painterResource(demon.profileArt),
+                    painter = painterResource(demon.sceneArt),
                     contentDescription = demon.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

@@ -21,9 +21,11 @@ object DemonCatalog {
                 "DONA MIHI PER FOEDUS QUOD EST IRE AD PRAESENS SUM VOBIS,",
                 "UT VOTA OMNIA OPUS EST.",
             ),
-            cardArt = R.drawable.demon_asmodeus_card,
-            profileArt = R.drawable.demon_asmodeus_full,
-            sigil = null, // DESIGN.md gap 1
+            sceneArt = R.drawable.demon_asmodeus_full,
+            cutoutArt = R.drawable.demon_asmodeus_cutout,
+            avatarArt = R.drawable.avatar_asmodeus,
+            sigil = R.raw.sigil_asmodeus,
+            ambientBed = R.raw.bed_asmodeus,
         ),
         Demon(
             id = "astaroth",
@@ -40,9 +42,11 @@ object DemonCatalog {
                 "HIC EST ME DIGNUS LEGI",
                 "SINT BENE OBEDIENTES.",
             ),
-            cardArt = R.drawable.demon_astaroth_card,
-            profileArt = R.drawable.demon_astaroth_card, // DESIGN.md gap 2
-            sigil = R.drawable.sigil_astaroth,
+            sceneArt = R.drawable.demon_astaroth_full,
+            cutoutArt = R.drawable.demon_astaroth_cutout,
+            avatarArt = R.drawable.avatar_astaroth,
+            sigil = R.raw.sigil_astaroth,
+            ambientBed = R.raw.bed_astaroth,
         ),
     )
 

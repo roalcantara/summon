@@ -165,7 +165,7 @@ private fun RitualContent(
             }
         }
 
-        SigilView(sigil = demon.sigil, opacity = state.progress.sigilOpacity, accent = accent, modifier = Modifier.size(SigilSize))
+        SigilView(sigil = null, opacity = state.progress.sigilOpacity, accent = accent, modifier = Modifier.size(SigilSize))
 
         Surface(shape = MaterialTheme.shapes.medium, color = colors.surfaceContainer, modifier = Modifier.fillMaxWidth()) {
             Column(

@@ -1,5 +1,6 @@
 package com.summondemons.safely.data
 
+import com.summondemons.safely.R
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -52,5 +53,19 @@ class DemonCatalogTest {
     @Test
     fun unknownIdIsNull() {
         assertEquals(null, DemonCatalog.byId("baal"))
+    }
+
+    @Test
+    fun everyDemonHasDistinctArtSigilAndBed() {
+        val asmodeus = DemonCatalog.byId("asmodeus")!!
+        val astaroth = DemonCatalog.byId("astaroth")!!
+        assertEquals(R.raw.sigil_asmodeus, asmodeus.sigil)
+        assertEquals(R.raw.sigil_astaroth, astaroth.sigil)
+        assertEquals(R.raw.bed_asmodeus, asmodeus.ambientBed)
+        assertEquals(R.raw.bed_astaroth, astaroth.ambientBed)
+        assertEquals(R.drawable.demon_asmodeus_cutout, asmodeus.cutoutArt)
+        assertEquals(R.drawable.demon_astaroth_cutout, astaroth.cutoutArt)
+        assertEquals(R.drawable.demon_astaroth_full, astaroth.sceneArt)
+        assertEquals(R.drawable.avatar_astaroth, astaroth.avatarArt)
     }
 }
