@@ -8,19 +8,23 @@ import android.provider.Settings
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,12 +36,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -45,22 +53,53 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.summondemons.safely.BuildConfig
 import com.summondemons.safely.R
+import com.summondemons.safely.data.Demon
 import com.summondemons.safely.platform.RitualFeedback
 import com.summondemons.safely.ritual.RitualPhase
+import com.summondemons.safely.ritual.RitualState
 import com.summondemons.safely.ritual.RitualUiState
 import com.summondemons.safely.ritual.RitualViewModel
+import com.summondemons.safely.ritual.TurnDirection
 import com.summondemons.safely.ritual.headingLabel
-import com.summondemons.safely.ui.components.ButtonTone
-import com.summondemons.safely.ui.components.CompassIndicator
+import com.summondemons.safely.ritual.turnDirection
+import com.summondemons.safely.ui.components.CompassArc
+import com.summondemons.safely.ui.components.CompassMode
 import com.summondemons.safely.ui.components.DebugControls
+import com.summondemons.safely.ui.components.DemonCutout
+import com.summondemons.safely.ui.components.KaraokeLine
 import com.summondemons.safely.ui.components.PrimaryActionButton
-import com.summondemons.safely.ui.components.SigilView
+import com.summondemons.safely.ui.fx.InkedSigil
+import com.summondemons.safely.ui.fx.LocalReduceMotion
+import com.summondemons.safely.ui.fx.ParticleField
+import com.summondemons.safely.ui.fx.ParticleStyle
+import com.summondemons.safely.ui.fx.SharedDemonArt
+import com.summondemons.safely.ui.fx.rememberFrameTimeMs
+import com.summondemons.safely.ui.fx.segment
 import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.spacing
-import kotlin.math.roundToInt
+import kotlin.math.abs
+import kotlin.math.sin
 
-private val SigilSize = 220.dp
-private const val CURRENT_PHRASE_ALPHA = 0.6f
+private const val SIGIL_WIDTH_FRACTION = 0.86f
+private const val SIGIL_IN_ARC_FRACTION = 0.84f
+private const val CUTOUT_ASPECT = 896f / 1200f
+private const val CUTOUT_WIDTH_FRACTION = 0.8f
+private const val RING_ANIM_MS = 700
+private const val FLICKER_MIN = 0.45f
+private const val FLICKER_RATE = 0.02f // radians per ms
+private const val COMPLETED_ALPHA = 0.85f
+private const val UPCOMING_ALPHA = 0.6f
+private const val EMBER_ALPHA = 0.5f
+private const val CLIMAX_SCRIM_ALPHA = 0.85f
+private const val CLIMAX_PARTICLES = 80
+private const val FLASH_PEAK = 0.65f
+private const val FLASH_HALF_WIDTH = 0.06f
+private const val FLASH_ACCENT_ALPHA = 0.6f
+private const val RISE_START_SCALE = 0.4f
+private val RiseDistance = 48.dp
+
+/** Phases in which the sigil's rings are inked (the ritual is or was locked this attempt). */
+private val SEALED_PHASES = setOf(RitualPhase.Chanting, RitualPhase.Wavering, RitualPhase.Climax, RitualPhase.Done)
 
 @Composable
 fun RitualScreen(
@@ -100,9 +139,7 @@ fun RitualScreen(
 
     val done = state.ritual.phase == RitualPhase.Done
     LaunchedEffect(done) {
-        if (done) {
-            onSummoned()
-        }
+        if (done) onSummoned()
     }
 
     RitualContent(
@@ -133,85 +170,87 @@ private fun RitualContent(
     modifier: Modifier = Modifier,
 ) {
     val demon = state.demon
+    val ritual = state.ritual
     val accent = MaterialTheme.demonColors.accent(demon.accent)
     val colors = MaterialTheme.colorScheme
     val spacing = MaterialTheme.spacing
+    val reduceMotion = LocalReduceMotion.current
+    val inClimax = ritual.phase == RitualPhase.Climax || ritual.phase == RitualPhase.Done
+    val chromeAlpha = 1f - segment(ritual.climaxFraction, 0f, 0.3f)
+    val ringProgress by animateFloatAsState(
+        if (ritual.phase in SEALED_PHASES) 1f else 0f,
+        tween(RING_ANIM_MS),
+        label = "sigilRing",
+    )
+    val flicker = flickerAlpha(ritual.phase == RitualPhase.Wavering, reduceMotion)
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(colors.background)
-            .safeDrawingPadding()
-            .verticalScroll(rememberScrollState())
-            .padding(spacing.lg),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(spacing.lg),
-    ) {
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            color = colors.surfaceContainerHigh,
-            border = BorderStroke(1.dp, accent.copy(alpha = 0.5f)),
-            modifier = Modifier.fillMaxWidth(),
+    Box(modifier.fillMaxSize().background(colors.background)) {
+        ParticleField(accent.copy(alpha = EMBER_ALPHA), ParticleStyle.Embers, Modifier.fillMaxSize())
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .safeDrawingPadding()
+                .padding(spacing.lg)
+                .graphicsLayer { alpha = chromeAlpha },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(spacing.md),
         ) {
-            Row(Modifier.padding(spacing.md), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.ritual_label), style = MaterialTheme.typography.labelMedium, color = accent)
-                    Text(demon.name, style = MaterialTheme.typography.headlineLarge, color = colors.onSurface)
-                    Text(
-                        stringResource(R.string.ritual_instruction, headingLabel(demon.ritualHeading)),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = colors.onSurfaceVariant,
-                    )
-                }
-                CompassIndicator(azimuth = state.azimuth, target = demon.ritualHeading, aligned = state.ritual.aligned)
-            }
-        }
-
-        SigilView(sigil = null, opacity = 0.1f + 0.9f * state.ritual.inkProgress, accent = accent, modifier = Modifier.size(SigilSize))
-
-        Surface(shape = MaterialTheme.shapes.medium, color = colors.surfaceContainer, modifier = Modifier.fillMaxWidth()) {
-            Column(
-                Modifier.padding(spacing.lg),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(spacing.xs),
-            ) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(stringResource(R.string.chant_label), style = MaterialTheme.typography.labelMedium, color = accent)
-                    Text(
-                        stringResource(R.string.chant_resonance, (state.ritual.inkProgress * 100).roundToInt()),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = colors.primary,
-                    )
-                }
-                demon.chantPhrases.forEachIndexed { index, phrase ->
-                    val reached = index < state.ritual.phrase
-                    val current = index == state.ritual.phrase
-                    val phraseColor: Color = when {
-                        reached -> accent
-                        current && state.ritual.aligned -> accent.copy(alpha = CURRENT_PHRASE_ALPHA)
-                        else -> colors.outline
-                    }
-                    Text(
-                        phrase,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = if (current) FontWeight.Bold else FontWeight.Normal,
-                        color = phraseColor,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-                LinearProgressIndicator(
-                    progress = { if (state.ritual.phrase < 4) state.ritual.lit.toFloat() / state.ritual.syllables[state.ritual.phrase] else 1f },
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    demon.name.uppercase(),
+                    style = MaterialTheme.typography.labelMedium,
                     color = accent,
-                    trackColor = colors.surfaceContainerLowest,
-                    modifier = Modifier.fillMaxWidth().padding(top = spacing.sm),
+                    modifier = Modifier.weight(1f),
+                )
+                IconButton(onClick = onAbort) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_close),
+                        contentDescription = stringResource(R.string.action_abort),
+                        tint = colors.onSurfaceVariant,
+                    )
+                }
+            }
+
+            Box(Modifier.fillMaxWidth(SIGIL_WIDTH_FRACTION).aspectRatio(1f), contentAlignment = Alignment.Center) {
+                CompassArc(
+                    azimuth = state.azimuth,
+                    target = demon.ritualHeading,
+                    mode = compassMode(ritual.phase),
+                    graceFraction = ritual.graceFraction,
+                    modifier = Modifier.fillMaxSize(),
+                )
+                InkedSigil(
+                    sigil = demon.sigil,
+                    inkProgress = ritual.inkProgress,
+                    accent = accent,
+                    rimText = demon.name.uppercase(),
+                    modifier = Modifier.fillMaxSize(SIGIL_IN_ARC_FRACTION),
+                    ringProgress = ringProgress,
+                    micLevel = state.micLevel,
+                    flicker = flicker,
                 )
             }
-        }
 
-        if (state.micGranted == false) {
-            Surface(shape = MaterialTheme.shapes.medium, color = colors.errorContainer, contentColor = colors.onErrorContainer) {
-                Column(Modifier.padding(spacing.lg), verticalArrangement = Arrangement.spacedBy(spacing.md)) {
-                    Text(stringResource(R.string.mic_rationale), style = MaterialTheme.typography.bodyMedium)
+            Text(
+                phaseHint(state),
+                style = MaterialTheme.typography.titleLarge,
+                color = when (ritual.phase) {
+                    RitualPhase.Wavering -> colors.error
+                    RitualPhase.Chanting -> accent
+                    else -> colors.onSurface
+                },
+                textAlign = TextAlign.Center,
+            )
+
+            ChantStack(
+                phrases = demon.chantPhrases,
+                ritual = ritual,
+                accent = accent,
+                modifier = Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()),
+            )
+
+            if (state.micGranted == false) {
+                ErrorPanel(stringResource(R.string.mic_rationale)) {
                     PrimaryActionButton(
                         text = stringResource(if (permanentlyDenied) R.string.action_open_settings else R.string.action_retry),
                         onClick = if (permanentlyDenied) onOpenSettings else onRetryPermission,
@@ -219,31 +258,139 @@ private fun RitualContent(
                     )
                 }
             }
-        }
+            if (state.micGranted == true && state.micUnavailable) ErrorPanel(stringResource(R.string.mic_unavailable))
+            if (state.headingUnavailable && !state.simulateHeading) ErrorPanel(stringResource(R.string.heading_unavailable))
 
-        if (state.micGranted == true && state.micUnavailable) {
-            Surface(shape = MaterialTheme.shapes.medium, color = colors.errorContainer, contentColor = colors.onErrorContainer) {
-                Text(
-                    stringResource(R.string.mic_unavailable),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(spacing.lg),
+            if (BuildConfig.DEBUG) {
+                DebugControls(
+                    simulateHeading = state.simulateHeading,
+                    onSimulateHeadingChange = onSimulateHeadingChange,
+                    onHoldToChantChange = onHoldToChantChange,
                 )
             }
         }
+        if (inClimax) ClimaxOverlay(demon, accent, ritual.climaxFraction, reduceMotion)
+    }
+}
 
-        if (BuildConfig.DEBUG) {
-            DebugControls(
-                simulateHeading = state.simulateHeading,
-                onSimulateHeadingChange = onSimulateHeadingChange,
-                onHoldToChantChange = onHoldToChantChange,
-            )
+private fun compassMode(phase: RitualPhase): CompassMode = when (phase) {
+    RitualPhase.Seeking, RitualPhase.Locking -> CompassMode.Seeking
+    RitualPhase.Wavering -> CompassMode.Wavering
+    RitualPhase.Chanting, RitualPhase.Climax, RitualPhase.Done -> CompassMode.Locked
+}
+
+/** Sigil alpha multiplier: a nervous flicker while Wavering, steady otherwise. */
+@Composable
+private fun flickerAlpha(active: Boolean, reduceMotion: Boolean): Float {
+    if (!active) return 1f
+    if (reduceMotion) return FLICKER_MIN
+    val time by rememberFrameTimeMs()
+    return FLICKER_MIN + (1f - FLICKER_MIN) * abs(sin(time * FLICKER_RATE))
+}
+
+@Composable
+private fun phaseHint(state: RitualUiState): String {
+    val direction = headingLabel(state.demon.ritualHeading)
+    return when (state.ritual.phase) {
+        RitualPhase.Seeking -> when (turnDirection(state.azimuth, state.demon.ritualHeading)) {
+            TurnDirection.Left -> stringResource(R.string.hint_turn_left, direction)
+            TurnDirection.Right -> stringResource(R.string.hint_turn_right, direction)
+            null -> stringResource(R.string.hint_face, direction)
         }
+        RitualPhase.Locking -> stringResource(R.string.hint_hold_steady)
+        RitualPhase.Chanting -> if (state.micGranted == false && !state.holdToChant) {
+            stringResource(R.string.hint_mic_needed)
+        } else {
+            stringResource(R.string.hint_chant)
+        }
+        RitualPhase.Wavering -> stringResource(R.string.hint_face_again, direction)
+        RitualPhase.Climax, RitualPhase.Done -> stringResource(R.string.hint_summoning)
+    }
+}
 
-        PrimaryActionButton(
-            text = stringResource(R.string.action_abort),
-            onClick = onAbort,
-            tone = ButtonTone.Danger,
-            modifier = Modifier.fillMaxWidth(),
-        )
+@Composable
+private fun ChantStack(phrases: List<String>, ritual: RitualState, accent: Color, modifier: Modifier = Modifier) {
+    val colors = MaterialTheme.colorScheme
+    val chanting = ritual.phase == RitualPhase.Chanting
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
+    ) {
+        phrases.forEachIndexed { index, phrase ->
+            when {
+                index < ritual.phrase -> Text(
+                    phrase,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = accent.copy(alpha = COMPLETED_ALPHA),
+                    textAlign = TextAlign.Center,
+                )
+                index == ritual.phrase -> KaraokeLine(
+                    text = phrase,
+                    lit = ritual.lit,
+                    accent = accent,
+                    dim = if (chanting) colors.onSurface else colors.outline,
+                    style = MaterialTheme.typography.headlineMedium,
+                )
+                else -> Text(
+                    phrase,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colors.outline.copy(alpha = UPCOMING_ALPHA),
+                    textAlign = TextAlign.Center,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ErrorPanel(message: String, action: (@Composable () -> Unit)? = null) {
+    val colors = MaterialTheme.colorScheme
+    Surface(shape = MaterialTheme.shapes.medium, color = colors.errorContainer, contentColor = colors.onErrorContainer) {
+        Column(Modifier.padding(MaterialTheme.spacing.lg), verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md)) {
+            Text(message, style = MaterialTheme.typography.bodyMedium)
+            action?.invoke()
+        }
+    }
+}
+
+/** Climax staging by [fraction]: dim, converge, flash, then the demon rises out of the sigil. */
+@Composable
+private fun ClimaxOverlay(demon: Demon, accent: Color, fraction: Float, reduceMotion: Boolean) {
+    val colors = MaterialTheme.colorScheme
+    val dim = segment(fraction, 0f, 0.3f)
+    val converge = segment(fraction, 0f, 0.6f)
+    val flash = if (reduceMotion) 0f else 1f - (abs(fraction - FLASH_PEAK) / FLASH_HALF_WIDTH).coerceIn(0f, 1f)
+    val rise = if (reduceMotion) fraction else segment(fraction, 0.7f, 1f)
+    val riseDistance = with(LocalDensity.current) { RiseDistance.toPx() }
+    Box(
+        Modifier.fillMaxSize().background(colors.surfaceContainerLowest.copy(alpha = CLIMAX_SCRIM_ALPHA * dim)),
+        contentAlignment = Alignment.Center,
+    ) {
+        ParticleField(accent, ParticleStyle.Embers, Modifier.fillMaxSize(), count = CLIMAX_PARTICLES, converge = converge, seed = 29)
+        if (flash > 0f) {
+            Canvas(Modifier.fillMaxSize()) {
+                drawRect(
+                    Brush.radialGradient(
+                        listOf(colors.onBackground.copy(alpha = flash), accent.copy(alpha = flash * FLASH_ACCENT_ALPHA), Color.Transparent),
+                    ),
+                )
+            }
+        }
+        SharedDemonArt(
+            demonId = demon.id,
+            modifier = Modifier
+                .fillMaxWidth(CUTOUT_WIDTH_FRACTION)
+                .aspectRatio(CUTOUT_ASPECT)
+                .graphicsLayer {
+                    alpha = rise
+                    val scale = lerp(RISE_START_SCALE, 1f, rise)
+                    scaleX = scale
+                    scaleY = scale
+                    translationY = (1f - rise) * riseDistance
+                },
+        ) {
+            DemonCutout(demon.cutoutArt, demon.name, accent, Modifier.fillMaxSize(), silhouette = 1f - rise)
+        }
     }
 }
