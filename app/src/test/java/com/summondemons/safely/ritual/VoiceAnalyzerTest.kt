@@ -91,4 +91,30 @@ class VoiceAnalyzerTest {
         assertTrue(result.all { it.voiced })
         assertEquals(listOf(0, 8, 16), result.indices.filter { result[it].onset })
     }
+
+    @Test
+    fun negativeCountReturnsSilentWithoutThrowing() {
+        val analyzer = VoiceAnalyzer(16_000)
+        assertEquals(VoiceFrame.SILENT, analyzer.analyze(ShortArray(320), -1))
+    }
+
+    @Test
+    fun zeroCountFrameDoesNotCreateAnExtraOnset() {
+        val analyzer = VoiceAnalyzer(16_000)
+        val frames = sine(150.0, 16_000, List(10) { 8_000.0 })
+        val results = frames.take(5).map { analyzer.analyze(it, it.size) } +
+            analyzer.analyze(ShortArray(320), 0) +
+            frames.drop(5).map { analyzer.analyze(it, it.size) }
+        assertEquals(1, results.count { it.onset })
+    }
+
+    @Test
+    fun countSmallerThanArrayAnalysesOnlyThePrefix() {
+        val loud = sine(150.0, 16_000, listOf(8_000.0)).first()
+        val padded = ShortArray(320).also { loud.copyInto(it, endIndex = 160) }
+        val full = VoiceAnalyzer(16_000).analyze(padded, 160)
+        val prefix = VoiceAnalyzer(16_000).analyze(padded.copyOf(160), 160)
+        assertEquals(prefix.rms, full.rms, 1e-9)
+        assertEquals(rms(padded.copyOf(160), 160), full.rms, 1e-9)
+    }
 }

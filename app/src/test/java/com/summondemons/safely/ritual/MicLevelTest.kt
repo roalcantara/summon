@@ -14,4 +14,9 @@ class MicLevelTest {
     fun clampsToOne() {
         assertEquals(1f, smoothMicLevel(1f, RitualConfig.MIC_LEVEL_CEILING * 4), 0.001f)
     }
+
+    @Test
+    fun roomNoiseAtTheVoiceFloorStaysZero() {
+        assertEquals(0f, smoothMicLevel(0f, RitualConfig.VOICE_RMS_FLOOR), 0f)
+    }
 }

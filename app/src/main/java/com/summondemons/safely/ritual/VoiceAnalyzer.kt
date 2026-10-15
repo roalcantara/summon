@@ -20,6 +20,7 @@ data class VoiceFrame(val rms: Double, val voiced: Boolean, val onset: Boolean) 
 /**
  * Turns consecutive PCM16 frames into [VoiceFrame]s. Stateful (keeps the previous frame
  * and a short RMS history) but pure: no Android types.
+ * A new instance is needed when the sample rate changes.
  * - voiced: loud enough and periodic at a voice pitch (70–400 Hz) over the last 40 ms.
  * - onset: a voiced energy rise while armed; re-arms after a dip or an unvoiced frame.
  */
@@ -33,8 +34,10 @@ class VoiceAnalyzer(val sampleRate: Int) {
     private var peak = 0.0
 
     fun analyze(samples: ShortArray, count: Int): VoiceFrame {
-        val current = samples.copyOf(count)
-        val level = rms(current, count)
+        if (count <= 0) return VoiceFrame.SILENT
+        val n = count.coerceAtMost(samples.size)
+        val current = samples.copyOf(n)
+        val level = rms(current, n)
         val window = previous + current
         previous = current
         val voiced = level > VOICE_RMS_FLOOR && periodicity(window) >= VOICING_MIN_CORRELATION
@@ -54,7 +57,7 @@ class VoiceAnalyzer(val sampleRate: Int) {
         return VoiceFrame(level, voiced, onset)
     }
 
-    /** Highest normalized autocorrelation over the voice-pitch lags, in [-1, 1]. */
+    /** Highest normalized autocorrelation over the voice-pitch lags, in [0, 1]. */
     private fun periodicity(x: ShortArray): Double {
         val upper = minOf(maxLag, x.size / 2)
         var best = 0.0
