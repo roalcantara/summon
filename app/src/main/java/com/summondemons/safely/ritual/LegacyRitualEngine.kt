@@ -13,7 +13,7 @@ data class RitualProgress(val phraseIndex: Int = 0, val sustainedMs: Long = 0L) 
 }
 
 /** Pure ritual rules (PRODUCT.md "Heading gate", "Chant", ADR-0007). */
-object RitualEngine {
+object LegacyRitualEngine {
 
     fun step(progress: RitualProgress, aligned: Boolean, loud: Boolean, dtMs: Long): RitualProgress {
         if (progress.completed) return progress

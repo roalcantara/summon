@@ -76,7 +76,7 @@ class RitualViewModel(
                         s
                     } else {
                         s.copy(
-                            progress = RitualEngine.step(
+                            progress = LegacyRitualEngine.step(
                                 s.progress, s.aligned, micLoud || s.holdToChant, RitualConfig.TICK_MS,
                             ),
                         )

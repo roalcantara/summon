@@ -6,10 +6,10 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class RitualEngineTest {
+class LegacyRitualEngineTest {
 
     private fun run(start: RitualProgress, ticks: Int, aligned: Boolean = true, loud: Boolean = true) =
-        (1..ticks).fold(start) { p, _ -> RitualEngine.step(p, aligned, loud, TICK_MS) }
+        (1..ticks).fold(start) { p, _ -> LegacyRitualEngine.step(p, aligned, loud, TICK_MS) }
 
     @Test
     fun twentyLoudAlignedTicksAdvanceOnePhrase() {
@@ -20,18 +20,18 @@ class RitualEngineTest {
     @Test
     fun leavingTheHeadingResetsEverything() {
         val midway = RitualProgress(phraseIndex = 2, sustainedMs = 1_200)
-        assertEquals(RitualProgress(), RitualEngine.step(midway, aligned = false, loud = true, dtMs = TICK_MS))
+        assertEquals(RitualProgress(), LegacyRitualEngine.step(midway, aligned = false, loud = true, dtMs = TICK_MS))
     }
 
     @Test
     fun silenceDecaysAtHalfRateAndNeverBelowZero() {
         assertEquals(
             RitualProgress(1, 950),
-            RitualEngine.step(RitualProgress(1, 1_000), aligned = true, loud = false, dtMs = TICK_MS),
+            LegacyRitualEngine.step(RitualProgress(1, 1_000), aligned = true, loud = false, dtMs = TICK_MS),
         )
         assertEquals(
             RitualProgress(1, 0),
-            RitualEngine.step(RitualProgress(1, 30), aligned = true, loud = false, dtMs = TICK_MS),
+            LegacyRitualEngine.step(RitualProgress(1, 30), aligned = true, loud = false, dtMs = TICK_MS),
         )
     }
 
@@ -45,7 +45,7 @@ class RitualEngineTest {
     @Test
     fun stepAfterCompletionIsANoOp() {
         val done = RitualProgress(phraseIndex = 4)
-        assertEquals(done, RitualEngine.step(done, aligned = false, loud = false, dtMs = TICK_MS))
+        assertEquals(done, LegacyRitualEngine.step(done, aligned = false, loud = false, dtMs = TICK_MS))
     }
 
     @Test
