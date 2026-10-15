@@ -18,9 +18,14 @@ class DemonViewModel : ViewModel() {
 
     fun demon(id: String): Demon? = DemonCatalog.byId(id)
 
-    fun unlock(id: String) {
+    fun unlock(id: String) = setUnlocked(id, true)
+
+    /** Debug "Unsummon" (PRODUCT.md Debug aids). */
+    fun lock(id: String) = setUnlocked(id, false)
+
+    private fun setUnlocked(id: String, unlocked: Boolean) {
         _demons.update { entries ->
-            entries.map { if (it.demon.id == id) it.copy(unlocked = true) else it }
+            entries.map { if (it.demon.id == id) it.copy(unlocked = unlocked) else it }
         }
     }
 }

@@ -24,6 +24,18 @@ class DemonViewModelTest {
     }
 
     @Test
+    fun lockReSealsOnlyThatDemon() {
+        val vm = DemonViewModel()
+        vm.unlock("asmodeus")
+        vm.unlock("astaroth")
+        vm.lock("astaroth")
+        assertEquals(
+            mapOf("asmodeus" to true, "astaroth" to false),
+            vm.demons.value.associate { it.demon.id to it.unlocked },
+        )
+    }
+
+    @Test
     fun demonLookup() {
         val vm = DemonViewModel()
         assertNotNull(vm.demon("asmodeus"))
