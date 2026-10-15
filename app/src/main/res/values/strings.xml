@@ -2,17 +2,10 @@
     <string name="app_name">Summon Demons Safely</string>
 
     <string name="grimoire_title">My Grimoire</string>
-    <string name="grimoire_subtitle">Face the right way. Chant with conviction. Hope for the best.</string>
-    <string name="card_sealed">Sealed</string>
     <string name="action_summon">Summon</string>
     <string name="action_view">View</string>
 
-    <string name="ritual_label">SUMMONING RITUAL</string>
-    <string name="ritual_instruction">Hold the phone with both hands and face %1$s</string>
-    <string name="chant_label">SACRED CHANT</string>
-    <string name="chant_resonance">RESONANCE %1$d%%</string>
     <string name="action_abort">Abort Ritual</string>
-    <string name="compass_unknown">--°</string>
     <string name="mic_rationale">The ritual listens to the rhythm of your chant. Nothing is recorded or saved — the microphone only measures loudness and pitch.</string>
     <string name="action_retry">Allow microphone</string>
     <string name="action_open_settings">Open settings</string>
