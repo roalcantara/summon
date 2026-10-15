@@ -4,6 +4,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import com.summondemons.safely.ui.fx.LocalReduceMotion
+import com.summondemons.safely.ui.fx.rememberReduceMotion
 
 private val DarkColors = darkColorScheme(
     primary = Palette.primary,
@@ -49,6 +51,7 @@ fun SummonDemonsSafelyTheme(content: @Composable () -> Unit) {
     CompositionLocalProvider(
         LocalDemonColors provides DefaultDemonColors,
         LocalSpacing provides Spacing(),
+        LocalReduceMotion provides rememberReduceMotion(),
     ) {
         MaterialTheme(
             colorScheme = DarkColors,
