@@ -45,7 +45,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.summondemons.safely.BuildConfig
 import com.summondemons.safely.R
-import com.summondemons.safely.platform.Haptics
+import com.summondemons.safely.platform.RitualFeedback
 import com.summondemons.safely.ritual.RitualPhase
 import com.summondemons.safely.ritual.RitualUiState
 import com.summondemons.safely.ritual.RitualViewModel
@@ -72,6 +72,7 @@ fun RitualScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val activity = LocalActivity.current
+    RitualFeedback(viewModel.effects, state.demon.ambientBed)
 
     // Ask once; re-check on every resume (e.g. after returning from Settings).
     var requested by rememberSaveable { mutableStateOf(false) }
@@ -100,7 +101,6 @@ fun RitualScreen(
     val done = state.ritual.phase == RitualPhase.Done
     LaunchedEffect(done) {
         if (done) {
-            Haptics.success(context)
             onSummoned()
         }
     }

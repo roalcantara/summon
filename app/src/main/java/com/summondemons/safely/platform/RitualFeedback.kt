@@ -1,0 +1,80 @@
+package com.summondemons.safely.platform
+
+import android.os.Handler
+import android.os.Looper
+import androidx.annotation.RawRes
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import com.summondemons.safely.platform.RitualSounds.Cue
+import com.summondemons.safely.ritual.RitualEffect
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
+
+private const val BED_VOLUME = 0.7f
+private const val BED_DUCKED = 0.2f
+private const val FADE_IN_MS = 1_200L
+private const val DUCK_MS = 300L
+private const val SWELL_MS = 2_000L
+private const val FADE_OUT_MS = 1_500L
+
+/** Lets the boom and the bed's fade-out ring on after navigating to Profile. */
+private const val RELEASE_DELAY_MS = 2_500L
+
+/** Turns ritual effects into haptics and sounds (spec §6–7). Composed by the Ritual screen. */
+@Composable
+fun RitualFeedback(effects: Flow<RitualEffect>, @RawRes bed: Int) {
+    val context = LocalContext.current
+    val sounds = remember(bed) { RitualSounds(context, bed) }
+    DisposableEffect(sounds) {
+        onDispose { Handler(Looper.getMainLooper()).postDelayed({ sounds.release() }, RELEASE_DELAY_MS) }
+    }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { sounds.stopBed() }
+
+    LaunchedEffect(effects, sounds) {
+        var fade: Job? = null
+        fun fadeBed(to: Float, ms: Long) {
+            fade?.cancel()
+            fade = launch { sounds.fadeBed(to, ms) }
+        }
+        effects.collect { effect ->
+            when (effect) {
+                RitualEffect.ProximityTick -> Haptics.tick(context)
+                RitualEffect.Locked -> {
+                    Haptics.clunk(context)
+                    sounds.play(Cue.Lock)
+                    fadeBed(BED_VOLUME, FADE_IN_MS)
+                }
+                RitualEffect.SyllableLit -> Haptics.syllable(context)
+                is RitualEffect.PhraseComplete -> {
+                    Haptics.chime(context)
+                    sounds.play(Cue.chime(effect.phrase))
+                }
+                RitualEffect.DriftWarning -> {
+                    Haptics.warn(context)
+                    fadeBed(BED_DUCKED, DUCK_MS)
+                }
+                RitualEffect.Resumed -> fadeBed(BED_VOLUME, DUCK_MS)
+                RitualEffect.PhraseLost -> {
+                    Haptics.warn(context)
+                    fadeBed(0f, FADE_OUT_MS)
+                }
+                RitualEffect.ClimaxStart -> {
+                    Haptics.crescendo(context)
+                    sounds.play(Cue.Riser)
+                    fadeBed(1f, SWELL_MS)
+                }
+                RitualEffect.Summoned -> {
+                    Haptics.success(context)
+                    sounds.play(Cue.Boom)
+                    fadeBed(0f, FADE_OUT_MS)
+                }
+            }
+        }
+    }
+}
