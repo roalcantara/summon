@@ -30,6 +30,7 @@ If two sources disagree, the higher one wins. Fix the lower one or note it in an
 | `reference/prompts/` | The two original Stitch prompts, verbatim |
 | `reference/stitch/` | Stitch mockups, character art, logo, sigil |
 | `reference/src/` | Draft Compose code (input for the port; does not compile as-is) |
+| `tools/` | Small generators (e.g. `gen_tada.py` for `res/raw/tada.wav`) |
 
 ## Commands
 
@@ -47,12 +48,12 @@ cd ../mdweb && npm install && npm run dev   # http://localhost:3000
 ```
 
 ## Current state
-
-- `app/` is still the Android Studio "Basic Views Activity" template (XML, fragments,
-  package `com.example.mydemon`).
-- Next step: port `reference/src/` to Compose in `app/`, per a dedicated spec in
-  `docs/superpowers/specs/`.
-
+- `app/` is the Compose port (package `com.summondemons.safely`): Grimoire,
+  Ritual and Profile per `PRODUCT.md`. Design:
+  `docs/superpowers/specs/2026-10-15-compose-port-design.md`.
+- Open items: DESIGN.md art gaps (`sigil_asmodeus`, `demon_astaroth_full`,
+  cut-outs, `avatar_astaroth`), a real `tada` sound, bundling Cinzel/Inter, and
+  the "LOVIS" question in ADR-0005.
 ## Conventions
 
 - Kotlin + Jetpack Compose, Modern Android Development guidelines.

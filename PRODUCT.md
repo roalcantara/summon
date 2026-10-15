@@ -22,14 +22,15 @@ Profile (doubles as the success screen) → back to Grimoire.
 | Lock state | Both demons start **locked**. Locked card: grey tint, silhouette, **Summon** → Ritual. Unlocked card: theme-color tint/border, illustration, **View** → Profile. Unlock state is in-memory only. |
 | Ritual setup | Large faint sigil; text "Hold the phone with both hands and face {direction}", where {direction} comes from the demon's `ritualHeading` (North for both MVP demons). |
 | Heading gate | `ritualHeading` is a **per-demon property** (compass degrees, tolerance ±20°). The ritual is *Active* only while the device azimuth is within tolerance of it — for North that is [340°, 360°) ∪ [0°, 20°]. Leaving the range **resets progress to 0**. Future demons may require South, East, etc.; nothing may hard-code North. |
-| Chant | The incantation is shown as **exactly 4 phrases**, grey until reached. Sustained mic volume above threshold for **2 s** while Active advances one phrase and highlights it in the demon's color. |
+| Chant | The incantation is shown as **exactly 4 phrases**, grey until reached. Sustained mic volume above threshold for **2 s** while Active advances one phrase and highlights it in the demon's color. Brief silences (between words) drain the 2 s counter at half speed instead of resetting it (ADR-0007). |
 | Sigil | Opacity 0.10 at start, then 0.25 / 0.50 / 0.75 / 1.00 after phrases 1–4. |
 | Success | After phrase 4 the sigil fully glows, then the app navigates to Profile with `isNewSummon = true`. |
 | Profile (new summon) | `RibbonBanner` "New Demon Received!", rotating sunburst, bouncing demon, "Tada!" sound, button **Awesome!** pinned to the bottom → Grimoire. |
 | Profile (view) | Same layout without banner and sound; button **Back**. |
 | Profile content | Image, name, title, description, quote. No stats. |
 | Debug aids | "Simulate heading" (snaps to the demon's `ritualHeading`) and "Hold to Chant" controls, **debug builds only**. |
-| Permissions | `RECORD_AUDIO` requested on entering the Ritual; if denied, explain why and offer a retry. |
+| Orientation | Portrait only (the compass reading assumes it). |
+| Permissions | `RECORD_AUDIO` requested on entering the Ritual only if not already granted; if denied, explain why and offer a retry (or a shortcut to app settings once the denial is permanent). |
 
 ## Demons
 
