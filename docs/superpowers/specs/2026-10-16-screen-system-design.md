@@ -2,7 +2,7 @@
 
 - Date: 2026-10-16
 - Status: Agreed in prototype review; independent review applied (web prototype, branch `claude/cool-rubin-pylwkn` of
-  `roalcantara/mydemon`); awaiting written-spec review
+  `roalcantara/mydemon`); written-spec review applied
 - Builds on: `PRODUCT.md`, `DESIGN.md`, ADR-0001…0009, `2026-10-15-ritual-2-design.md`
 - Changes canon: PRODUCT.md (Core loop, Grimoire, Lock state, Heading gate, Chant,
   Success, Profile rows removed, Debug aids, Non-goals, Demons table), DESIGN.md
@@ -46,7 +46,7 @@ gradient placeholders (see "Gaps").
 
 All rules are pure Kotlin in a new `progress` package and take `today` as an argument
 (a local epoch day, `LocalDate.now(zone).toEpochDay()`), so tests and the debug clock
-can move time.
+can move time. `java.time` needs core library desugaring on API 24–25 (§9).
 
 ### Data
 
@@ -91,6 +91,12 @@ that ink in once after a summon (see §4 Carousel).
 `evaluate` runs after the first progress load and on every `ON_START` of the activity
 (`LifecycleEventEffect(ON_START)` in `AppNavHost`, calling `GameViewModel.evaluate()`).
 It only flips flags; screens show the result on their next frame.
+
+**Evaluate before visit.** `GameViewModel.visit` applies `evaluate` first, in the same
+`update`: `visit(evaluate(p, today), id, today)`. Otherwise a Grimoire restored on a
+bound demon after 3+ days in the background could visit him (from `ticks`) before the
+`ON_START` evaluate runs, and he would never escape. With this rule the two can run in
+either order.
 
 **Two different "sealed" states.** *Unbound* (`!bound`) drives the stage: silhouette,
 summon cue, avatar sigil. *Unrevealed* (`!revealed`) drives the dossier: smudged
@@ -187,7 +193,7 @@ no re-lock. On phrase I (no clock) Wavering simply waits.
   once, on the step that produces `ClimaxStart`, before the climax plays.
 - **Feedback resumes with the phase.** The ambient bed follows the phase rather than
   the `Locked`/`Resumed` effects alone: `RitualFeedback` starts the bed on `ON_START`
-  if the phase is Chanting or Wavering.
+  if the phase is Chanting (normal volume) or Wavering (ducked volume).
 - **The Abandon dialog doesn't pause anything.** The ritual keeps ticking (and the
   clock keeps draining) behind it, as in the prototype; the dialog is a decision, not
   a pause.
@@ -209,8 +215,8 @@ Routes (type-safe, `navigation/Routes.kt`): `Home` (start), `Grimoire`, `Ritual(
 | Grimoire | ← or system back | Home (the book "slams" shut: a dust puff). |
 | Grimoire | Tap sealed demon or "Tap to summon", summon available | Ritual(demonId). |
 | Grimoire | Tap sealed demon or cue while cooling | The cooling cue shakes; nothing else. |
-| Ritual | ✕ or back, before the first seal | Grimoire. |
-| Ritual | ✕ or back, after a seal, not in climax | Dialog "Abandon the ritual? / Your seals will fade." **Abandon** → Grimoire; **Stay** closes. |
+| Ritual | ✕ or back, no phrase sealed (`phrase == 0`, also after a crack back to phrase I) | Grimoire. |
+| Ritual | ✕ or back, at least one phrase sealed (`phrase >= 1`), not in climax | Dialog "Abandon the ritual? / Your seals will fade." **Abandon** → Grimoire; **Stay** closes. |
 | Ritual | Back during climax | Ignored (as today). |
 | Ritual | `Summoned` | Pop to Grimoire with that demon selected and the celebration on. The cut-out stays a shared element (`demon-art-{id}`). |
 | Ritual | Opened (incl. restored after process death) while the demon is bound or `!canSummon`, and not already in Climax/Done | Pop back to Grimoire at once. Prevents a second summon from a restored back stack. |
@@ -227,8 +233,9 @@ restored after process death (the summon is already saved; only the party is los
 
 **Time** comes from an injected `GameClock`: `now(): ZonedDateTime` (with the debug day
 offset in debug builds) and `ticks: Flow<ZonedDateTime>`, which emits on collection, at
-every top of the hour (this covers midnight), and on `ACTION_TIME_CHANGED`,
-`ACTION_TIMEZONE_CHANGED` and `ACTION_DATE_CHANGED`. `today`, the current hour,
+every top of the hour (this covers midnight), on `ACTION_TIME_CHANGED`,
+`ACTION_TIMEZONE_CHANGED` and `ACTION_DATE_CHANGED`, and (debug builds) whenever the day
+offset or the court override changes, so the debug sheet's changes show at once. `today`, the current hour,
 `canSummonToday`, "Next summon in {h} h", the Home court chip and the visit-on-view
 all derive from `ticks`, so they stay correct while the app is open across midnight.
 
@@ -455,11 +462,15 @@ it is logged and that change is lost (the UI keeps showing the stored state).
 **First frame.** `installSplashScreen().setKeepOnScreenCondition { !loaded }` in
 `MainActivity` (`androidx.core:core-splashscreen`) holds the splash until the first
 progress value is loaded, which covers every destination restored after process death.
+This needs a `Theme.SplashScreen` launch theme (with `postSplashScreenTheme` pointing at
+today's theme) on the activity, and `installSplashScreen()` before `super.onCreate`.
 
 **Debug settings** (day offset, court override) live in a separate DataStore file
 `debug_settings`, read only in debug builds and excluded from backup. The progress file
 is backed up (current backup rules already include everything; only the debug file
-needs an `<exclude>`).
+needs an exclude: `<exclude domain="file" path="datastore/debug_settings.preferences_pb"/>`
+in `backup_rules.xml` (API ≤ 30) and in both `<cloud-backup>` and `<device-transfer>`
+of `data_extraction_rules.xml` (API 31+)).
 
 ## 7. Debug aids (debug builds only)
 
@@ -545,8 +556,10 @@ Removed: `ProfileScreen`, `Profile` route, `DemonViewModel` (and `DemonViewModel
 
 New dependencies: `androidx.datastore:datastore-preferences`,
 `org.jetbrains.kotlinx:kotlinx-serialization-json` (the serialization plugin is
-already applied), `androidx.core:core-splashscreen`. Pin the newest stable versions
-that compile with Kotlin 2.2.10.
+already applied), `androidx.core:core-splashscreen`, and
+`com.android.tools:desugar_jdk_libs` with `isCoreLibraryDesugaringEnabled = true`
+(`java.time` on API 24–25). Pin the newest stable versions that compile with Kotlin
+2.2.10.
 
 ## 10. Error handling
 
@@ -582,7 +595,8 @@ suites case for case:
 - `ProgressJsonTest`: round trip; unknown keys ignored; corrupt JSON → `Progress()`.
 - `GameViewModelTest` (fake clock + in-memory store): `evaluate` after load and not
   before; every mutation goes through `update`; visit on selection and on a `ticks`
-  day change; `openGrimoireFromHome` uses `focusDemon`; celebration flow and Secret
+  day change; a visit 3+ days after the last one escapes the demon instead of
+  visiting him; `openGrimoireFromHome` uses `focusDemon`; celebration flow and Secret
   jump after a flawless summon; commit uses the ritual's start day.
 - `RitualViewModelTest`: `inCourt` reaches the engine; no ticks while inactive; ticks
   held after restart until a heading arrives; `commitSummon` called exactly once with
