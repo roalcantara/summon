@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Signing (ADR-0017): never commit keystores
+*.jks
+*.keystore
+!debug.keystore
