@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.summondemons.safely.R
 import com.summondemons.safely.ritual.headingLabel
-import com.summondemons.safely.ui.DemonEntry
+import com.summondemons.safely.data.Demon
 import com.summondemons.safely.ui.components.DemonCutout
 import com.summondemons.safely.ui.components.PrimaryActionButton
 import com.summondemons.safely.ui.fx.HeatShimmer
@@ -81,6 +81,9 @@ private val SceneBlur = 16.dp
 private val FloatAmplitude = 6.dp
 private val LogoSize = 36.dp
 private val AvatarSize = 40.dp
+
+/** A demon and whether he is bound. Temporary: the Grimoire rewrite (Task 24) reads `GameUiState`. */
+data class DemonEntry(val demon: Demon, val unlocked: Boolean)
 private val SelectedAvatarSize = 52.dp
 private val AvatarRing = 2.dp
 private val AvatarRowHeight = 72.dp

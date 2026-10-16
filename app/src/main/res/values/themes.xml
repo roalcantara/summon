@@ -2,4 +2,10 @@
     <style name="Theme.SummonDemonsSafely" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/obsidian</item>
     </style>
+
+    <!-- Launch theme: the splash stays up until progress has loaded (ADR-0013). -->
+    <style name="Theme.SummonDemonsSafely.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/obsidian</item>
+        <item name="postSplashScreenTheme">@style/Theme.SummonDemonsSafely</item>
+    </style>
 </resources>

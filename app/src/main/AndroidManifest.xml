@@ -8,6 +8,7 @@
     <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
 
     <application
+        android:name=".SummonApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -20,7 +21,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.SummonDemonsSafely">
+            android:theme="@style/Theme.SummonDemonsSafely.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

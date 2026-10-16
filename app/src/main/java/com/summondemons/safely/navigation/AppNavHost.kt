@@ -3,12 +3,20 @@ package com.summondemons.safely.navigation
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -17,31 +25,42 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.summondemons.safely.AppGraph
 import com.summondemons.safely.BuildConfig
+import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.platform.AndroidHeadingSource
 import com.summondemons.safely.platform.AndroidPcmSource
 import com.summondemons.safely.ritual.RitualViewModel
-import com.summondemons.safely.ui.DemonViewModel
+import com.summondemons.safely.ui.GameViewModel
 import com.summondemons.safely.ui.fx.LocalNavAnimatedVisibilityScope
 import com.summondemons.safely.ui.fx.LocalSharedTransitionScope
+import com.summondemons.safely.ui.screens.DemonEntry
 import com.summondemons.safely.ui.screens.GrimoireScreen
 import com.summondemons.safely.ui.screens.ProfileScreen
 import com.summondemons.safely.ui.screens.RitualScreen
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun AppNavHost(navController: NavHostController = rememberNavController()) {
-    val demonViewModel: DemonViewModel = viewModel() // activity-scoped
+fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavController()) {
+    val factory = remember(graph) { GameViewModel.factory(graph.progressStore, graph.clock, graph.debugSettings) }
+    val game: GameViewModel = viewModel(factory = factory) // activity-scoped
+    val state by game.uiState.collectAsStateWithLifecycle()
     val appContext = LocalContext.current.applicationContext
+    LifecycleEventEffect(Lifecycle.Event.ON_START) { game.evaluate() }
+
+    if (!state.loaded) {
+        // The splash normally covers this; never render screens from an unloaded Progress().
+        Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background))
+        return
+    }
 
     SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this) {
             NavHost(navController = navController, startDestination = Grimoire) {
                 composable<Grimoire> {
                     ProvideDestinationScope {
-                        val demons by demonViewModel.demons.collectAsStateWithLifecycle()
                         GrimoireScreen(
-                            demons = demons,
+                            demons = DemonCatalog.all.map { DemonEntry(it, unlocked = state.record(it.id).bound) },
                             onSummon = { id -> navController.navigate(Ritual(id)) },
                             onView = { id -> navController.navigate(Profile(id, isNewSummon = false)) },
                         )
@@ -50,20 +69,23 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
 
                 composable<Ritual> { entry ->
                     ProvideDestinationScope {
-                        val demon = demonViewModel.demon(entry.toRoute<Ritual>().demonId)
+                        val demon = DemonCatalog.byId(entry.toRoute<Ritual>().demonId)
                         if (demon == null) {
                             LaunchedEffect(Unit) { navController.popBackStack() }
                         } else {
-                            val factory = remember(demon) {
+                            // The day the ritual started spends the summon, even if the climax lands after midnight.
+                            val startDay = rememberSaveable { game.today() }
+                            val ritualFactory = remember(demon) {
                                 RitualViewModel.factory(
                                     demon,
                                     AndroidHeadingSource(appContext),
                                     AndroidPcmSource(),
-                                    commitSummon = { demonViewModel.unlock(demon.id) },
+                                    inCourt = { game.inCourtNow(demon.house) },
+                                    commitSummon = { flawless -> game.commitSummon(demon.id, startDay, flawless) },
                                 )
                             }
                             RitualScreen(
-                                viewModel = viewModel(factory = factory),
+                                viewModel = viewModel(factory = ritualFactory),
                                 onSummoned = {
                                     navController.navigate(Profile(demon.id, isNewSummon = true)) { popUpTo<Grimoire>() }
                                 },
@@ -76,7 +98,7 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                 composable<Profile> { entry ->
                     ProvideDestinationScope {
                         val route = entry.toRoute<Profile>()
-                        val demon = demonViewModel.demon(route.demonId)
+                        val demon = DemonCatalog.byId(route.demonId)
                         if (demon == null) {
                             LaunchedEffect(Unit) { navController.popBackStack() }
                         } else {
@@ -86,7 +108,7 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                                 onDone = dropUnlessResumed { navController.popBackStack<Grimoire>(inclusive = false) },
                                 onUnsummon = if (BuildConfig.DEBUG && !route.isNewSummon) {
                                     dropUnlessResumed {
-                                        demonViewModel.lock(demon.id)
+                                        game.unsummon(demon.id)
                                         navController.popBackStack<Grimoire>(inclusive = false)
                                     }
                                 } else {
