@@ -24,7 +24,15 @@ shrinking, signing secrets, versioning, privacy commitments, and launcher icon a
    answer is "no data collected". Any future network feature requires a new ADR and
    privacy policy update.
 4. **Shrinking:** R8 code optimization and resource shrinking are enabled for release builds.
-   The obfuscation mapping file is included inside the AAB for Play deobfuscation.
+   In AGP 9.4+, `optimization { enable = true }` enables R8 code shrinking/obfuscation and
+   resource shrinking. Specifying `packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")`
+   restricts optimization to external dependency packages while leaving the app's own code
+   (`com.summondemons.safely.**`) in its original form. This deliberate configuration avoids
+   aggressive reflection/serialization pitfalls with kotlinx-serialization models and
+   Navigation route types without requiring brittle custom keep rules, while stripping unused
+   framework/library bytecode and all unreferenced resources. The obfuscation mapping file
+   is included inside the AAB (`BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map`)
+   for Play Console deobfuscation.
 5. **Versioning:** `versionCode` is a monotonically increasing integer bumped on every
    upload; `versionName` follows SemVer (`1.0.0` for initial launch).
 6. **Launcher icon:** Generated reproducibly from `ic_game_logo.webp` via `tools/gen_icons.py`.
