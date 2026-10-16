@@ -1,0 +1,192 @@
+package com.summondemons.safely.ui.components
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.summondemons.safely.R
+import com.summondemons.safely.data.Demon
+import com.summondemons.safely.ritual.headingLabel
+import com.summondemons.safely.ritual.headingLetter
+import com.summondemons.safely.ui.theme.demonColors
+import com.summondemons.safely.ui.theme.spacing
+import com.summondemons.safely.ui.theme.textRoles
+import com.summondemons.safely.ui.theme.upper
+
+enum class BadgeKey { Direction, House, Calling, Legions }
+
+data class BadgeInfo(val key: BadgeKey, val label: String, val text: String)
+
+private const val RIM_ALPHA = 0.7f
+private const val SELECTED_TINT = 0.22f
+private const val BAND_ALPHA = 0.8f
+private const val BAND_BORDER_ALPHA = 0.55f
+private const val LAYER_FADE_MS = 150
+private val BadgeIconSize = 24.dp
+private val BandIconSize = 14.dp
+private val BadgeLabelSize = 13.sp
+private val BandTextSize = 14.sp
+private val SelectedGlow = 8.dp
+
+/** The four facts on a demon's card with their explanations (ADR-0011). */
+@Composable
+fun rememberBadges(demon: Demon): List<BadgeInfo> {
+    val direction = headingLabel(demon.ritualHeading)
+    val liege = demon.liege?.let { stringResource(R.string.badge_liege, it) } ?: stringResource(R.string.badge_no_liege)
+    return listOf(
+        BadgeInfo(BadgeKey.Direction, direction, stringResource(R.string.badge_direction_text, direction, liege)),
+        BadgeInfo(BadgeKey.House, demon.house.planet, demon.house.tooltip),
+        BadgeInfo(BadgeKey.Calling, demon.calling.label, demon.calling.tooltip),
+        BadgeInfo(
+            BadgeKey.Legions,
+            stringResource(R.string.badge_legions_label, demon.legions),
+            stringResource(R.string.badge_legions_text, demon.rank, demon.legions),
+        ),
+    )
+}
+
+/** Glyph in the demon accent (the rim carries the House metal). */
+@Composable
+fun BadgeIcon(key: BadgeKey, demon: Demon, size: Dp) {
+    val accent = MaterialTheme.demonColors.accent(demon.accent)
+    when (key) {
+        BadgeKey.Direction -> DirectionGlyph(demon.ritualHeading, headingLetter(demon.ritualHeading), accent, size)
+        BadgeKey.House -> HouseGlyph(demon.house, MaterialTheme.demonColors.metal(demon.house), size)
+        BadgeKey.Calling -> CallingGlyph(demon.calling, accent, size)
+        BadgeKey.Legions -> LegionsGlyph(accent, size)
+    }
+}
+
+/** Four equal tiles; tapping one selects it (tapping it again deselects). */
+@Composable
+fun BadgeRow(demon: Demon, selected: BadgeKey?, onSelect: (BadgeKey?) -> Unit, modifier: Modifier = Modifier) {
+    val colors = MaterialTheme.colorScheme
+    val accent = MaterialTheme.demonColors.accent(demon.accent)
+    val rim = MaterialTheme.demonColors.metal(demon.house)
+    val shape = MaterialTheme.shapes.small
+    Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)) {
+        rememberBadges(demon).forEach { badge ->
+            val on = badge.key == selected
+            val explain = stringResource(R.string.badge_explain, badge.label)
+            Column(
+                Modifier
+                    .weight(1f)
+                    .then(if (on) Modifier.shadow(SelectedGlow, shape, ambientColor = accent, spotColor = accent) else Modifier)
+                    .clip(shape)
+                    .background(
+                        Brush.linearGradient(
+                            listOf(
+                                if (on) lerp(colors.surfaceContainerHigh, accent, SELECTED_TINT) else colors.surfaceContainerHigh,
+                                colors.surfaceContainerLow,
+                            ),
+                        ),
+                    )
+                    .border(if (on) 1.5.dp else 1.dp, if (on) accent else rim.copy(alpha = RIM_ALPHA), shape)
+                    .selectable(selected = on, role = Role.Tab, onClick = { onSelect(if (on) null else badge.key) })
+                    .semantics { contentDescription = explain }
+                    .padding(vertical = MaterialTheme.spacing.sm, horizontal = MaterialTheme.spacing.xs),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs),
+            ) {
+                BadgeIcon(badge.key, demon, BadgeIconSize)
+                Text(
+                    badge.label,
+                    style = MaterialTheme.textRoles.name.copy(fontSize = BadgeLabelSize),
+                    color = colors.onSurface,
+                    maxLines = 1,
+                    modifier = Modifier.clearAndSetSemantics { },
+                )
+            }
+        }
+    }
+}
+
+/**
+ * The description, or the selected badge's explanation. Every demon's texts are stacked in
+ * one Box, only the current one visible and in semantics, so the band is always as tall as the
+ * tallest text and nothing below it moves (ADR-0016).
+ */
+@Composable
+fun InfoBand(demons: List<Demon>, demon: Demon, badge: BadgeKey?, modifier: Modifier = Modifier) {
+    val colors = MaterialTheme.colorScheme
+    val roles = MaterialTheme.textRoles
+    val accent = MaterialTheme.demonColors.accent(demon.accent)
+    val shape = MaterialTheme.shapes.small
+    Box(
+        modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(colors.surfaceContainerHigh.copy(alpha = BAND_ALPHA))
+            .then(if (badge != null) Modifier.border(1.dp, accent.copy(alpha = BAND_BORDER_ALPHA), shape) else Modifier)
+            .padding(horizontal = MaterialTheme.spacing.lg, vertical = MaterialTheme.spacing.md),
+        contentAlignment = Alignment.Center,
+    ) {
+        demons.forEach { d ->
+            val current = d.id == demon.id
+            BandLayer(visible = current && badge == null) {
+                Text(
+                    d.description,
+                    style = roles.body.copy(fontSize = BandTextSize, fontWeight = FontWeight.SemiBold),
+                    color = colors.primary,
+                    textAlign = TextAlign.Center,
+                )
+            }
+            rememberBadges(d).forEach { info ->
+                BandLayer(visible = current && badge == info.key) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs + 2.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(bottom = MaterialTheme.spacing.xs),
+                        ) {
+                            BadgeIcon(info.key, d, BandIconSize)
+                            Text(info.label.upper(), style = roles.meta, color = MaterialTheme.demonColors.accent(d.accent))
+                        }
+                        Text(info.text, style = roles.body.copy(fontSize = BandTextSize), color = colors.onSurface, textAlign = TextAlign.Center)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BandLayer(visible: Boolean, content: @Composable () -> Unit) {
+    // A cross-fade in every motion setting (reduced motion swaps slides for cross-fades, §4).
+    val alpha by animateFloatAsState(if (visible) 1f else 0f, tween(LAYER_FADE_MS), label = "bandLayer")
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .graphicsLayer { this.alpha = alpha }
+            .then(if (visible) Modifier else Modifier.clearAndSetSemantics { }),
+        contentAlignment = Alignment.Center,
+    ) { content() }
+}
