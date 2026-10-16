@@ -78,6 +78,7 @@ import com.summondemons.safely.ui.components.AltarRing
 import com.summondemons.safely.ui.components.ChantTablet
 import com.summondemons.safely.ui.components.CueChip
 import com.summondemons.safely.ui.components.DebugControls
+import com.summondemons.safely.ui.components.CUTOUT_ASPECT
 import com.summondemons.safely.ui.components.DemonCutout
 import com.summondemons.safely.ui.components.FocusTone
 import com.summondemons.safely.ui.components.PrimaryActionButton
@@ -100,7 +101,6 @@ private const val SIGIL_WIDTH_FRACTION = 0.86f
 private const val SIGIL_IN_RING_FRACTION = 0.84f
 private const val SIGIL_MAX_HEIGHT_FRACTION = 0.42f
 private const val GHOST_ALPHA = 0.12f
-private const val CUTOUT_ASPECT = 896f / 1200f
 private const val CUTOUT_WIDTH_FRACTION = 0.8f
 private const val RING_ANIM_MS = 700
 private const val HEARTBEAT_HALF_MS = 150 // 300 ms heartbeat while wavering

@@ -26,6 +26,9 @@ private const val RIM_ALPHA_UNBLURRED = 0.2f
 private const val SILHOUETTE_ALPHA = 0.94f
 private val RimBlur = 10.dp
 
+/** Width / height of every cut-out art export (896 × 1200); shared so Grimoire and Ritual frame it identically. */
+const val CUTOUT_ASPECT = 896f / 1200f
+
 /**
  * Cut-out art with an accent rim glow behind it. [silhouette] 0..1 darkens the art toward
  * a near-black silhouette (locked demons, the start of the climax).

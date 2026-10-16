@@ -211,7 +211,7 @@ private fun DashedBubble(color: Color, modifier: Modifier = Modifier, content: @
             .clip(shape)
             .background(MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = GHOST_ALPHA))
             .drawBehind {
-                val corner = 16.dp.toPx()
+                val corner = shape.topStart.toPx(size, this)
                 drawRoundRect(
                     color,
                     cornerRadius = CornerRadius(corner),

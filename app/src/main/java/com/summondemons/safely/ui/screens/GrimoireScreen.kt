@@ -85,6 +85,7 @@ import com.summondemons.safely.ui.GameUiState
 import com.summondemons.safely.ui.components.BadgeKey
 import com.summondemons.safely.ui.components.BadgeRow
 import com.summondemons.safely.ui.components.DebugChip
+import com.summondemons.safely.ui.components.CUTOUT_ASPECT
 import com.summondemons.safely.ui.components.DemonCutout
 import com.summondemons.safely.ui.components.DossierCarousel
 import com.summondemons.safely.ui.components.FloorCircle
@@ -123,7 +124,6 @@ private const val EMBERS = 20
 private const val PARTY_EMBERS = 50
 private const val SMOKE = 8
 private const val SUNBURST_ALPHA = 0.2f
-private const val ART_ASPECT = 896f / 1200f
 private const val FLOOR_WIDTH = 0.92f
 private const val FLOOR_ASPECT = 4f
 private const val SCENE_HEIGHT = 0.94f
@@ -173,10 +173,11 @@ fun GrimoireScreen(
     val density = LocalDensity.current
 
     // Captured when this demon is first shown: the visit clears restlessness, but he still sulks for this viewing.
-    val restless = remember(demon.id, state.today) { ProgressRules.isRestless(record, state.today) }
-    // Ink flags are read once per viewing and consumed at once; the remembered values keep the animation alive.
-    val inkCodex = remember(demon.id) { record.revealed && record.revealPending.codex }
-    val inkBattle = remember(demon.id) { record.revealed && record.revealPending.battle }
+    // Saved, so a configuration change doesn't re-read the already-visited record.
+    val restless = rememberSaveable(demon.id, state.today) { ProgressRules.isRestless(record, state.today) }
+    // Ink flags are read once per viewing and consumed at once; the saved values keep the animation alive.
+    val inkCodex = rememberSaveable(demon.id) { record.revealed && record.revealPending.codex }
+    val inkBattle = rememberSaveable(demon.id) { record.revealed && record.revealPending.battle }
     var page by remember(demon.id) { mutableIntStateOf(0) }
     var badge by remember(demon.id) { mutableStateOf<BadgeKey?>(null) }
     var badgeTaps by remember { mutableIntStateOf(0) }
@@ -260,7 +261,8 @@ fun GrimoireScreen(
         }
 
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
-            AvatarRail(demons, state, demon.id, enabled = party == null, onBack, onSelect, onDebug)
+            // Like system back (BackHandler above), the rail's back arrow dismisses the celebration first.
+            AvatarRail(demons, state, demon.id, enabled = party == null, { if (party != null) onDismissCelebration() else onBack() }, onSelect, onDebug)
             BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
                 var fixedPx by remember { mutableIntStateOf(0) }
                 val navBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -393,7 +395,7 @@ private fun Stage(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.BottomCenter) {
-            Box(Modifier.aspectRatio(ART_ASPECT, matchHeightConstraintsFirst = true)) {
+            Box(Modifier.aspectRatio(CUTOUT_ASPECT, matchHeightConstraintsFirst = true)) {
                 if (bound) SceneBackdrop(demon.sceneArt, Modifier.align(Alignment.TopCenter))
                 FloorCircle(
                     accent = accent,
@@ -408,7 +410,7 @@ private fun Stage(
                         scaleY = pop.value
                     },
                 ) {
-                    Jitter(enabled = restless, modifier = Modifier.fillMaxSize()) {
+                    Jitter(enabled = restless && bound, modifier = Modifier.fillMaxSize()) {
                         DemonCutout(
                             art = demon.cutoutArt,
                             contentDescription = null,
@@ -516,7 +518,6 @@ private fun CardHeader(demon: Demon, bound: Boolean, modifier: Modifier) {
             Modifier
                 .size(MedallionSize)
                 .background(colors.surfaceContainerLow, CircleShape)
-                .then(Modifier.padding(0.dp))
                 .clip(CircleShape)
                 .background(metal.copy(alpha = METAL_RING_ALPHA), CircleShape)
                 .padding(1.dp)

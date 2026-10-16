@@ -26,6 +26,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -96,6 +98,8 @@ class GameViewModel(
             val day = today()
             if (savedState.get<String>(KEY_SELECTED).isNullOrEmpty()) select(ProgressRules.focusDemon(ProgressRules.evaluate(first, day), demonIds, day))
             store.update { ProgressRules.evaluate(it, today()) }
+            // Keeps time-derived state right while the app stays open across midnight (§1).
+            time.map { it.epochDay() }.distinctUntilChanged().drop(1).collect { day -> update { ProgressRules.evaluate(it, day) } }
         }
     }
 

@@ -161,9 +161,11 @@ private fun RitualDestination(
     appContext: android.content.Context,
     navController: NavHostController,
 ) {
-    // The day the ritual started spends the summon, even if the climax lands after midnight (§1).
-    val startDay = rememberSaveable { game.today() }
     val ritualFactory = remember(demon) {
+        // The day the ritual started spends the summon, even if the climax lands after midnight (§1).
+        // Taken with the factory, which only builds a ViewModel in this same composition: a rotation
+        // keeps the existing ViewModel (and its day); process death restarts both the ritual and the day.
+        val startDay = game.today()
         RitualViewModel.factory(
             demon,
             AndroidHeadingSource(appContext),
