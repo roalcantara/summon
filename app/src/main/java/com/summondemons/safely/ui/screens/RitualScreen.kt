@@ -234,7 +234,8 @@ private fun RitualContent(
                     azimuth = state.azimuth,
                     target = demon.ritualHeading,
                     mode = compassMode(ritual.phase),
-                    graceFraction = ritual.graceFraction,
+                    // Stand-in until the altar ring (Task 25): the red arc shows focus spent.
+                    graceFraction = if (ritual.clockActive) 1f - ritual.focusFraction else 0f,
                     modifier = Modifier.fillMaxSize(),
                 )
                 InkedSigil(

@@ -5,7 +5,7 @@ import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.ritual.RitualConfig.FRAME_MS
 import com.summondemons.safely.ritual.RitualEffect.ClimaxStart
 import com.summondemons.safely.ritual.RitualEffect.Locked
-import com.summondemons.safely.ritual.RitualEffect.PhraseComplete
+import com.summondemons.safely.ritual.RitualEffect.Sealed
 import com.summondemons.safely.ritual.RitualEffect.ProximityTick
 import com.summondemons.safely.ritual.RitualEffect.Summoned
 import com.summondemons.safely.ritual.RitualEffect.SyllableLit
@@ -92,7 +92,7 @@ class RitualViewModelTest {
 
         assertEquals(RitualPhase.Done, vm.uiState.value.ritual.phase)
         assertEquals(
-            listOf(Locked, PhraseComplete(0), PhraseComplete(1), PhraseComplete(2), PhraseComplete(3), ClimaxStart, Summoned),
+            listOf(Locked, Sealed(0), Sealed(1), Sealed(2), Sealed(3), ClimaxStart(flawless = true), Summoned),
             effects.filter { it != SyllableLit && it != ProximityTick },
         )
         assertEquals(0, pcm.subscriptions)
@@ -123,7 +123,7 @@ class RitualViewModelTest {
     }
 
     @Test
-    fun driftLosesTheCurrentPhraseOnlyAfterTheGrace() = runTest(dispatcher) {
+    fun driftWaversWithoutLosingProgressAndNeverReturnsToSeeking() = runTest(dispatcher) {
         val heading = FakeHeading()
         val vm = newVm(demon, heading, silentPcm())
         observe(vm)
@@ -133,16 +133,13 @@ class RitualViewModelTest {
         advanceTimeBy(1_500); runCurrent()
         val lit = vm.uiState.value.ritual.lit
         assertTrue("lit=$lit", lit > 0)
+        assertEquals(0, vm.uiState.value.ritual.phrase) // still phrase I: no clock
 
         vm.setHoldToChant(false)
         heading.readings.emit(demon.ritualHeading + 90f)
-        advanceTimeBy(1_000); runCurrent()
+        advanceTimeBy(5_000); runCurrent()
         assertEquals(RitualPhase.Wavering, vm.uiState.value.ritual.phase)
         assertEquals(lit, vm.uiState.value.ritual.lit)
-
-        advanceTimeBy(600); runCurrent()
-        assertEquals(RitualPhase.Seeking, vm.uiState.value.ritual.phase)
-        assertEquals(0, vm.uiState.value.ritual.lit)
     }
 
     @Test

@@ -1,17 +1,18 @@
 package com.summondemons.safely.ritual
 
 import com.summondemons.safely.ritual.RitualConfig.CLIMAX_MS
-import com.summondemons.safely.ritual.RitualConfig.DRIFT_GRACE_MS
+import com.summondemons.safely.ritual.RitualConfig.COURT_BONUS
+import com.summondemons.safely.ritual.RitualConfig.FOCUS_DRIFT_MULTIPLIER
 import com.summondemons.safely.ritual.RitualConfig.FRAME_MS
 import com.summondemons.safely.ritual.RitualConfig.LOCK_HOLD_MS
 import com.summondemons.safely.ritual.RitualConfig.ONSET_REFRACTORY_MS
 import com.summondemons.safely.ritual.RitualEffect.ClimaxStart
-import com.summondemons.safely.ritual.RitualEffect.DriftWarning
+import com.summondemons.safely.ritual.RitualEffect.Cracked
+import com.summondemons.safely.ritual.RitualEffect.Drift
 import com.summondemons.safely.ritual.RitualEffect.Locked
-import com.summondemons.safely.ritual.RitualEffect.PhraseComplete
-import com.summondemons.safely.ritual.RitualEffect.PhraseLost
 import com.summondemons.safely.ritual.RitualEffect.ProximityTick
 import com.summondemons.safely.ritual.RitualEffect.Resumed
+import com.summondemons.safely.ritual.RitualEffect.Sealed
 import com.summondemons.safely.ritual.RitualEffect.Summoned
 import com.summondemons.safely.ritual.RitualEffect.SyllableLit
 import com.summondemons.safely.ritual.RitualPhase.Chanting
@@ -21,9 +22,11 @@ import com.summondemons.safely.ritual.RitualPhase.Locking
 import com.summondemons.safely.ritual.RitualPhase.Seeking
 import com.summondemons.safely.ritual.RitualPhase.Wavering
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.math.ceil
 
 class RitualEngineTest {
 
@@ -33,18 +36,26 @@ class RitualEngineTest {
     private val on = 0f
     private val off = 90f
     private val lockFrames = (LOCK_HOLD_MS / FRAME_MS).toInt()
-    private val graceFrames = (DRIFT_GRACE_MS / FRAME_MS).toInt()
     private val climaxFrames = (CLIMAX_MS / FRAME_MS).toInt()
     private val refractoryFrames = (ONSET_REFRACTORY_MS / FRAME_MS).toInt()
+
+    /** The prototype's test phrases: 8, 6, 2 and 3 syllables. */
+    private val phrases = listOf("DAEMONIUM RESIDENTE,", "GRATIA SIT CURA.", "HIC EST", "UT VOTA")
 
     private fun fresh(syllables: List<Int> = listOf(2, 2, 2, 2)) = RitualState(target = 0f, syllables = syllables)
 
     /** Runs [frames] identical ticks and collects every effect. */
-    private fun run(start: RitualState, frames: Int, azimuth: Float? = on, voice: VoiceFrame = silent): Step {
+    private fun run(
+        start: RitualState,
+        frames: Int,
+        azimuth: Float? = on,
+        voice: VoiceFrame = silent,
+        inCourt: Boolean = false,
+    ): Step {
         var state = start
         val effects = mutableListOf<RitualEffect>()
         repeat(frames) {
-            val step = RitualEngine.step(state, RitualInput(azimuth, voice))
+            val step = RitualEngine.step(state, RitualInput(azimuth, voice, inCourt))
             state = step.state
             effects += step.effects
         }
@@ -53,12 +64,32 @@ class RitualEngineTest {
 
     private fun locked(syllables: List<Int> = listOf(2, 2, 2, 2)) = run(fresh(syllables), lockFrames).state
 
+    /** The prototype phrases, locked (optionally while the House is in court). */
+    private fun lockedPhrases(inCourt: Boolean = false) =
+        run(RitualState.start(0f, phrases), lockFrames, inCourt = inCourt).state
+
     /** One onset frame, then silence for the refractory period. */
     private fun syllable(state: RitualState): Step {
         val lit = run(state, 1, voice = onset)
         val rest = run(lit.state, refractoryFrames)
         return Step(rest.state, lit.effects + rest.effects)
     }
+
+    /** The prototype's helper: [count] × (silence for the refractory period, then one onset). */
+    private fun chant(start: RitualState, count: Int, azimuth: Float? = on): Step {
+        var state = start
+        val effects = mutableListOf<RitualEffect>()
+        repeat(count) {
+            val rest = run(state, refractoryFrames, azimuth)
+            val lit = run(rest.state, 1, azimuth, onset)
+            state = lit.state
+            effects += rest.effects + lit.effects
+        }
+        return Step(state, effects)
+    }
+
+    /** Phrase I of the prototype phrases sealed: phrase II's clock just started. */
+    private fun firstSealed() = lockedPhrases().let { chant(it, it.syllables[0]).state }
 
     // --- Seeking and locking ---
 
@@ -103,6 +134,15 @@ class RitualEngineTest {
         assertEquals(listOf(false, true, false, true, false, true), ticks)
     }
 
+    @Test
+    fun theCourtMultiplierIsFixedAtLock() {
+        assertEquals(1f + COURT_BONUS, lockedPhrases(inCourt = true).courtMultiplier, 0.0001f)
+        assertEquals(1f, lockedPhrases(inCourt = false).courtMultiplier, 0.0001f)
+        // Court leaving after the lock changes nothing.
+        val later = run(lockedPhrases(inCourt = true), 10, inCourt = false).state
+        assertEquals(1f + COURT_BONUS, later.courtMultiplier, 0.0001f)
+    }
+
     // --- Chanting ---
 
     @Test
@@ -130,7 +170,7 @@ class RitualEngineTest {
     }
 
     @Test
-    fun silencePausesWithoutDecay() {
+    fun silenceOnPhraseOnePausesWithoutDecay() {
         val one = syllable(locked(listOf(3, 2, 2, 2))).state
         val later = run(one, 500).state
         assertEquals(Chanting, later.phase)
@@ -138,11 +178,11 @@ class RitualEngineTest {
     }
 
     @Test
-    fun litSyllablesCompleteAPhrase() {
+    fun litSyllablesSealAPhrase() {
         val step = syllable(syllable(locked()).state)
         assertEquals(1, step.state.phrase)
         assertEquals(0, step.state.lit)
-        assertTrue(PhraseComplete(0) in step.effects)
+        assertTrue(Sealed(0) in step.effects)
         assertEquals(0.25f, step.state.inkProgress, 0.0001f)
     }
 
@@ -152,24 +192,65 @@ class RitualEngineTest {
         repeat(3) { state = syllable(state).state }
         val step = run(state, 1, voice = onset)
         assertEquals(Climax, step.state.phase)
-        assertEquals(listOf(SyllableLit, PhraseComplete(3), ClimaxStart), step.effects)
+        assertEquals(listOf(SyllableLit, Sealed(3), ClimaxStart(flawless = true)), step.effects)
         assertEquals(1f, step.state.inkProgress)
     }
 
-    // --- Wavering ---
+    // --- Focus clock (prototype suite) ---
 
     @Test
-    fun driftingWarnsAndReturningInTimeKeepsProgress() {
-        val chanting = syllable(locked(listOf(3, 2, 2, 2))).state
-        val wavering = run(chanting, graceFrames, azimuth = off)
-        assertEquals(Wavering, wavering.state.phase)
-        assertEquals(listOf(DriftWarning), wavering.effects)
-        assertEquals(1, wavering.state.lit)
+    fun prototypePhrasesHaveTheExpectedSyllables() {
+        assertEquals(listOf(8, 6, 2, 3), lockedPhrases().syllables)
+    }
 
-        val back = run(wavering.state, 1)
+    @Test
+    fun phraseOneHasNoClockAndWaveringOnItDoesNotDrain() {
+        val s = lockedPhrases()
+        assertEquals(0L, s.focusBudgetMs)
+        val wavering = run(s, 500, azimuth = off).state
+        assertEquals(Wavering, wavering.phase)
+        assertEquals(0, wavering.phrase)
+        assertEquals(0L, wavering.focusMs)
+    }
+
+    @Test
+    fun aSealStartsAFullClockForTheNextPhrase() {
+        val start = lockedPhrases()
+        val step = chant(start, start.syllables[0])
+        assertTrue(Sealed(0) in step.effects)
+        assertEquals(1, step.state.phrase)
+        assertEquals(focusBudget(step.state.syllables[1], 1), step.state.focusBudgetMs)
+        assertEquals(step.state.focusBudgetMs, step.state.focusMs)
+    }
+
+    @Test
+    fun drainsOnceOnHeadingEvenInSilenceAndThreeTimesOffHeading() {
+        val sealed = firstSealed()
+        val onHeading = run(sealed, 10).state
+        assertEquals(10 * FRAME_MS, sealed.focusMs - onHeading.focusMs)
+        val offHeading = run(sealed, 10, azimuth = off).state
+        assertEquals(10 * FRAME_MS * FOCUS_DRIFT_MULTIPLIER, sealed.focusMs - offHeading.focusMs)
+    }
+
+    @Test
+    fun syllablesDoNotCountOffHeadingAndResumingNeedsNoReLock() {
+        val drifted = chant(firstSealed(), 2, azimuth = off).state
+        assertEquals(0, drifted.lit)
+        val back = run(drifted, 1, voice = onset)
         assertEquals(Chanting, back.state.phase)
-        assertEquals(1, back.state.lit)
-        assertEquals(listOf(Resumed), back.effects)
+        assertTrue(Resumed in back.effects)
+    }
+
+    @Test
+    fun aNullHeadingCountsAsOffHeading() {
+        assertEquals(Wavering, run(firstSealed(), 1, azimuth = null).state.phase)
+    }
+
+    @Test
+    fun onceLockedTheRitualNeverReturnsToSeekingAndWarnsOnce() {
+        val step = run(locked(), 500, azimuth = null)
+        assertEquals(Wavering, step.state.phase)
+        assertEquals(1, step.effects.count { it == Drift })
     }
 
     @Test
@@ -179,20 +260,50 @@ class RitualEngineTest {
     }
 
     @Test
-    fun graceExpiryLosesOnlyTheCurrentPhrase() {
-        val secondPhrase = syllable(syllable(syllable(locked(listOf(2, 3, 2, 2))).state).state).state
-        assertEquals(1, secondPhrase.phrase)
-        assertEquals(1, secondPhrase.lit)
+    fun runningOutCracksTheLastSealClearsThePhraseAndEndsFlawless() {
+        val s = chant(firstSealed(), 2).state
+        assertEquals(2, s.lit)
+        val step = run(s, ceil(s.focusMs.toDouble() / FRAME_MS).toInt() + 1)
+        assertTrue(Cracked(0) in step.effects)
+        assertEquals(0, step.state.phrase)
+        assertEquals(0, step.state.lit)
+        assertEquals(0L, step.state.focusBudgetMs) // back on phrase I: no clock
+        assertFalse(step.state.flawless)
+        assertEquals(0f, step.state.inkProgress)
+    }
 
-        val lost = run(secondPhrase, graceFrames + 1, azimuth = off)
-        assertEquals(Seeking, lost.state.phase)
-        assertEquals(1, lost.state.phrase)
-        assertEquals(0, lost.state.lit)
-        assertTrue(PhraseLost in lost.effects)
+    @Test
+    fun aCrackOnPhraseThreeReopensPhraseTwoWithItsOwnFullBudget() {
+        val sealed = firstSealed()
+        val s = chant(sealed, sealed.syllables[1]).state
+        assertEquals(2, s.phrase)
+        val frames = ceil(s.focusMs.toDouble() / FRAME_MS / FOCUS_DRIFT_MULTIPLIER).toInt() + 1
+        val step = run(s, frames, azimuth = off)
+        assertEquals(1, step.state.phrase)
+        assertTrue(Cracked(1) in step.effects)
+        assertEquals(focusBudget(s.syllables[1], 1), step.state.focusBudgetMs)
+    }
 
-        val relocked = run(lost.state, lockFrames)
-        assertEquals(Chanting, relocked.state.phase)
-        assertTrue(Locked in relocked.effects)
+    @Test
+    fun aFlawlessRunReachesTheClimaxAndReportsIt() {
+        var s = lockedPhrases()
+        val effects = mutableListOf<RitualEffect>()
+        for (p in 0 until 4) {
+            val step = chant(s, s.syllables[p])
+            s = step.state
+            effects += step.effects
+        }
+        assertEquals(Climax, s.phase)
+        assertTrue(ClimaxStart(flawless = true) in effects)
+        assertEquals(0f, s.focusFraction)
+        assertEquals(Done, run(s, climaxFrames).state.phase)
+    }
+
+    @Test
+    fun budgetsAreThreeSecondsPlusHalfASecondPerSyllableScaledInCourt() {
+        assertEquals(12_000L, focusBudget(18, 1))
+        assertEquals(7_500L, focusBudget(6, 1, 1.25f))
+        assertEquals(0L, focusBudget(8, 0))
     }
 
     // --- Climax and done ---

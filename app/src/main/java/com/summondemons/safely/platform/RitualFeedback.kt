@@ -78,20 +78,20 @@ private fun handle(
             fadeBed(BED_VOLUME, FADE_IN_MS)
         }
         RitualEffect.SyllableLit -> Haptics.syllable(context)
-        is RitualEffect.PhraseComplete -> {
+        is RitualEffect.Sealed -> {
             Haptics.chime(context)
             sounds.play(Cue.chime(effect.phrase))
         }
-        RitualEffect.DriftWarning -> {
+        is RitualEffect.Cracked -> {
+            Haptics.warn(context)
+            sounds.play(Cue.Boom)
+        }
+        RitualEffect.Drift -> {
             Haptics.warn(context)
             fadeBed(BED_DUCKED, DUCK_MS)
         }
         RitualEffect.Resumed -> fadeBed(BED_VOLUME, DUCK_MS)
-        RitualEffect.PhraseLost -> {
-            Haptics.warn(context)
-            fadeBed(0f, FADE_OUT_MS)
-        }
-        RitualEffect.ClimaxStart -> {
+        is RitualEffect.ClimaxStart -> {
             Haptics.crescendo(context)
             sounds.play(Cue.Riser)
             fadeBed(1f, SWELL_MS)

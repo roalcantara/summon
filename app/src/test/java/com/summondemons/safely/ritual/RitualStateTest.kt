@@ -36,10 +36,20 @@ class RitualStateTest {
     @Test
     fun fractionsOnlyApplyInTheirPhase() {
         val state = RitualState(target = 0f, syllables = listOf(1, 1, 1, 1))
-        assertEquals(0f, state.graceFraction)
-        assertEquals(0.5f, state.copy(phase = RitualPhase.Wavering, phaseMs = 750).graceFraction, 0.0001f)
-        assertEquals(0.5f, state.copy(phase = RitualPhase.Climax, phaseMs = 1_250).climaxFraction, 0.0001f)
+        assertEquals(0f, state.focusFraction)
+        assertEquals(0.25f, state.copy(focusMs = 1_000, focusBudgetMs = 4_000).focusFraction, 0.0001f)
+        assertEquals(0.5f, state.copy(phase = RitualPhase.Climax, climaxMs = 1_250).climaxFraction, 0.0001f)
         assertEquals(1f, state.copy(phase = RitualPhase.Done).climaxFraction)
+    }
+
+    @Test
+    fun theClockRunsOnPhrasesTwoToFourWhileChantingOrWavering() {
+        val state = RitualState(target = 0f, syllables = listOf(1, 1, 1, 1))
+        assertFalse(state.copy(phase = RitualPhase.Chanting, phrase = 0).clockActive)
+        assertTrue(state.copy(phase = RitualPhase.Chanting, phrase = 1).clockActive)
+        assertTrue(state.copy(phase = RitualPhase.Wavering, phrase = 3).clockActive)
+        assertFalse(state.copy(phase = RitualPhase.Climax, phrase = 4).clockActive)
+        assertFalse(state.copy(phase = RitualPhase.Locking, phrase = 2).clockActive)
     }
 
     @Test(expected = IllegalArgumentException::class)
