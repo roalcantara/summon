@@ -27,6 +27,7 @@ If two sources disagree, the higher one wins. Fix the lower one or note it in an
 | `gradle/libs.versions.toml` | Dependency versions |
 | `docs/decisions/` | ADRs |
 | `docs/superpowers/specs/`, `docs/superpowers/plans/` | Design specs and implementation plans |
+| `docs/PRIVACY_POLICY.md`, `docs/STORE_LISTING.md` | Privacy policy and Play Store listing drafts (release prep: `docs/superpowers/plans/play-store-readiness.md`) |
 | `reference/prompts/` | The two original Stitch prompts, verbatim |
 | `reference/stitch/` | Stitch mockups, character art, logo, sigil |
 | `reference/src/` | Draft Compose code (input for the port; does not compile as-is) |
