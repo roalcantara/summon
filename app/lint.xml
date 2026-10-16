@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!--
+      Orientation lock (ADR-0017):
+      The ritual compass heading assumes portrait orientation.
+      LockedOrientationActivity and DiscouragedApi warnings are suppressed for v1.
+    -->
+    <issue id="LockedOrientationActivity" severity="ignore" />
+    <issue id="DiscouragedApi" severity="ignore">
+        <ignore path="src/main/AndroidManifest.xml" />
+    </issue>
+</lint>
