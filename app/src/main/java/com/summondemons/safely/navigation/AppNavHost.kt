@@ -34,6 +34,8 @@ import com.summondemons.safely.platform.AndroidPcmSource
 import com.summondemons.safely.platform.GameSounds
 import com.summondemons.safely.platform.LocalGameSounds
 import com.summondemons.safely.ritual.RitualViewModel
+import com.summondemons.safely.progress.ProgressRules
+import com.summondemons.safely.ui.screens.HomeScreen
 import com.summondemons.safely.ui.GameViewModel
 import com.summondemons.safely.ui.fx.LocalNavAnimatedVisibilityScope
 import com.summondemons.safely.ui.fx.LocalSharedTransitionScope
@@ -62,7 +64,29 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
     CompositionLocalProvider(LocalGameSounds provides sounds) {
         SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this) {
-            NavHost(navController = navController, startDestination = Grimoire) {
+            NavHost(navController = navController, startDestination = Home) {
+                composable<Home> {
+                    ProvideDestinationScope {
+                        val demons = DemonCatalog.all
+                        val anyRestless = demons.any { ProgressRules.isRestless(state.record(it.id), state.today) }
+                        val focusId = ProgressRules.focusDemon(state.progress, DemonCatalog.ids, state.today)
+                        HomeScreen(
+                            boundCount = demons.count { state.record(it.id).bound },
+                            demonCount = demons.size,
+                            courtHouses = state.courtHouses,
+                            restlessAccent = if (anyRestless) DemonCatalog.byId(focusId)?.accent else null,
+                            showHint = !state.progress.homeHintSeen,
+                            escaped = demons.filter { state.record(it.id).escapeBannerPending },
+                            onOpen = dropUnlessResumed {
+                                game.openGrimoireFromHome()
+                                navController.navigate(Grimoire) { launchSingleTop = true }
+                            },
+                            onDismissEscape = game::dismissEscapeBanners,
+                            onDebug = null, // Task 26
+                        )
+                    }
+                }
+
                 composable<Grimoire> {
                     ProvideDestinationScope {
                         GrimoireScreen(

@@ -1,5 +1,6 @@
 package com.summondemons.safely.ui.components
 
+import androidx.compose.material3.AssistChip
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -79,4 +80,10 @@ fun DebugControls(
             }
         }
     }
+}
+
+/** Opens the debug sheet from Home and Grimoire. Debug builds only (caller checks BuildConfig.DEBUG). */
+@Composable
+fun DebugChip(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    AssistChip(onClick = onClick, label = { Text(stringResource(R.string.debug_chip)) }, modifier = modifier)
 }

@@ -3,6 +3,9 @@ package com.summondemons.safely.navigation
 import kotlinx.serialization.Serializable
 
 @Serializable
+data object Home
+
+@Serializable
 data object Grimoire
 
 @Serializable
