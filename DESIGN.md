@@ -40,6 +40,15 @@ colors:
   demon-asmodeus: '#ffd54f'
   demon-astaroth: '#e040fb'
   ritual-safe: '#4ade80'
+  house-sol: '#f2c14e'
+  house-venus: '#c87a3c'
+  ink-highlight: '#fff6d0'
+  stage-home-glow: '#3a2a55'
+  stage-home-mid: '#1a1530'
+  stage-sol-glow: '#6b4a12'
+  stage-sol-mid: '#2a1d0b'
+  stage-venus-glow: '#3b2a4a'
+  stage-venus-mid: '#2a1a26'
 typography:
   display: { family: Cinzel, size: 32sp, weight: 700, line: 40sp }
   headline-large: { family: Cinzel, size: 24sp, weight: 700, line: 32sp }
@@ -76,16 +85,24 @@ characters and copy; the interface stays dark and glowing.
 
 ## Color → Compose mapping
 
-Each `colors` key in the frontmatter maps 1:1 to the `darkColorScheme` slot of the
-same name in camelCase (`surface-container-high` → `surfaceContainerHigh`). The app
+Each Material `colors` key in the frontmatter maps 1:1 to the `darkColorScheme` slot of
+the same name in camelCase (`surface-container-high` → `surfaceContainerHigh`). The app
 ships a dark scheme only. Extras that have no Material slot are exposed as a
 `DemonColors` object provided through a `CompositionLocal`:
 
 | Token | Use |
 |---|---|
-| `demon-asmodeus` | Asmodeus accent: card tint, highlighted chant phrase, sigil glow |
+| `demon-asmodeus` | Asmodeus accent: stage particles, highlighted chant phrase, sigil, badges |
 | `demon-astaroth` | Astaroth accent: same roles |
-| `ritual-safe` | Compass "aligned" state |
+| `ritual-safe` | Altar ring locked / aligned, safe cue chip |
+| `house-sol` | Sol metal: badge rims, number medallion, Home court chip |
+| `house-venus` | Venus metal: same roles |
+| `ink-highlight` | Hot core of flashes: focus-bar court shimmer, sealed medallion, sigil flare, grimoire opening burst |
+| `stage-home-glow`, `stage-home-mid` | Home background gradient (edge: `surface-container-lowest`) |
+| `stage-sol-glow`, `stage-sol-mid` | Sol stage gradient (edge: `background`) |
+| `stage-venus-glow`, `stage-venus-mid` | Venus stage gradient (edge: `background`) |
+
+Smoke particles use `on-surface-variant`; Home embers and the compass rose use `primary`.
 
 ## Typography
 
@@ -93,6 +110,19 @@ ships a dark scheme only. Extras that have no Material slot are exposed as a
 - Inter for body and labels; numbers use tabular figures.
 - Both are bundled in `res/font/` as static, Latin-subset instances generated from the
   Google Fonts variable fonts (SIL OFL 1.1; licences in `app/src/main/assets/licenses/`).
+
+### Text roles (ADR-0014)
+
+Read through `MaterialTheme.textRoles`. Compose has no text-transform: `cue` and `meta`
+strings are upper-cased at the call site with `upper()` (`uppercase(Locale.ROOT)`).
+
+| Role | Style | Used for |
+|---|---|---|
+| `cue` | `label-medium`, letter spacing 0.08 em, upper case | What to do now: cue chips, "Tap to summon", "Circle cooling" |
+| `incantation` | Cinzel 15 sp Bold, line 22 sp, letter spacing 0.02 em | Every chant phrase on the tablet |
+| `meta` | `label-small`, letter spacing 0.14 em, upper case, `outline` | Small headers and counters: "Sacred chant", "1 / 6", "2 of 2 spirits bound" |
+| `name` | Cinzel Bold; size per use (`title` / `headline-*`, or a size fixed by the screen spec) | Demon names, numbers, badge labels, ability names |
+| `body` | `body-medium` | Descriptions, quotes, dossier pages |
 
 ## Shapes
 
@@ -104,23 +134,41 @@ dark palette carries the RPG feel.
 ## Rules
 
 - Composables read colors, type, shapes and spacing from `MaterialTheme` (and
-  `DemonColors`) only. No hardcoded colors or ad-hoc dimensions.
-- A demon's accent comes from its data, never from a `when (id)` in UI code.
+  `DemonColors`, `textRoles`) only. No hardcoded colors or ad-hoc dimensions.
+- A demon's accent and House metal come from its data, never from a `when (id)` in UI code.
 - Motion respects `LocalReduceMotion` (system animator scale 0): no particles,
-  parallax, floating, shimmer, sunburst rotation or climax flash.
+  parallax, floating, jitter, shimmer, sunburst rotation, grimoire bob/hop/peek, dust
+  puff, quote-slot and floor-circle pulses, or climax flash. The grimoire opening keeps
+  a 150 ms fade; the avatar burn-away and badge/carousel changes cross-fade. Ink-in,
+  karaoke and the focus bar still update.
 
 ## Components (contracts)
 
 | Component | Purpose | States / inputs |
 |---|---|---|
-| `PrimaryActionButton` | Main CTA (Summon, View, Awesome!, Back) | `text`, `onClick`, `enabled`, `tone`; gold container, bold label, soft glow |
-| `RibbonBanner` | "New Demon Received!" header on Profile | `text`; primary container color |
-| `RotatingSunburstBackground` | Rays behind the demon on Profile | `color`, `rotating` |
-| `InkedSigil` | The demon's vector sigil | `sigil` (raw), `inkProgress` 0–1, `ringProgress` 0–1, `rimText`, `accent`, `micLevel` (glow), `ghostAlpha` (faint full-glyph underlay); glow blurred on API 31+, dimmed and narrowed below |
-| `CompassArc` | Heading ring around the sigil | `azimuth`, `target`, `mode` (Seeking / Locked / Wavering), `graceFraction` |
-| `KaraokeLine` | Current chant phrase | `text`, `lit` syllables, `accent`, `dim` |
-| `DemonCutout` | Cut-out art with accent rim glow | `art`, `accent`, `silhouette` 0–1 |
+| `PrimaryActionButton` | Main CTA (**Awesome!**, **Stay**, Allow microphone) | `text`, `onClick`, `enabled`, `tone`; gold container, bold label, soft glow |
+| `RibbonBanner` | "New Demon Received!" on the Grimoire celebration; "Seal broken!" on Home | `text`; primary container color |
+| `RotatingSunburstBackground` | Rays behind the demon during the Grimoire celebration | `color`, `rotating` |
+| `InkedSigil` | The demon's vector sigil | `sigil` (raw), `inkProgress` 0–1, `ringProgress` 0–1, `rimText`, `accent`, `micLevel` (glow), `ghostAlpha`, `flash` (group, color, duration: seal flare / crack drain) |
+| `AltarRing` | Ring around the sigil on the Ritual | `azimuth`, `target`, `phase`, `lockFraction`, `accent`; outline track, `ritual-safe` lock fill / locked ring, `error` while wavering, a marker toward the target |
+| `CueChip` | One-line cue | `text`, `tone` (neutral / safe / error), `shake` |
+| `FocusBar` | Focus left under the current phrase | `fraction`, `tone` (normal / drift / court), `accent`; heartbeat below `FOCUS_LOW_FRACTION` |
+| `ChantTablet` | Framed chant panel | `phrases`, `phrase`, `lit`, `accent`, `active`, `header`, `focusFraction`, `focusTone` (normal / drift / court), `flare`, `cracked`, `micLevel`, `wavering`; contains `Medallion`, `KaraokeLine`, `FocusBar` |
+| `KaraokeLine` | Current chant phrase | `text`, `lit` syllables, `accent`, `dim`, `micLevel` (newest-syllable glow) |
+| `BadgeRow` | Direction / House / Calling / Legions tiles | `demon`, `selected`, `onSelect`; rim = House metal, glyph = accent (House glyph = metal); `BadgeIcon` draws one glyph |
+| `InfoBand` | Description or the selected badge's explanation | `demons`, `demon`, `badge`; height of the tallest text |
+| `DossierCarousel` | Six dossier pages | `demon`, `record`, `inkCodex`, `inkBattle`, `page`, `onPage`; ‹ › and swipe, wrapping |
+| `Smudge` / `InkLine` | Sealed page lines / ink-in of revealed lines | `lines`; `ink`, `index` |
+| `QuoteSlot` | Fixed 72 dp slot under the demon | `state` (celebration / bound / ready / cooling), quote, hours, `shake` |
+| `SigilAvatar` | Avatar rail item | `demon`, `bound`, `burn`, `restless`, `selected`, `enabled` |
+| `FloorCircle` | Accent ellipse under the demon | `accent`, `pulse` |
+| `StageBackground` | Gradient stage (Home, Sol, Venus) with a scrim | `stage`, `dim` |
+| `CompassRose` | Inlaid rose on the Home floor | — (`primary`) |
+| `RestlessGrimoire` | Vector placeholder for the Home book | `restless`, `accent`, `opening`, `onOpen` |
+| Glyphs | `DirectionGlyph`, `HouseGlyph`, `CallingGlyph`, `LegionsGlyph` | vector paths in a 24-unit box; `color`, `size` |
+| `DemonCutout` | Cut-out art with accent rim glow | `art`, `accent`, `silhouette` 0–1, `alignment` |
 | `ParticleField` | Embers / smoke / converging climax sparks | `color`, `style`, `count`, `converge` 0–1 |
+| `DebugChip` | Opens the debug sheet (debug builds only) | `onClick` |
 | `HeatShimmer` | Rising heat haze | `color`; AGSL on API 33+, breathing gradient below |
 | `rememberParallax` | Gyro offset for art layers | max offset; `TYPE_GAME_ROTATION_VECTOR`, none if absent |
 
@@ -161,6 +209,7 @@ All sounds are original synthesized works (CC0) from `tools/gen_audio.py`, mono
 `lock`, `riser`, `boom`, `tada`. Regenerate with
 `python3 -I tools/gen_audio.py app/src/main/res/raw`. To replace one with a recording,
 use a CC0 file of the same name and record its source URL and licence here.
+`chime_4` also opens the Home grimoire (50 %); `boom` at 35 % marks a crack.
 
 ### Screen mockups (visual reference only)
 
@@ -174,4 +223,13 @@ breach screen).
 
 ## Gaps
 
-None open. Asmodeus has no new scene art; `demon_asmodeus_full` keeps the earlier render.
+Placeholders ship; art can replace them later. Never ship the prototype's Hero Wars
+stand-in images.
+
+| Gap | Placeholder | Stitch prompt |
+|---|---|---|
+| Home hall background (`stage_home`) | `StageBackground(Home)` gradient | "Portrait 9:19.5 mobile game background, a candle-lit stone summoning hall seen from the doorway, an inlaid brass compass rose on the floor, deep navy and violet shadows, warm gold candle glow, empty centre for a book, cute stylised 2D fantasy RPG art, no characters, no text." |
+| Sol stage (`stage_sol`) | `StageBackground(Sol)` gradient | "Portrait 9:19.5 mobile game stage background, a sunlit golden throne-room dais with a sun disc behind it, warm amber and gold fading to deep navy at the edges, soft light rays, empty centre for a character, cute stylised 2D fantasy RPG art, no characters, no text." |
+| Venus stage (`stage_venus`) | `StageBackground(Venus)` gradient | "Portrait 9:19.5 mobile game stage background, a copper-and-rose dawn garden pavilion, morning mist, dusky violet fading to deep navy at the edges, empty centre for a character, cute stylised 2D fantasy RPG art, no characters, no text." |
+| Home grimoire | `RestlessGrimoire` vector | "Square game asset on a transparent background: a thick cute chained grimoire with a glowing round lock, plum leather cover with gold corners, iron chains crossing it, slightly open with a pair of glowing eyes peeking from the pages, stylised 2D fantasy RPG art, no text." |
+| Asmodeus scene art | `demon_asmodeus_full` keeps the earlier render | (reuse the Ritual 2.0 scene prompt) |

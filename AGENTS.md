@@ -41,21 +41,27 @@ If two sources disagree, the higher one wins. Fix the lower one or note it in an
 ./gradlew installDebug         # install on a connected device/emulator
 ```
 
-The interactive web simulator lives in the sibling repo `../mdweb` (not part of this
-repo, see ADR-0004):
+The interactive web prototype for the screen-system pass lives in
+`roalcantara/mydemon`, branch `claude/cool-rubin-pylwkn` (not part of this repo, see
+ADR-0004 and its 2026-10-16 amendment):
 
 ```bash
-cd ../mdweb && npm install && npm run dev   # http://localhost:3000
+git clone -b claude/cool-rubin-pylwkn https://github.com/roalcantara/mydemon ../mydemon
+cd ../mydemon && npm install && npm run dev   # http://localhost:3000
 ```
 
 ## Current state
 
-- `app/` is the Compose port (package `com.summondemons.safely`) with Ritual 2.0:
-  lock-then-chant ritual, voiced-syllable detection, self-inking vector sigils,
-  climax with shared-element hand-off, hero-pager Grimoire. Design:
-  `docs/superpowers/specs/2026-10-15-ritual-2-design.md`.
+- `app/` is the Compose port (package `com.summondemons.safely`): Home → Grimoire →
+  Ritual, one summon per local day, restless/escaped demons, a static demon card, the
+  focus-clock ritual, persistent progress (Preferences DataStore). Design:
+  `docs/superpowers/specs/2026-10-16-screen-system-design.md` (builds on
+  `2026-10-15-ritual-2-design.md`).
+- Packages: `data/` (demons, Houses, Callings), `progress/` (pure progress rules, JSON
+  model, court hours, `ProgressStore`), `time/` (`GameClock`, debug settings), `ritual/`,
+  `platform/` (Android implementations), `ui/`, `navigation/`.
 - Open items: the "LOVIS" question in ADR-0005; per-device tuning of the voice
-  thresholds (ADR-0008).
+  thresholds (ADR-0008); Stitch art for the DESIGN.md Gaps.
 
 ## Conventions
 
