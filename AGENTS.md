@@ -28,10 +28,12 @@ If two sources disagree, the higher one wins. Fix the lower one or note it in an
 | `docs/decisions/` | ADRs |
 | `docs/superpowers/specs/`, `docs/superpowers/plans/` | Design specs and implementation plans |
 | `docs/PRIVACY_POLICY.md`, `docs/STORE_LISTING.md` | Privacy policy and Play Store listing drafts (release prep: `docs/superpowers/plans/play-store-readiness.md`) |
+| `docs/play-store/` | Store graphics and assets (`icon-512.png`, `feature-graphic.png`, screenshots) |
+| `tools/gen_icons.py` | Launcher and store graphics generator |
 | `reference/prompts/` | The two original Stitch prompts, verbatim |
 | `reference/stitch/` | Stitch mockups, character art, logo, sigil |
 | `reference/src/` | Draft Compose code (input for the port; does not compile as-is) |
-| `tools/` | Small generators (`gen_audio.py` for `res/raw/*.wav`, `sigil_to_raw.py` for sigils) |
+| `tools/` | Small generators (`gen_audio.py` for `res/raw/*.wav`, `sigil_to_raw.py` for sigils, `gen_icons.py` for icons) |
 | `art/sigils/` | Stroke-only sigil sources (SVG), converted by `tools/sigil_to_raw.py` |
 
 ## Commands
@@ -40,6 +42,7 @@ If two sources disagree, the higher one wins. Fix the lower one or note it in an
 ./gradlew assembleDebug        # build
 ./gradlew testDebugUnitTest    # unit tests
 ./gradlew installDebug         # install on a connected device/emulator
+./gradlew bundleRelease        # signed AAB (needs upload key, see ADR-0017)
 ```
 
 The interactive web prototype for the screen-system pass lives in
@@ -58,6 +61,7 @@ cd ../mydemon && npm install && npm run dev   # http://localhost:3000
   focus-clock ritual, persistent progress (Preferences DataStore). Design:
   `docs/superpowers/specs/2026-10-16-screen-system-design.md` (builds on
   `2026-10-15-ritual-2-design.md`).
+- Release prep: ADR-0017.
 - Packages: `data/` (demons, Houses, Callings), `progress/` (pure progress rules, JSON
   model, court hours, `ProgressStore`), `time/` (`GameClock`, debug settings), `ritual/`,
   `platform/` (Android implementations), `ui/`, `navigation/`.

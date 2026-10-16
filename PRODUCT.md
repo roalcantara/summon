@@ -41,6 +41,7 @@ the new summon. One summon per local calendar day across all demons (ADR-0015).
 | Orientation | Portrait only (the compass reading assumes it). |
 | Permissions | `RECORD_AUDIO` requested on entering the Ritual only if not already granted; if denied, explain why and offer a retry (or a shortcut to app settings once the denial is permanent). |
 | Motion | If system animations are off: no particles, parallax, floating, jitter, shimmer, sunburst rotation, grimoire bob/hop/peek, dust puff, pulses or climax flash; the grimoire opening, the avatar burn-away and badge/carousel changes become short fades; the climax keeps its timing but the demon simply fades in. Ink-in, karaoke and the focus bar still update. |
+| Privacy | No network access, no data collection. The mic and heading sensor run only while the Ritual is in the foreground; audio is analysed in memory and never stored or sent (ADR-0017, docs/PRIVACY_POLICY.md). |
 
 ## Demons
 
