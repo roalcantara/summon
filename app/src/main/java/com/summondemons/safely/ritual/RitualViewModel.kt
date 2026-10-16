@@ -50,6 +50,8 @@ data class RitualUiState(
     val micUnavailable: Boolean = false,
     /** The device has no heading sensor; the ritual can't lock (debug can simulate). */
     val headingUnavailable: Boolean = false,
+    /** The Ritual screen is started; no ticks run otherwise, so the focus clock pauses (§2). */
+    val active: Boolean = true,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -57,6 +59,10 @@ class RitualViewModel(
     private val demon: Demon,
     private val headingSource: HeadingSource,
     private val pcmSource: PcmSource,
+    /** Whether the demon's House is in court now (debug override applied); read every tick, used at lock. */
+    private val inCourt: () -> Boolean = { false },
+    /** Saves the summon. Called inside the tick, exactly once, on the step that starts the climax (ADR-0013). */
+    private val commitSummon: (flawless: Boolean) -> Unit = {},
     private val analysisDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ViewModel() {
 
@@ -69,7 +75,7 @@ class RitualViewModel(
     )
     private val _effects = MutableSharedFlow<RitualEffect>(extraBufferCapacity = EFFECT_BUFFER)
 
-    /** One-shot events for haptics and sounds. Missing one (e.g. while stopped) is harmless. */
+    /** One-shot events for haptics, sounds and flashes. Lossy by design: nothing durable depends on them. */
     val effects: SharedFlow<RitualEffect> = _effects.asSharedFlow()
 
     private var holdFrames = 0
@@ -103,14 +109,28 @@ class RitualViewModel(
         state.update { it.copy(holdToChant = on) }
     }
 
+    /** Called from the Ritual screen's ON_START / ON_STOP. */
+    fun setActive(active: Boolean) = state.update { it.copy(active = active) }
+
     /** One 20 ms tick. Only this collector changes `ritual`, so read-then-update is safe. */
     private fun tick(micFrame: VoiceFrame) {
         val current = state.value
+        if (!current.active || awaitingHeading(current)) return
         val voice = if (current.holdToChant) syntheticVoice() else micFrame
-        val step = RitualEngine.step(current.ritual, RitualInput(current.azimuth, voice))
+        val step = RitualEngine.step(current.ritual, RitualInput(current.azimuth, voice, inCourt()))
+        // The summon is saved here, not through the lossy effects flow, before the climax plays.
+        step.effects.filterIsInstance<RitualEffect.ClimaxStart>().firstOrNull()?.let { commitSummon(it.flawless) }
         state.update { it.copy(ritual = step.state, micLevel = smoothMicLevel(it.micLevel, voice.rms)) }
         step.effects.forEach { _effects.tryEmit(it) }
     }
+
+    /**
+     * After a (re)start, ticks wait for the first heading reading, so a return from the
+     * background never reads as off heading (no drift, no 3× drain, no crack). Devices
+     * without a heading sensor tick with a null heading.
+     */
+    private fun awaitingHeading(s: RitualUiState): Boolean =
+        s.azimuth == null && !s.simulateHeading && !s.headingUnavailable
 
     /** Debug "Hold to Chant": continuous voicing with an onset every ~240 ms. */
     private fun syntheticVoice(): VoiceFrame =
@@ -146,7 +166,13 @@ class RitualViewModel(
     companion object {
         private const val EFFECT_BUFFER = 64
 
-        fun factory(demon: Demon, headingSource: HeadingSource, pcmSource: PcmSource): ViewModelProvider.Factory =
-            viewModelFactory { initializer { RitualViewModel(demon, headingSource, pcmSource) } }
+        fun factory(
+            demon: Demon,
+            headingSource: HeadingSource,
+            pcmSource: PcmSource,
+            inCourt: () -> Boolean = { false },
+            commitSummon: (flawless: Boolean) -> Unit = {},
+        ): ViewModelProvider.Factory =
+            viewModelFactory { initializer { RitualViewModel(demon, headingSource, pcmSource, inCourt, commitSummon) } }
     }
 }

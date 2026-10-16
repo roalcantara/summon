@@ -55,12 +55,16 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                             LaunchedEffect(Unit) { navController.popBackStack() }
                         } else {
                             val factory = remember(demon) {
-                                RitualViewModel.factory(demon, AndroidHeadingSource(appContext), AndroidPcmSource())
+                                RitualViewModel.factory(
+                                    demon,
+                                    AndroidHeadingSource(appContext),
+                                    AndroidPcmSource(),
+                                    commitSummon = { demonViewModel.unlock(demon.id) },
+                                )
                             }
                             RitualScreen(
                                 viewModel = viewModel(factory = factory),
                                 onSummoned = {
-                                    demonViewModel.unlock(demon.id)
                                     navController.navigate(Profile(demon.id, isNewSummon = true)) { popUpTo<Grimoire>() }
                                 },
                                 onAbort = dropUnlessResumed { navController.popBackStack() },

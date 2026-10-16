@@ -2,11 +2,12 @@ package com.summondemons.safely.ritual
 
 import com.summondemons.safely.data.Demon
 import com.summondemons.safely.data.DemonCatalog
+import com.summondemons.safely.ritual.RitualConfig.COURT_BONUS
 import com.summondemons.safely.ritual.RitualConfig.FRAME_MS
 import com.summondemons.safely.ritual.RitualEffect.ClimaxStart
 import com.summondemons.safely.ritual.RitualEffect.Locked
-import com.summondemons.safely.ritual.RitualEffect.Sealed
 import com.summondemons.safely.ritual.RitualEffect.ProximityTick
+import com.summondemons.safely.ritual.RitualEffect.Sealed
 import com.summondemons.safely.ritual.RitualEffect.Summoned
 import com.summondemons.safely.ritual.RitualEffect.SyllableLit
 import kotlinx.coroutines.Dispatchers
@@ -68,8 +69,13 @@ class RitualViewModelTest {
 
     private fun TestScope.observe(vm: RitualViewModel) = backgroundScope.launch { vm.uiState.collect {} }
 
-    private fun newVm(demon: Demon, heading: HeadingSource, pcm: PcmSource) =
-        RitualViewModel(demon, heading, pcm, dispatcher)
+    private fun newVm(
+        demon: Demon,
+        heading: HeadingSource,
+        pcm: PcmSource,
+        inCourt: () -> Boolean = { false },
+        commitSummon: (Boolean) -> Unit = {},
+    ) = RitualViewModel(demon, heading, pcm, inCourt, commitSummon, analysisDispatcher = dispatcher)
 
     @Before
     fun setUp() = Dispatchers.setMain(dispatcher)
@@ -96,6 +102,84 @@ class RitualViewModelTest {
             effects.filter { it != SyllableLit && it != ProximityTick },
         )
         assertEquals(0, pcm.subscriptions)
+    }
+
+    @Test
+    fun commitSummonIsCalledOnceAtTheClimaxStartEvenWithoutAnEffectCollector() = runTest(dispatcher) {
+        val commits = mutableListOf<Boolean>()
+        val vm = newVm(demon, { emptyFlow() }, silentPcm(), commitSummon = { commits += it })
+        observe(vm)
+        vm.onMicPermission(false)
+        vm.setSimulateHeading(true)
+        vm.setHoldToChant(true)
+
+        while (vm.uiState.value.ritual.phase != RitualPhase.Climax) {
+            assertTrue("no commit before the climax", commits.isEmpty())
+            advanceTimeBy(FRAME_MS); runCurrent()
+        }
+        assertEquals(listOf(true), commits) // saved before the climax plays
+
+        advanceTimeBy(5_000); runCurrent()
+        assertEquals(RitualPhase.Done, vm.uiState.value.ritual.phase)
+        assertEquals(listOf(true), commits)
+    }
+
+    @Test
+    fun inCourtAtTheLockReachesTheEngine() = runTest(dispatcher) {
+        val vm = newVm(demon, { emptyFlow() }, silentPcm(), inCourt = { true })
+        observe(vm)
+        vm.onMicPermission(false)
+        vm.setSimulateHeading(true)
+        advanceTimeBy(1_000); runCurrent()
+        assertEquals(RitualPhase.Chanting, vm.uiState.value.ritual.phase)
+        assertEquals(1f + COURT_BONUS, vm.uiState.value.ritual.courtMultiplier, 0.0001f)
+    }
+
+    @Test
+    fun noTicksWhileInactive() = runTest(dispatcher) {
+        val vm = newVm(demon, { emptyFlow() }, silentPcm())
+        observe(vm)
+        vm.setActive(false)
+        runCurrent()
+        assertFalse(vm.uiState.value.active)
+        vm.onMicPermission(false)
+        vm.setSimulateHeading(true)
+        vm.setHoldToChant(true)
+        advanceTimeBy(2_000); runCurrent()
+        assertEquals(RitualPhase.Seeking, vm.uiState.value.ritual.phase)
+        assertEquals(0f, vm.uiState.value.micLevel)
+
+        vm.setActive(true)
+        advanceTimeBy(1_000); runCurrent()
+        assertEquals(RitualPhase.Chanting, vm.uiState.value.ritual.phase)
+    }
+
+    @Test
+    fun ticksAreHeldUntilTheFirstHeadingArrives() = runTest(dispatcher) {
+        val heading = FakeHeading()
+        val vm = newVm(demon, heading, silentPcm())
+        observe(vm)
+        vm.onMicPermission(false)
+        vm.setHoldToChant(true)
+        advanceTimeBy(1_000); runCurrent()
+        assertEquals(RitualPhase.Seeking, vm.uiState.value.ritual.phase)
+        assertEquals(0f, vm.uiState.value.micLevel) // no tick ran
+
+        heading.readings.emit(demon.ritualHeading)
+        advanceTimeBy(1_000); runCurrent()
+        assertEquals(RitualPhase.Chanting, vm.uiState.value.ritual.phase)
+        assertTrue(vm.uiState.value.micLevel > 0f)
+    }
+
+    @Test
+    fun devicesWithoutAHeadingSensorStillTick() = runTest(dispatcher) {
+        val vm = newVm(demon, FakeHeading(available = false), silentPcm())
+        observe(vm)
+        vm.onMicPermission(false)
+        vm.setHoldToChant(true)
+        advanceTimeBy(500); runCurrent()
+        assertTrue(vm.uiState.value.micLevel > 0f)
+        assertEquals(RitualPhase.Seeking, vm.uiState.value.ritual.phase)
     }
 
     @Test
@@ -162,10 +246,10 @@ class RitualViewModelTest {
     @Test
     fun restartingThePipelineForgetsTheOldHeading() = runTest(dispatcher) {
         var subscriptions = 0
-        val vm = newVm(demon, { flow { if (subscriptions++ == 0) emit(0f) } }, silentPcm())
+        val vm = newVm(demon, { flow { if (subscriptions++ == 0) emit(demon.ritualHeading) } }, silentPcm())
         val first = backgroundScope.launch { vm.uiState.collect {} }
         runCurrent()
-        assertEquals(0f, vm.uiState.value.azimuth)
+        assertEquals(demon.ritualHeading, vm.uiState.value.azimuth)
 
         first.cancel()
         advanceTimeBy(6_000); runCurrent() // past WhileSubscribed(5_000): pipeline stops
@@ -213,9 +297,9 @@ class RitualViewModelTest {
         val vm = newVm(demon, heading, pcm)
         observe(vm)
         vm.onMicPermission(true)
-        heading.readings.emit(0f); advanceTimeBy(300); runCurrent()
-        heading.readings.emit(90f); advanceTimeBy(300); runCurrent()
-        heading.readings.emit(0f); advanceTimeBy(300); runCurrent()
+        heading.readings.emit(demon.ritualHeading); advanceTimeBy(300); runCurrent()
+        heading.readings.emit(demon.ritualHeading + 90f); advanceTimeBy(300); runCurrent()
+        heading.readings.emit(demon.ritualHeading); advanceTimeBy(300); runCurrent()
         assertEquals(1, pcm.subscriptions)
     }
 
