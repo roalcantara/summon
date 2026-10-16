@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -81,15 +82,20 @@ class RitualViewModel(
     private var holdFrames = 0
 
     private val azimuths: Flow<Float> = state
-        .map { it.simulateHeading }
+        .map { Pair(it.simulateHeading, it.active) }
         .distinctUntilChanged()
-        .flatMapLatest { simulate -> if (simulate) flowOf(demon.ritualHeading) else headingSource.azimuths() }
+        .flatMapLatest { (simulate, active) ->
+            when {
+                simulate -> flowOf(demon.ritualHeading)
+                active -> headingSource.azimuths()
+                else -> emptyFlow()
+            }
+        }
 
     private val voiceFrames: Flow<VoiceFrame> = state
-        .map { it.micGranted }
+        .map { it.micGranted == true && it.active }
         .distinctUntilChanged()
-        .flatMapLatest { granted -> if (granted == true) micFrames() else silentFrames() }
-
+        .flatMapLatest { live -> if (live) micFrames() else silentFrames() }
     val uiState: StateFlow<RitualUiState> = channelFlow {
         // On (re)start the sensors restart too: forget the last reading so ticks never run on a stale heading.
         state.update { if (it.simulateHeading) it else it.copy(azimuth = null) }
@@ -110,7 +116,10 @@ class RitualViewModel(
     }
 
     /** Called from the Ritual screen's ON_START / ON_STOP. */
-    fun setActive(active: Boolean) = state.update { it.copy(active = active) }
+    fun setActive(active: Boolean) = state.update {
+        if (!active && !it.simulateHeading) it.copy(active = false, azimuth = null)
+        else it.copy(active = active)
+    }
 
     /** One 20 ms tick. Only this collector changes `ritual`, so read-then-update is safe. */
     private fun tick(micFrame: VoiceFrame) {

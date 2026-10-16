@@ -42,22 +42,36 @@ class RitualViewModelTest {
     private val demon = DemonCatalog.byId("asmodeus")!!
 
     private class FakeHeading(override val available: Boolean = true) : HeadingSource {
-        val readings = MutableSharedFlow<Float>(replay = 1)
-        override fun azimuths(): Flow<Float> = readings
+        val readings = MutableSharedFlow<Float>()
+        var activeCollectors = 0
+        override fun azimuths(): Flow<Float> = flow {
+            activeCollectors++
+            try {
+                readings.collect { emit(it) }
+            } finally {
+                activeCollectors--
+            }
+        }
     }
 
     /** 16 kHz frames every 20 ms; [amplitude] gives the 150 Hz sine amplitude of frame i (0 = silence). */
     private class FakePcm(private val amplitude: (Int) -> Double) : PcmSource {
         var subscriptions = 0
+        var activeCollectors = 0
         override fun frames(): Flow<PcmFrame> = flow {
             subscriptions++
-            var f = 0
-            while (true) {
-                delay(FRAME_MS)
-                val amp = amplitude(f)
-                val samples = ShortArray(320) { i -> (amp * sin(2 * PI * 150.0 * (f * 320 + i) / 16_000)).toInt().toShort() }
-                emit(PcmFrame(samples, samples.size, 16_000))
-                f++
+            activeCollectors++
+            try {
+                var f = 0
+                while (true) {
+                    delay(FRAME_MS)
+                    val amp = amplitude(f)
+                    val samples = ShortArray(320) { i -> (amp * sin(2 * PI * 150.0 * (f * 320 + i) / 16_000)).toInt().toShort() }
+                    emit(PcmFrame(samples, samples.size, 16_000))
+                    f++
+                }
+            } finally {
+                activeCollectors--
             }
         }
     }
@@ -228,6 +242,7 @@ class RitualViewModelTest {
         observe(vm)
         vm.onMicPermission(false)
         vm.setHoldToChant(true)
+        advanceTimeBy(100); runCurrent()
         heading.readings.emit(demon.ritualHeading)
         advanceTimeBy(1_500); runCurrent()
         val lit = vm.uiState.value.ritual.lit
@@ -322,5 +337,61 @@ class RitualViewModelTest {
     fun headingAvailabilityComesFromTheSource() = runTest(dispatcher) {
         assertTrue(newVm(demon, FakeHeading(available = false), silentPcm()).uiState.value.headingUnavailable)
         assertFalse(newVm(demon, FakeHeading(available = true), silentPcm()).uiState.value.headingUnavailable)
+    }
+
+    @Test
+    fun micStopsWhenRitualBecomesInactive() = runTest(dispatcher) {
+        val pcm = chantingPcm()
+        val vm = newVm(demon, { emptyFlow() }, pcm)
+        observe(vm)
+        vm.onMicPermission(true)
+        advanceTimeBy(100); runCurrent()
+        assertEquals(1, pcm.activeCollectors)
+
+        vm.setActive(false)
+        advanceTimeBy(100); runCurrent()
+        assertEquals(0, pcm.activeCollectors)
+
+        vm.setActive(true)
+        advanceTimeBy(100); runCurrent()
+        assertEquals(1, pcm.activeCollectors)
+    }
+
+    @Test
+    fun headingSensorStopsWhenRitualBecomesInactive() = runTest(dispatcher) {
+        val heading = FakeHeading()
+        val vm = newVm(demon, heading, silentPcm())
+        observe(vm)
+        advanceTimeBy(100); runCurrent()
+        assertEquals(1, heading.activeCollectors)
+
+        vm.setActive(false)
+        advanceTimeBy(100); runCurrent()
+        assertEquals(0, heading.activeCollectors)
+
+        vm.setActive(true)
+        advanceTimeBy(100); runCurrent()
+        assertEquals(1, heading.activeCollectors)
+    }
+
+    @Test
+    fun restartAfterInactiveWaitsForAFreshHeading() = runTest(dispatcher) {
+        val heading = FakeHeading()
+        val vm = newVm(demon, heading, silentPcm())
+        observe(vm)
+        advanceTimeBy(100); runCurrent()
+        heading.readings.emit(demon.ritualHeading)
+        advanceTimeBy(700); runCurrent()
+        assertTrue("ritual should lock on heading", vm.uiState.value.ritual.phase != RitualPhase.Seeking)
+
+        // Inactive: should clear heading so ticks don't run on stale azimuth
+        vm.setActive(false)
+        advanceTimeBy(100); runCurrent()
+        assertNull(vm.uiState.value.azimuth)
+
+        // Reactivate: still null until a new heading arrives
+        vm.setActive(true)
+        advanceTimeBy(100); runCurrent()
+        assertNull(vm.uiState.value.azimuth)
     }
 }
