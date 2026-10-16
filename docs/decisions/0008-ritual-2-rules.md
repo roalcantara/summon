@@ -1,7 +1,7 @@
 # 0008 — Ritual 2.0 rules
 
 - Date: 2026-10-15
-- Status: Accepted (supersedes ADR-0007)
+- Status: Accepted (supersedes ADR-0007); the grace period and "silence pauses" are superseded by ADR-0010
 
 ## Context
 Play-testing the first port showed that the ritual felt arbitrary. Any noise above an
