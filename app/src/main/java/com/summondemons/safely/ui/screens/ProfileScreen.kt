@@ -22,7 +22,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -35,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -44,7 +42,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
-import com.summondemons.safely.platform.TadaPlayer
+import com.summondemons.safely.platform.GameSounds
+import com.summondemons.safely.platform.LocalGameSounds
 import com.summondemons.safely.ui.components.DemonCutout
 import com.summondemons.safely.ui.components.PrimaryActionButton
 import com.summondemons.safely.ui.components.RibbonBanner
@@ -83,12 +82,14 @@ fun ProfileScreen(
     val reduceMotion = LocalReduceMotion.current
 
     if (isNewSummon) {
-        val context = LocalContext.current
+        val sounds = LocalGameSounds.current
         // Saved so activity recreation (font scale, locale) doesn't replay the fanfare.
         var tadaPlayed by rememberSaveable { mutableStateOf(false) }
-        DisposableEffect(Unit) {
-            val player = if (tadaPlayed) null else TadaPlayer.play(context).also { tadaPlayed = true }
-            onDispose { player?.release() }
+        LaunchedEffect(Unit) {
+            if (!tadaPlayed) {
+                sounds?.play(GameSounds.Cue.Tada)
+                tadaPlayed = true
+            }
         }
     }
     val bounce = remember { Animatable(if (isNewSummon) BOUNCE_FROM else 1f) }

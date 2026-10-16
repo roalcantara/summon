@@ -12,6 +12,9 @@ object Haptics {
     private val SUCCESS_AMPLITUDES = intArrayOf(0, 180, 0, 255)
     private val WARN_TIMINGS = longArrayOf(0, 40, 60, 40)
     private val WARN_AMPLITUDES = intArrayOf(0, 200, 0, 200)
+    /** Crack: 80 ms on, 50 ms off, 80 ms on, strong (§5). */
+    private val CRACK_TIMINGS = longArrayOf(0, 80, 50, 80)
+    private val CRACK_AMPLITUDES = intArrayOf(0, 255, 0, 255)
 
     /** 2 s ramp in ten 200 ms steps (amplitude 40 → 255), a short gap, then a final burst. */
     private val CRESCENDO_TIMINGS = longArrayOf(0) + LongArray(10) { 200 } + longArrayOf(60, 140)
@@ -25,6 +28,7 @@ object Haptics {
     fun chime(context: Context) = predefined(context, VibrationEffect.EFFECT_CLICK, fallbackMs = 25)
     fun clunk(context: Context) = predefined(context, VibrationEffect.EFFECT_HEAVY_CLICK, fallbackMs = 40)
     fun warn(context: Context) = waveform(context, WARN_TIMINGS, WARN_AMPLITUDES, WARN_TIMINGS)
+    fun crack(context: Context) = waveform(context, CRACK_TIMINGS, CRACK_AMPLITUDES, CRACK_TIMINGS)
     fun crescendo(context: Context) = waveform(context, CRESCENDO_TIMINGS, CRESCENDO_AMPLITUDES, CRESCENDO_FALLBACK)
 
     /** 80 ms pulse, 60 ms gap, 140 ms burst. */

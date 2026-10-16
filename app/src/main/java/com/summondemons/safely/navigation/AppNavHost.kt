@@ -13,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
@@ -30,6 +31,8 @@ import com.summondemons.safely.BuildConfig
 import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.platform.AndroidHeadingSource
 import com.summondemons.safely.platform.AndroidPcmSource
+import com.summondemons.safely.platform.GameSounds
+import com.summondemons.safely.platform.LocalGameSounds
 import com.summondemons.safely.ritual.RitualViewModel
 import com.summondemons.safely.ui.GameViewModel
 import com.summondemons.safely.ui.fx.LocalNavAnimatedVisibilityScope
@@ -46,6 +49,8 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
     val game: GameViewModel = viewModel(factory = factory) // activity-scoped
     val state by game.uiState.collectAsStateWithLifecycle()
     val appContext = LocalContext.current.applicationContext
+    val sounds = remember { GameSounds(appContext) }
+    DisposableEffect(sounds) { onDispose { sounds.release() } }
     LifecycleEventEffect(Lifecycle.Event.ON_START) { game.evaluate() }
 
     if (!state.loaded) {
@@ -54,7 +59,8 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
         return
     }
 
-    SharedTransitionLayout {
+    CompositionLocalProvider(LocalGameSounds provides sounds) {
+        SharedTransitionLayout {
         CompositionLocalProvider(LocalSharedTransitionScope provides this) {
             NavHost(navController = navController, startDestination = Grimoire) {
                 composable<Grimoire> {
@@ -119,6 +125,7 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
                     }
                 }
             }
+        }
         }
     }
 }

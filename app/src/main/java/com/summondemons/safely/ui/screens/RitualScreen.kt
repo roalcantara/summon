@@ -123,7 +123,7 @@ fun RitualScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val activity = LocalActivity.current
-    RitualFeedback(viewModel.effects, state.demon.ambientBed)
+    RitualFeedback(viewModel.effects, state.demon.ambientBed, state.ritual.phase)
     // The focus clock only runs while the screen is started (§2).
     LifecycleEventEffect(Lifecycle.Event.ON_START) { viewModel.setActive(true) }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { viewModel.setActive(false) }

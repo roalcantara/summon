@@ -60,9 +60,9 @@ class RitualSounds(context: Context, @RawRes bed: Int) {
             }
         }
     }
-    fun play(cue: Cue) {
+    fun play(cue: Cue, volume: Float = 1f) {
         if (released) return
-        ids[cue]?.let { pool.play(it, 1f, 1f, 1, 0, 1f) }
+        ids[cue]?.let { pool.play(it, volume, volume, 1, 0, 1f) }
     }
 
     /** Fades the bed to [to] (0..1); starts it when rising from silence, pauses it at 0. Cancellable. */

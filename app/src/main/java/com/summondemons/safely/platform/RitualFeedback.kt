@@ -7,7 +7,9 @@ import androidx.annotation.RawRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -15,6 +17,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.summondemons.safely.platform.RitualSounds.Cue
 import com.summondemons.safely.ritual.RitualEffect
+import com.summondemons.safely.ritual.RitualPhase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -25,17 +28,19 @@ private const val FADE_IN_MS = 1_200L
 private const val DUCK_MS = 300L
 private const val SWELL_MS = 2_000L
 private const val FADE_OUT_MS = 1_500L
+private const val CRACK_VOLUME = 0.35f
 
-/** Lets the boom and the bed's fade-out ring on after navigating to Profile. */
+/** Lets the boom and the bed's fade-out ring on after navigating back to the Grimoire. */
 private const val RELEASE_DELAY_MS = 2_500L
 
-/** Turns ritual effects into haptics and sounds (spec §6–7). Composed by the Ritual screen. */
+/** Turns ritual effects into haptics and sounds (§5). Composed by the Ritual screen. */
 @Composable
-fun RitualFeedback(effects: Flow<RitualEffect>, @RawRes bed: Int) {
+fun RitualFeedback(effects: Flow<RitualEffect>, @RawRes bed: Int, phase: RitualPhase) {
     val context = LocalContext.current
     val sounds = remember(bed) { RitualSounds(context, bed) }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val summoned = remember(sounds) { BooleanArray(1) }
+    val currentPhase by rememberUpdatedState(phase)
     DisposableEffect(sounds) {
         onDispose {
             // Leaving mid-ritual: silence the bed now; the delayed release only lets cues finish.
@@ -51,6 +56,12 @@ fun RitualFeedback(effects: Flow<RitualEffect>, @RawRes bed: Int) {
             fun fadeBed(to: Float, ms: Long) {
                 fade?.cancel()
                 fade = launch { sounds.fadeBed(to, ms) }
+            }
+            // The bed follows the phase, not only Locked/Resumed, so it returns after the background (§2).
+            when (currentPhase) {
+                RitualPhase.Chanting -> fadeBed(BED_VOLUME, FADE_IN_MS)
+                RitualPhase.Wavering -> fadeBed(BED_DUCKED, FADE_IN_MS)
+                else -> Unit
             }
             try {
                 effects.collect { effect ->
@@ -83,8 +94,8 @@ private fun handle(
             sounds.play(Cue.chime(effect.phrase))
         }
         is RitualEffect.Cracked -> {
-            Haptics.warn(context)
-            sounds.play(Cue.Boom)
+            Haptics.crack(context)
+            sounds.play(Cue.Boom, CRACK_VOLUME)
         }
         RitualEffect.Drift -> {
             Haptics.warn(context)
