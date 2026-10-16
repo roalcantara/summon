@@ -502,8 +502,9 @@ Astaroth "Knows every secret and every tense. Will explain his own fall at lengt
 asked." Quotes and chants are unchanged.
 
 `Calling` = Warlord | Tutor | Oracle | Treasurer | Menace (name + tooltip each, from
-the prototype); `House` carries name, planet, metal token, court text, tooltip and
-rank word. Copy lives in `strings.xml` where it is UI chrome, and in `DemonCatalog`
+the prototype); `House` carries planet, metal token, court ranges and tooltip only
+(§1). The Legions badge uses the demon's own `rank` ("Great King"), not a House rank
+word. Copy lives in `strings.xml` where it is UI chrome, and in `DemonCatalog`
 where it is demon data (as today).
 
 ## 9. Architecture
