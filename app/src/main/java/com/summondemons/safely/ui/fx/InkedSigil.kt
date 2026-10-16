@@ -4,6 +4,8 @@ import android.os.Build
 import androidx.annotation.RawRes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.Animatable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,6 +53,7 @@ private const val GLOW_MIC_WIDTH = 3f
 private const val GLOW_ALPHA = 0.25f
 private const val GLOW_MIC_ALPHA = 0.45f
 private const val INK_ANIM_MS = 250
+private const val FLASH_WIDTH = 2f
 /** Below API 31 `blur` is a no-op, so the glow pass is dimmed and narrowed instead of smeared. */
 private const val UNBLURRED_GLOW_ALPHA_SCALE = 0.3f
 private const val UNBLURRED_GLOW_MAX_WIDTH = 1.5f * STROKE
@@ -58,6 +61,13 @@ private val GlowBlur = 6.dp
 
 @Immutable
 class LoadedSigil(val strokes: List<SigilStroke>, val paths: List<Path>, val lengths: List<Float>)
+
+/**
+ * One stroke group lit in [color] that fades over [durationMs]: a seal flare (accent →
+ * ink highlight, 700 ms) or a crack drain (`error`, 1.5 s). [id] makes repeats distinct.
+ */
+@Immutable
+data class SigilFlash(val group: Int, val color: Color, val durationMs: Int, val id: Long)
 
 @Composable
 fun rememberSigil(@RawRes res: Int): LoadedSigil {
@@ -86,7 +96,16 @@ fun InkedSigil(
     ringProgress: Float = 1f,
     micLevel: Float = 0f,
     ghostAlpha: Float = 0f,
+    /** Lights one stroke group for a moment. */
+    flash: SigilFlash? = null,
 ) {
+    val flashAlpha = remember { Animatable(0f) }
+    LaunchedEffect(flash) {
+        if (flash != null) {
+            flashAlpha.snapTo(1f)
+            flashAlpha.animateTo(0f, tween(flash.durationMs))
+        }
+    }
     val loaded = rememberSigil(sigil)
     val ink by animateFloatAsState(inkProgress, tween(INK_ANIM_MS), label = "sigilInk")
     val fractions = remember(loaded, ink) { SigilPaths.inkFractions(loaded.strokes, loaded.lengths, ink) }
@@ -109,6 +128,8 @@ fun InkedSigil(
             if (ghostAlpha > 0f) drawSigil(loaded, allInked, ghost, STROKE, 1f)
             drawSigil(loaded, fractions, core, STROKE, ringProgress)
             drawRim(textMeasurer, rimText, letterStyle, core, ringProgress)
+            val alpha = flashAlpha.value
+            if (flash != null && alpha > 0f) drawGroup(loaded, flash.group, flash.color.copy(alpha = alpha), STROKE * FLASH_WIDTH)
         }
     }
 }
@@ -145,6 +166,18 @@ private fun DrawScope.drawSigil(sigil: LoadedSigil, fractions: List<Float>, colo
                     )
                 }
             }
+        }
+    }
+}
+
+/** Every stroke of ink group [group], fully drawn. */
+private fun DrawScope.drawGroup(sigil: LoadedSigil, group: Int, color: Color, width: Float) {
+    val unit = size.minDimension / VIEWBOX
+    val origin = Offset((size.width - VIEWBOX * unit) / 2f, (size.height - VIEWBOX * unit) / 2f)
+    translate(origin.x, origin.y) {
+        scale(unit, unit, pivot = Offset.Zero) {
+            val stroke = Stroke(width, cap = StrokeCap.Round, join = StrokeJoin.Round)
+            sigil.strokes.forEachIndexed { i, s -> if (s.group == group) drawPath(sigil.paths[i], color, style = stroke) }
         }
     }
 }
