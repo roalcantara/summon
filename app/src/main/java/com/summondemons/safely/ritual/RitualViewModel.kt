@@ -59,7 +59,7 @@ class RitualViewModel(
     private val demon: Demon,
     private val headingSource: HeadingSource,
     private val pcmSource: PcmSource,
-    /** Whether the demon's House is in court now (debug override applied); read every tick, used at lock. */
+    /** Whether the demon's House is in court now (debug override applied); read only at the moment of lock. */
     private val inCourt: () -> Boolean = { false },
     /** Saves the summon. Called inside the tick, exactly once, on the step that starts the climax (ADR-0013). */
     private val commitSummon: (flawless: Boolean) -> Unit = {},
@@ -117,7 +117,8 @@ class RitualViewModel(
         val current = state.value
         if (!current.active || awaitingHeading(current)) return
         val voice = if (current.holdToChant) syntheticVoice() else micFrame
-        val step = RitualEngine.step(current.ritual, RitualInput(current.azimuth, voice, inCourt()))
+        val inCourt = if (RitualEngine.canLock(current.ritual, current.azimuth)) inCourt() else false
+        val step = RitualEngine.step(current.ritual, RitualInput(current.azimuth, voice, inCourt))
         // The summon is saved here, not through the lossy effects flow, before the climax plays.
         step.effects.filterIsInstance<RitualEffect.ClimaxStart>().firstOrNull()?.let { commitSummon(it.flawless) }
         state.update { it.copy(ritual = step.state, micLevel = smoothMicLevel(it.micLevel, voice.rms)) }

@@ -126,7 +126,7 @@ strings are upper-cased at the call site with `upper()` (`uppercase(Locale.ROOT)
 
 ## Shapes
 
-12 / 16 / 24 dp rounded corners; buttons are pills.
+6 (extra-small / smudges) / 12 / 16 / 24 dp rounded corners; buttons are pills.
 **Deliberate deviation:** Stitch's own DESIGN.md asks for tight 4px chamfered
 corners. We keep the rounder shapes from prompt 2 so the UI stays friendly; the
 dark palette carries the RPG feel.

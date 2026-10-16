@@ -9,12 +9,12 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.data.House
-import com.summondemons.safely.progress.CourtHours
 import com.summondemons.safely.progress.DemonRecord
 import com.summondemons.safely.progress.Progress
 import com.summondemons.safely.progress.ProgressRules
 import com.summondemons.safely.progress.ProgressStore
 import com.summondemons.safely.progress.Reveal
+import com.summondemons.safely.time.ClockTick
 import com.summondemons.safely.time.CourtOverride
 import com.summondemons.safely.time.DebugSettings
 import com.summondemons.safely.time.DebugSettingsStore
@@ -74,23 +74,27 @@ class GameViewModel(
     private val stored: StateFlow<Progress?> = store.progress.stateIn(viewModelScope, SharingStarted.Eagerly, null)
     /** Re-reads the clock on every activity start: hourly delays don't advance while the phone sleeps. */
     private val refresh = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-    private val time: StateFlow<ZonedDateTime> =
-        merge(clock.ticks, refresh.map { clock.now() }).stateIn(viewModelScope, SharingStarted.Eagerly, clock.now())
+    private val time: StateFlow<ClockTick> =
+        merge(clock.ticks, refresh.map { clock.tick() }).stateIn(viewModelScope, SharingStarted.Eagerly, clock.tick())
     private val session = MutableStateFlow(Session())
     private val selected: StateFlow<String> = savedState.getStateFlow(KEY_SELECTED, savedState[KEY_SELECTED] ?: "")
 
     val uiState: StateFlow<GameUiState> =
-        combine(stored, time, selected, session, debug.settings) { progress, now, selectedId, s, settings ->
+        combine(stored, time, selected, session) { progress, tick, selectedId, s ->
             GameUiState(
                 loaded = progress != null,
                 progress = progress ?: Progress(),
-                now = now,
+                now = tick.now,
                 selectedId = selectedId.ifEmpty { demonIds.first() },
                 celebration = s.celebration,
                 openSecret = s.openSecret,
-                courtHouses = House.entries.filterTo(mutableSetOf()) { inCourt(it, now.hour, settings.court) },
+                courtHouses = tick.courtHouses,
             )
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, GameUiState(now = clock.now(), selectedId = selected.value))
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            GameUiState(now = clock.now(), selectedId = selected.value, courtHouses = clock.courtHouses()),
+        )
 
     init {
         viewModelScope.launch {
@@ -99,14 +103,14 @@ class GameViewModel(
             if (savedState.get<String>(KEY_SELECTED).isNullOrEmpty()) select(ProgressRules.focusDemon(ProgressRules.evaluate(first, day), demonIds, day))
             store.update { ProgressRules.evaluate(it, today()) }
             // Keeps time-derived state right while the app stays open across midnight (§1).
-            time.map { it.epochDay() }.distinctUntilChanged().drop(1).collect { day -> update { ProgressRules.evaluate(it, day) } }
+            time.map { it.now.epochDay() }.distinctUntilChanged().drop(1).collect { day -> update { ProgressRules.evaluate(it, day) } }
         }
     }
 
     fun today(): Long = clock.now().epochDay()
 
     /** For the ritual's court provider: the demon's House against the clock, debug override applied. */
-    fun inCourtNow(house: House): Boolean = inCourt(house, clock.now().hour, debug.settings.value.court)
+    fun inCourtNow(house: House): Boolean = clock.inCourt(house)
 
     /** On every activity start. Skipped until loaded (the first load runs its own evaluate). */
     fun evaluate() {
@@ -187,10 +191,4 @@ class GameViewModel(
         fun factory(store: ProgressStore, clock: GameClock, debug: DebugSettingsStore): ViewModelProvider.Factory =
             viewModelFactory { initializer { GameViewModel(store, clock, debug, createSavedStateHandle()) } }
     }
-}
-
-private fun inCourt(house: House, hour: Int, court: CourtOverride): Boolean = when (court) {
-    CourtOverride.Auto -> CourtHours.inCourt(house, hour)
-    CourtOverride.In -> true
-    CourtOverride.Out -> false
 }

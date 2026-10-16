@@ -24,6 +24,18 @@ object RitualEngine {
             RitualPhase.Done -> Step(s)
         }
     }
+    /**
+     * Whether a step with [state] and [azimuth] can lock on this tick.
+     * Keeps RitualEngine pure: inputs and state only.
+     */
+    fun canLock(state: RitualState, azimuth: Float?): Boolean {
+        if (state.phase != RitualPhase.Seeking && state.phase != RitualPhase.Locking) return false
+        val s = state.copy(azimuth = azimuth)
+        if (!s.aligned) return false
+        val held = (if (s.phase == RitualPhase.Locking) s.lockMs else 0L) + FRAME_MS
+        return held >= LOCK_HOLD_MS
+    }
+
 
     private fun seek(s: RitualState, inCourt: Boolean): Step {
         val effects = mutableListOf<RitualEffect>()

@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -78,7 +77,6 @@ private val Swipe = 40.dp
 private val InkBlur = 6.dp
 private val SmudgeHeight = 12.dp
 private val SmudgeStripe = 11.dp
-private val SmudgeShape = RoundedCornerShape(6.dp)
 private val PageTextSize = 13.sp
 
 /**
@@ -249,7 +247,7 @@ fun Smudge(lines: Int, modifier: Modifier = Modifier) {
                 Modifier
                     .fillMaxWidth(SMUDGE_FIRST_WIDTH - i * SMUDGE_WIDTH_STEP)
                     .height(SmudgeHeight)
-                    .clip(SmudgeShape)
+                    .clip(MaterialTheme.shapes.extraSmall)
                     .background(brush),
             )
         }

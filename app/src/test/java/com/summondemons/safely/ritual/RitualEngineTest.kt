@@ -115,6 +115,21 @@ class RitualEngineTest {
     }
 
     @Test
+    fun canLockIsTrueOnlyWhenAlignedAndLockHoldSatisfied() {
+        val s = fresh()
+        assertFalse(RitualEngine.canLock(s, null))
+        assertFalse(RitualEngine.canLock(s, off))
+        assertFalse(RitualEngine.canLock(s, on)) // Seeking with 0 hold: held = 20ms < 600ms
+
+        val locking = s.copy(phase = Locking, lockMs = LOCK_HOLD_MS - FRAME_MS)
+        assertTrue(RitualEngine.canLock(locking, on))
+        assertFalse(RitualEngine.canLock(locking, off))
+
+        val chanting = s.copy(phase = Chanting)
+        assertFalse(RitualEngine.canLock(chanting, on))
+    }
+
+    @Test
     fun leavingBeforeTheLockStartsOver() {
         val holding = run(fresh(), 10).state
         val left = run(holding, 1, azimuth = off)

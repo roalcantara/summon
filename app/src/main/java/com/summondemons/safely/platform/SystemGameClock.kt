@@ -5,7 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
+import com.summondemons.safely.data.House
+import com.summondemons.safely.progress.CourtHours
 import com.summondemons.safely.time.DebugSettings
+import com.summondemons.safely.time.ClockTick
 import com.summondemons.safely.time.GameClock
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
@@ -32,11 +35,14 @@ class SystemGameClock(context: Context, private val debug: StateFlow<DebugSettin
 
     override fun now(): ZonedDateTime = ZonedDateTime.now().plusDays(debug.value.dayOffset.toLong())
 
-    override val ticks: Flow<ZonedDateTime> =
+    override val ticks: Flow<ClockTick> =
         merge(systemTimeChanges(), topsOfTheHour(), debug.drop(1).map { })
-            .map { now() }
-            .onStart { emit(now()) }
+            .map { tick() }
+            .onStart { emit(tick()) }
             .conflate()
+
+    override fun inCourt(house: House): Boolean =
+        CourtHours.inCourt(house, now().hour, debug.value.court)
 
     private fun systemTimeChanges(): Flow<Unit> = callbackFlow {
         val receiver = object : BroadcastReceiver() {

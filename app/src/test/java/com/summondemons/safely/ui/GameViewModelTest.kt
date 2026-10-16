@@ -36,8 +36,8 @@ class GameViewModelTest {
     private val dispatcher = StandardTestDispatcher()
     private val start = ZonedDateTime.of(2026, 10, 16, 10, 0, 0, 0, ZoneId.of("UTC"))
     private val day0 = start.epochDay()
-    private val clock = FakeGameClock(start)
     private val debug = FakeDebugSettings()
+    private val clock = FakeGameClock(start, debug.settings)
 
     private fun boundOn(day: Long, id: String = "asmodeus", flawless: Boolean = false) =
         ProgressRules.commitSummon(Progress(), id, day, flawless)
@@ -206,5 +206,50 @@ class GameViewModelTest {
         assertEquals(Progress(), store.state.value)
         assertEquals(DebugSettings(), debug.settings.value)
         assertNull(vm.uiState.value.celebration)
+    }
+
+    @Test
+    fun fakeClockCrossingMidnightMakesThreeDaysNeglectedDemonEscapeWithoutEvaluateCall() = runTest(dispatcher) {
+        val store = InMemoryProgressStore(boundOn(day0 - 2))
+        val vm = vm(store)
+        observe(vm); runCurrent()
+        assertTrue(store.state.value.record("asmodeus").bound)
+
+        // Advancing 1 day crosses midnight from day0 to day0 + 1.
+        // The demon was last visited on day0 - 2, so neglected days = (day0 + 1) - (day0 - 2) = 3 >= 3.
+        clock.advanceDays(1); runCurrent()
+
+        val record = store.state.value.record("asmodeus")
+        assertFalse(record.bound)
+        assertTrue(record.escapeBannerPending)
+    }
+
+    @Test
+    fun commitSummonFromRitualCreatedOnDayNPlusOneRecordsDayNPlusOne() = runTest(dispatcher) {
+        val store = InMemoryProgressStore()
+        val vm = vm(store)
+        observe(vm); runCurrent()
+
+        // Move to day N+1
+        clock.advanceDays(1); runCurrent()
+        val dayNPlus1 = vm.today()
+        assertEquals(day0 + 1, dayNPlus1)
+
+        // When a ritual is opened on day N+1, its factory captures startDay = game.today()
+        val startDay = dayNPlus1
+
+        // Even if time moves forward again (e.g. crossing midnight to day N+2 during the ritual)
+        clock.advanceDays(1); runCurrent()
+        assertEquals(day0 + 2, vm.today())
+
+        // The ritual finishes and commits the summon using the startDay captured at creation
+        vm.commitSummon("asmodeus", startDay, flawless = true); runCurrent()
+
+        val progress = store.state.value
+        val record = progress.record("asmodeus")
+        assertTrue(record.bound)
+        assertTrue(record.flawless)
+        assertEquals(dayNPlus1, record.lastVisitDay)
+        assertEquals(dayNPlus1, progress.lastSummonDay)
     }
 }

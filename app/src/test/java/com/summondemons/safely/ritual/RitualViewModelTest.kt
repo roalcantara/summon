@@ -125,14 +125,29 @@ class RitualViewModelTest {
     }
 
     @Test
-    fun inCourtAtTheLockReachesTheEngine() = runTest(dispatcher) {
-        val vm = newVm(demon, { emptyFlow() }, silentPcm(), inCourt = { true })
+    fun inCourtAtTheLockReachesTheEngineAndIsCalledOnlyAtLock() = runTest(dispatcher) {
+        var courtChecks = 0
+        val vm = newVm(demon, { emptyFlow() }, silentPcm(), inCourt = { courtChecks++; true })
         observe(vm)
         vm.onMicPermission(false)
+        // While still seeking without heading: no calls
+        advanceTimeBy(500); runCurrent()
+        assertEquals(0, courtChecks)
+
+        // Simulate heading: LOCK_HOLD_MS = 600 ms. Advance 500 ms (not locked yet)
         vm.setSimulateHeading(true)
-        advanceTimeBy(1_000); runCurrent()
+        advanceTimeBy(500); runCurrent()
+        assertEquals(0, courtChecks)
+
+        // Advance another 200 ms: crosses 600 ms, locks on this tick
+        advanceTimeBy(200); runCurrent()
+        assertEquals(1, courtChecks)
         assertEquals(RitualPhase.Chanting, vm.uiState.value.ritual.phase)
         assertEquals(1f + COURT_BONUS, vm.uiState.value.ritual.courtMultiplier, 0.0001f)
+
+        // While chanting: inCourt must not be called again
+        advanceTimeBy(1_000); runCurrent()
+        assertEquals(1, courtChecks)
     }
 
     @Test

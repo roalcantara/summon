@@ -11,8 +11,8 @@ enum class RitualPhase { Seeking, Locking, Chanting, Wavering, Climax, Done }
 
 /**
  * One 20 ms tick: the latest heading (null = unknown, which counts as off heading once
- * locked), the analysed mic frame, and whether the demon's House is in court (read every
- * tick, used only at the moment of lock, ADR-0012).
+ * locked), the analysed mic frame, and whether the demon's House is in court (read only
+ * at the moment of lock, ADR-0012).
  */
 data class RitualInput(val azimuth: Float?, val voice: VoiceFrame, val inCourt: Boolean = false)
 
