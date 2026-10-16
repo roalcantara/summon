@@ -76,4 +76,13 @@ class HeadingMathTest {
         assertEquals(null, turnDirection(5f, 0f))
         assertEquals(null, turnDirection(null, 0f))
     }
+
+    @Test
+    fun headingLetterIsTheNearestCompassPointAbbreviation() {
+        assertEquals("N", headingLetter(0f))
+        assertEquals("E", headingLetter(90f))
+        assertEquals("NE", headingLetter(30f))
+        assertEquals("N", headingLetter(350f))
+        assertEquals("SW", headingLetter(-135f))
+    }
 }
