@@ -1,281 +1,565 @@
 package com.summondemons.safely.ui.screens
 
-import androidx.compose.animation.core.animateDpAsState
+import androidx.activity.compose.BackHandler
+import androidx.annotation.DrawableRes
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.minimumInteractiveComponentSize
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
-import com.summondemons.safely.ritual.headingLabel
 import com.summondemons.safely.data.Demon
+import com.summondemons.safely.data.DemonCatalog
+import com.summondemons.safely.platform.GameSounds
+import com.summondemons.safely.platform.LocalGameSounds
+import com.summondemons.safely.progress.DemonRecord
+import com.summondemons.safely.progress.ProgressRules
+import com.summondemons.safely.progress.Reveal
+import com.summondemons.safely.ui.GameUiState
+import com.summondemons.safely.ui.components.BadgeKey
+import com.summondemons.safely.ui.components.BadgeRow
+import com.summondemons.safely.ui.components.DebugChip
 import com.summondemons.safely.ui.components.DemonCutout
-import com.summondemons.safely.ui.components.PrimaryActionButton
-import com.summondemons.safely.ui.fx.HeatShimmer
-import com.summondemons.safely.ui.fx.InkedSigil
+import com.summondemons.safely.ui.components.DossierCarousel
+import com.summondemons.safely.ui.components.FloorCircle
+import com.summondemons.safely.ui.components.InfoBand
+import com.summondemons.safely.ui.components.QuoteSlot
+import com.summondemons.safely.ui.components.QuoteSlotState
+import com.summondemons.safely.ui.components.RibbonBanner
+import com.summondemons.safely.ui.components.RotatingSunburstBackground
+import com.summondemons.safely.ui.components.SECRET_PAGE
+import com.summondemons.safely.ui.components.SigilAvatar
+import com.summondemons.safely.ui.components.StageBackground
+import com.summondemons.safely.ui.fx.Jitter
 import com.summondemons.safely.ui.fx.LocalReduceMotion
 import com.summondemons.safely.ui.fx.ParticleField
 import com.summondemons.safely.ui.fx.ParticleStyle
 import com.summondemons.safely.ui.fx.SharedDemonArt
 import com.summondemons.safely.ui.fx.rememberFrameTimeMs
-import com.summondemons.safely.ui.fx.rememberParallax
 import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.spacing
-import kotlinx.coroutines.launch
+import com.summondemons.safely.ui.theme.stage
+import com.summondemons.safely.ui.theme.textRoles
+import kotlinx.coroutines.delay
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.sin
 
-private const val SCENE_SCRIM_TOP = 0.55f
-private const val SCENE_SCRIM_BOTTOM_LOCKED = 0.92f
-private const val SCENE_SCRIM_BOTTOM_UNLOCKED = 0.75f
-private const val SCENE_SCALE = 1.1f
-private const val SCENE_PARALLAX = -0.5f
-private const val SIGIL_ALPHA_LOCKED = 0.15f
-private const val SIGIL_ALPHA_UNLOCKED = 0.3f
-private const val SIGIL_DEG_PER_SECOND = 4f
+/** Share of the area below the avatar rail taken by the card; raise for more text, lower for bigger art. */
+private const val CARD_HEIGHT_FRACTION = 0.5f
+private const val BADGE_INFO_MS = 5_000L
+private const val AVATAR_BURN_CONSUME_MS = 2_200L
+private const val STAGE_CROSSFADE_MS = 500
+private const val DIM_BOUND = 0.35f
+private const val DIM_SEALED = 0.55f
+private const val EMBER_ALPHA = 0.67f
+private const val EMBERS = 20
+private const val PARTY_EMBERS = 50
+private const val SMOKE = 8
+private const val SUNBURST_ALPHA = 0.2f
+private const val ART_ASPECT = 896f / 1200f
+private const val FLOOR_WIDTH = 0.92f
+private const val FLOOR_ASPECT = 4f
+private const val SCENE_HEIGHT = 0.94f
+private const val SCENE_BRIGHTNESS = 0.35f
+private const val SCENE_SHADE_START = 0.55f
+private const val SCENE_SHADE_ALPHA = 0.7f
 private const val FLOAT_PERIOD_S = 4f
-private const val EMBER_COUNT = 24
-private const val SMOKE_COUNT = 10
-private val SceneBlur = 16.dp
+private const val PARTY_POP_FROM = 0.85f
+private const val CARD_ALPHA = 0.95f
+private const val METAL_RING_ALPHA = 0.45f
+private val RailHeight = 72.dp
 private val FloatAmplitude = 6.dp
-private val LogoSize = 36.dp
-private val AvatarSize = 40.dp
+private val SceneBlur = 3.dp
+private val StageSwipe = 60.dp
+private val CarouselMinHeight = 88.dp
+private val CarouselTopPadding = 12.dp
+private val MedallionSize = 48.dp
+private val BannerDrop = 30.dp
+private val NameSize = 26.sp
+private val NumberSize = 18.sp
+private val TitleSize = 12.sp
 
-/** A demon and whether he is bound. Temporary: the Grimoire rewrite (Task 24) reads `GameUiState`. */
-data class DemonEntry(val demon: Demon, val unlocked: Boolean)
-private val SelectedAvatarSize = 52.dp
-private val AvatarRing = 2.dp
-private val AvatarRowHeight = 72.dp
-
-@OptIn(ExperimentalMaterial3Api::class)
+/** The Grimoire (ADR-0016): avatar rail, a stage over a static demon card, and the new-summon party. */
 @Composable
 fun GrimoireScreen(
-    demons: List<DemonEntry>,
+    state: GameUiState,
+    onBack: () -> Unit,
+    onSelect: (String) -> Unit,
     onSummon: (String) -> Unit,
-    onView: (String) -> Unit,
+    onVisit: (String) -> Unit,
+    onDismissCelebration: () -> Unit,
+    onConsumeReveal: (String, Reveal) -> Unit,
+    onSecretShown: () -> Unit,
+    onDebug: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    demons: List<Demon> = DemonCatalog.all,
 ) {
-    val spacing = MaterialTheme.spacing
-    val pager = rememberPagerState { demons.size }
-    val scope = rememberCoroutineScope()
-    Scaffold(
-        modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_game_logo),
-                            contentDescription = null,
-                            modifier = Modifier.size(LogoSize).clip(CircleShape),
-                        )
-                        Text(
-                            stringResource(R.string.grimoire_title),
-                            style = MaterialTheme.typography.headlineLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-            )
-        },
-    ) { innerPadding ->
-        val top = innerPadding.calculateTopPadding()
-        Box(Modifier.fillMaxSize()) {
-            HorizontalPager(state = pager, modifier = Modifier.fillMaxSize(), key = { demons[it].demon.id }) { page ->
-                val entry = demons[page]
-                DemonHeroPage(
-                    entry = entry,
-                    topPadding = top,
-                    onSummon = { onSummon(entry.demon.id) },
-                    onView = { onView(entry.demon.id) },
-                )
-            }
-            AvatarRow(
-                demons = demons,
-                selected = pager.currentPage,
-                onSelect = { scope.launch { pager.animateScrollToPage(it) } },
-                modifier = Modifier.align(Alignment.TopCenter).padding(top = top + spacing.sm),
-            )
-        }
-    }
-}
-
-@Composable
-private fun DemonHeroPage(entry: DemonEntry, topPadding: Dp, onSummon: () -> Unit, onView: () -> Unit) {
-    val demon = entry.demon
-    val locked = !entry.unlocked
+    val demon = demons.firstOrNull { it.id == state.selectedId } ?: demons.first()
+    val record = state.record(demon.id)
+    val bound = record.bound
+    val party = state.celebration?.takeIf { it.demonId == demon.id }
     val accent = MaterialTheme.demonColors.accent(demon.accent)
     val colors = MaterialTheme.colorScheme
     val spacing = MaterialTheme.spacing
     val reduceMotion = LocalReduceMotion.current
-    val parallax by rememberParallax()
-    val time by if (reduceMotion) remember { mutableLongStateOf(0L) } else rememberFrameTimeMs()
-    val floatPx = with(LocalDensity.current) { FloatAmplitude.toPx() }
+    val sounds = LocalGameSounds.current
+    val density = LocalDensity.current
 
-    Box(Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(demon.sceneArt),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer {
-                    scaleX = SCENE_SCALE
-                    scaleY = SCENE_SCALE
-                    translationX = parallax.x * SCENE_PARALLAX
-                    translationY = parallax.y * SCENE_PARALLAX
-                }
-                .blur(SceneBlur),
-        )
-        Box(
-            Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            colors.surfaceContainerLowest.copy(alpha = SCENE_SCRIM_TOP),
-                            colors.surfaceContainerLowest.copy(alpha = if (locked) SCENE_SCRIM_BOTTOM_LOCKED else SCENE_SCRIM_BOTTOM_UNLOCKED),
-                        ),
-                    ),
-                ),
-        )
-        InkedSigil(
-            sigil = demon.sigil,
-            inkProgress = 1f,
-            accent = accent,
-            rimText = demon.name.uppercase(),
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .graphicsLayer {
-                    rotationZ = if (reduceMotion) 0f else time / 1_000f * SIGIL_DEG_PER_SECOND
-                    alpha = if (locked) SIGIL_ALPHA_LOCKED else SIGIL_ALPHA_UNLOCKED
-                },
-        )
-        HeatShimmer(accent, Modifier.fillMaxSize())
-        ParticleField(accent, ParticleStyle.Embers, Modifier.fillMaxSize(), count = EMBER_COUNT, seed = demon.id.hashCode())
-        if (locked) {
-            ParticleField(colors.onSurfaceVariant, ParticleStyle.Smoke, Modifier.fillMaxSize(), count = SMOKE_COUNT, seed = demon.id.hashCode() + 1)
+    // Captured when this demon is first shown: the visit clears restlessness, but he still sulks for this viewing.
+    val restless = remember(demon.id, state.today) { ProgressRules.isRestless(record, state.today) }
+    // Ink flags are read once per viewing and consumed at once; the remembered values keep the animation alive.
+    val inkCodex = remember(demon.id) { record.revealed && record.revealPending.codex }
+    val inkBattle = remember(demon.id) { record.revealed && record.revealPending.battle }
+    var page by remember(demon.id) { mutableIntStateOf(0) }
+    var badge by remember(demon.id) { mutableStateOf<BadgeKey?>(null) }
+    var badgeTaps by remember { mutableIntStateOf(0) }
+    var shake by remember { mutableIntStateOf(0) }
+    var badgeRowBounds by remember { mutableStateOf(Rect.Zero) }
+    var rootOrigin by remember { mutableStateOf(Offset.Zero) }
+    var tadaFor by rememberSaveable { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(demon.id, bound, state.today) { if (bound) onVisit(demon.id) }
+    LaunchedEffect(demon.id) {
+        if (inkCodex) onConsumeReveal(demon.id, Reveal.Codex)
+        if (inkBattle) onConsumeReveal(demon.id, Reveal.Battle)
+    }
+    LaunchedEffect(demon.id, bound, record.revealPending.avatar) {
+        if (bound && record.revealPending.avatar) {
+            delay(AVATAR_BURN_CONSUME_MS)
+            onConsumeReveal(demon.id, Reveal.Avatar)
         }
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = topPadding + AvatarRowHeight)
-                .navigationBarsPadding()
-                .padding(horizontal = spacing.xl, vertical = spacing.lg),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(spacing.sm),
-        ) {
-            SharedDemonArt(
-                demonId = demon.id,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .graphicsLayer {
-                        val bob = if (reduceMotion) 0f else sin(time / 1_000f * 2f * PI.toFloat() / FLOAT_PERIOD_S) * floatPx
-                        translationX = parallax.x
-                        translationY = parallax.y + bob
-                    },
-            ) {
-                DemonCutout(
-                    art = demon.cutoutArt,
-                    contentDescription = if (locked) null else demon.name,
-                    accent = accent,
-                    modifier = Modifier.fillMaxSize(),
-                    silhouette = if (locked) 1f else 0f,
-                )
+    }
+    LaunchedEffect(state.openSecret) {
+        if (state.openSecret) {
+            page = SECRET_PAGE
+            onSecretShown()
+        }
+    }
+    LaunchedEffect(badge, badgeTaps) {
+        if (badge != null) {
+            delay(BADGE_INFO_MS)
+            badge = null
+        }
+    }
+    // Saved, so recreating the activity doesn't replay the fanfare.
+    val partyKey = party?.let { "${it.demonId}@${state.today}" }
+    LaunchedEffect(partyKey) {
+        if (partyKey != null && tadaFor != partyKey) {
+            sounds?.play(GameSounds.Cue.Tada)
+            tadaFor = partyKey
+        }
+    }
+    BackHandler(enabled = party != null) { onDismissCelebration() }
+
+    val primary: () -> Unit = {
+        when {
+            party != null -> onDismissCelebration()
+            bound -> Unit
+            !state.canSummonToday -> shake++
+            else -> onSummon(demon.id)
+        }
+    }
+    val index = demons.indexOf(demon)
+    val step: (Int) -> Unit = { delta -> onSelect(demons[(index + delta + demons.size) % demons.size].id) }
+
+    Box(
+        modifier
+            .fillMaxSize()
+            .background(colors.background)
+            .onGloballyPositioned { rootOrigin = it.boundsInRoot().topLeft }
+            // Observe presses without consuming them: a tap outside the badge row clears the
+            // badge and still does its own action (e.g. summon).
+            .pointerInput(demon.id) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        if (event.type == PointerEventType.Press && event.changes.none { badgeRowBounds.contains(it.position + rootOrigin) }) {
+                            badge = null
+                        }
+                    }
+                }
+            },
+    ) {
+        Crossfade(targetState = demon.house.stage(), animationSpec = tween(STAGE_CROSSFADE_MS), label = "stage") { stage ->
+            StageBackground(stage, dim = if (bound) DIM_BOUND else DIM_SEALED, modifier = Modifier.fillMaxSize())
+        }
+        if (party != null) RotatingSunburstBackground(accent.copy(alpha = SUNBURST_ALPHA), Modifier.fillMaxSize(), rotating = !reduceMotion)
+        ParticleField(
+            accent.copy(alpha = EMBER_ALPHA), ParticleStyle.Embers, Modifier.fillMaxSize(),
+            count = if (party != null) PARTY_EMBERS else EMBERS, seed = demon.id.hashCode(),
+        )
+        if (!bound) {
+            ParticleField(colors.onSurfaceVariant, ParticleStyle.Smoke, Modifier.fillMaxSize(), count = SMOKE, seed = demon.id.hashCode() + 1)
+        }
+
+        Column(Modifier.fillMaxSize().statusBarsPadding()) {
+            AvatarRail(demons, state, demon.id, enabled = party == null, onBack, onSelect, onDebug)
+            BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
+                var fixedPx by remember { mutableIntStateOf(0) }
+                val navBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                // Fixed at the default font scale; grows only if header + band + badges + 88 dp don't fit.
+                val minimum = with(density) { fixedPx.toDp() } + spacing.lg + spacing.md + CarouselTopPadding + CarouselMinHeight + navBottom
+                val cardHeight = maxOf(maxHeight * CARD_HEIGHT_FRACTION, minimum)
+                Column(Modifier.fillMaxSize()) {
+                    Stage(
+                        demon = demon,
+                        bound = bound,
+                        restless = restless,
+                        party = party != null,
+                        canSummon = state.canSummonToday,
+                        quote = if (restless) demon.restlessQuote else demon.quote,
+                        hours = state.hoursToNextSummon,
+                        shake = shake,
+                        onPrimary = primary,
+                        onSwipe = step,
+                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                    )
+                    DemonCard(
+                        demons = demons,
+                        demon = demon,
+                        record = record,
+                        badge = badge,
+                        onBadge = {
+                            badge = it
+                            badgeTaps++
+                        },
+                        page = page,
+                        onPage = { page = it },
+                        inkCodex = inkCodex,
+                        inkBattle = inkBattle,
+                        onFixedHeight = { fixedPx = it },
+                        onBadgeRowBounds = { badgeRowBounds = it },
+                        modifier = Modifier.fillMaxWidth().height(cardHeight),
+                    )
+                }
+                if (party != null) PartyBanner(Modifier.align(Alignment.TopCenter).padding(top = spacing.sm))
             }
-            Text(demon.name, style = MaterialTheme.typography.displaySmall, color = if (locked) colors.onSurfaceVariant else accent)
-            Text(
-                if (locked) stringResource(R.string.grimoire_sealed_hint, headingLabel(demon.ritualHeading)) else demon.title,
-                style = MaterialTheme.typography.bodyMedium,
-                color = colors.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                minLines = 2,
-                maxLines = 2,
-            )
-            PrimaryActionButton(
-                text = stringResource(if (locked) R.string.action_summon else R.string.action_view),
-                onClick = if (locked) onSummon else onView,
-                modifier = Modifier.fillMaxWidth(),
-            )
         }
     }
 }
 
 @Composable
-private fun AvatarRow(demons: List<DemonEntry>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier) {
-    val colors = MaterialTheme.colorScheme
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        demons.forEachIndexed { index, entry ->
-            val isSelected = index == selected
-            val accent = MaterialTheme.demonColors.accent(entry.demon.accent)
-            val size by animateDpAsState(if (isSelected) SelectedAvatarSize else AvatarSize, label = "avatarSize")
-            Box(
-                Modifier
-                    .minimumInteractiveComponentSize()
-                    .selectable(selected = isSelected, role = Role.Tab, onClick = { onSelect(index) }),
-                contentAlignment = Alignment.Center,
-            ) {
-                Image(
-                    painter = painterResource(entry.demon.avatarArt),
-                    contentDescription = entry.demon.name,
-                    contentScale = ContentScale.Crop,
-                    colorFilter = if (entry.unlocked) null else ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }),
-                    modifier = Modifier
-                        .size(size)
-                        .clip(CircleShape)
-                        .border(AvatarRing, if (isSelected) accent else colors.outlineVariant, CircleShape),
+private fun AvatarRail(
+    demons: List<Demon>,
+    state: GameUiState,
+    selectedId: String,
+    enabled: Boolean,
+    onBack: () -> Unit,
+    onSelect: (String) -> Unit,
+    onDebug: (() -> Unit)?,
+) {
+    val spacing = MaterialTheme.spacing
+    val back = stringResource(R.string.grimoire_back)
+    Box(Modifier.fillMaxWidth().height(RailHeight).padding(horizontal = spacing.sm)) {
+        IconButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart).semantics { contentDescription = back }) {
+            Text("←", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.clearAndSetSemantics { })
+        }
+        Row(
+            Modifier.align(Alignment.Center),
+            horizontalArrangement = Arrangement.spacedBy(spacing.md),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            demons.forEach { d ->
+                val r = state.record(d.id)
+                SigilAvatar(
+                    demon = d,
+                    bound = r.bound,
+                    burn = r.bound && r.revealPending.avatar && d.id == selectedId,
+                    restless = ProgressRules.isRestless(r, state.today),
+                    selected = d.id == selectedId,
+                    enabled = enabled,
+                    onClick = { onSelect(d.id) },
                 )
             }
         }
+        if (onDebug != null) DebugChip(onDebug, Modifier.align(Alignment.CenterEnd))
     }
+}
+
+@Composable
+private fun Stage(
+    demon: Demon,
+    bound: Boolean,
+    restless: Boolean,
+    party: Boolean,
+    canSummon: Boolean,
+    quote: String,
+    hours: Int,
+    shake: Int,
+    onPrimary: () -> Unit,
+    onSwipe: (Int) -> Unit,
+    modifier: Modifier,
+) {
+    val accent = MaterialTheme.demonColors.accent(demon.accent)
+    val spacing = MaterialTheme.spacing
+    val reduceMotion = LocalReduceMotion.current
+    val swipePx = with(LocalDensity.current) { StageSwipe.toPx() }
+    val currentSwipe by rememberUpdatedState(onSwipe)
+    val time by if (reduceMotion) remember { mutableLongStateOf(0L) } else rememberFrameTimeMs()
+    val floatPx = with(LocalDensity.current) { FloatAmplitude.toPx() }
+    val pop = remember(demon.id, party) { Animatable(if (party && !reduceMotion) PARTY_POP_FROM else 1f) }
+    LaunchedEffect(pop) { pop.animateTo(1f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow)) }
+    val slot = when {
+        party -> QuoteSlotState.Celebration
+        bound -> QuoteSlotState.Bound
+        canSummon -> QuoteSlotState.Ready
+        else -> QuoteSlotState.Cooling
+    }
+    val label = when (slot) {
+        QuoteSlotState.Celebration -> stringResource(R.string.action_awesome)
+        QuoteSlotState.Bound -> demon.name
+        QuoteSlotState.Ready -> stringResource(R.string.cd_summon, demon.name)
+        QuoteSlotState.Cooling -> stringResource(R.string.cd_cooling, hours)
+    }
+    Column(
+        modifier
+            .pointerInput(party) {
+                if (party) return@pointerInput // no swiping during the celebration
+                var total = 0f
+                detectHorizontalDragGestures(
+                    onDragStart = { total = 0f },
+                    onDragEnd = { if (abs(total) > swipePx) currentSwipe(if (total < 0f) 1 else -1) },
+                ) { _, amount -> total += amount }
+            }
+            .padding(horizontal = spacing.xl)
+            .padding(bottom = spacing.md),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.BottomCenter) {
+            Box(Modifier.aspectRatio(ART_ASPECT, matchHeightConstraintsFirst = true)) {
+                if (bound) SceneBackdrop(demon.sceneArt, Modifier.align(Alignment.TopCenter))
+                FloorCircle(
+                    accent = accent,
+                    pulse = !party && !bound && canSummon,
+                    modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(FLOOR_WIDTH).aspectRatio(FLOOR_ASPECT),
+                )
+                SharedDemonArt(
+                    demonId = demon.id,
+                    modifier = Modifier.fillMaxSize().graphicsLayer {
+                        translationY = if (reduceMotion) 0f else sin(time / 1_000f * 2f * PI.toFloat() / FLOAT_PERIOD_S) * floatPx
+                        scaleX = pop.value
+                        scaleY = pop.value
+                    },
+                ) {
+                    Jitter(enabled = restless, modifier = Modifier.fillMaxSize()) {
+                        DemonCutout(
+                            art = demon.cutoutArt,
+                            contentDescription = null,
+                            accent = accent,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                    enabled = !bound || party,
+                                    onClick = onPrimary,
+                                )
+                                .semantics { contentDescription = label },
+                            silhouette = if (bound) 0f else 1f,
+                            alignment = Alignment.BottomCenter,
+                        )
+                    }
+                }
+            }
+        }
+        QuoteSlot(slot, demon, quote, hours, shake, onTap = onPrimary, modifier = Modifier.padding(top = spacing.md))
+    }
+}
+
+/** The demon's own scene, dimmed and softened, framing the cut-out. */
+@Composable
+private fun SceneBackdrop(@DrawableRes art: Int, modifier: Modifier) {
+    val shade = MaterialTheme.colorScheme.surfaceContainerLowest
+    val dim = remember { ColorMatrix().apply { setToScale(SCENE_BRIGHTNESS, SCENE_BRIGHTNESS, SCENE_BRIGHTNESS, 1f) } }
+    Box(modifier.fillMaxWidth().fillMaxHeight(SCENE_HEIGHT).clip(MaterialTheme.shapes.medium)) {
+        Image(
+            painter = painterResource(art),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            colorFilter = ColorFilter.colorMatrix(dim),
+            modifier = Modifier.fillMaxSize().blur(SceneBlur), // API 31+; plain dimmed art below
+        )
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.verticalGradient(SCENE_SHADE_START to Color.Transparent, 1f to shade.copy(alpha = SCENE_SHADE_ALPHA)),
+            ),
+        )
+    }
+}
+
+@Composable
+private fun DemonCard(
+    demons: List<Demon>,
+    demon: Demon,
+    record: DemonRecord,
+    badge: BadgeKey?,
+    onBadge: (BadgeKey?) -> Unit,
+    page: Int,
+    onPage: (Int) -> Unit,
+    inkCodex: Boolean,
+    inkBattle: Boolean,
+    onFixedHeight: (Int) -> Unit,
+    onBadgeRowBounds: (Rect) -> Unit,
+    modifier: Modifier,
+) {
+    val colors = MaterialTheme.colorScheme
+    val spacing = MaterialTheme.spacing
+    Surface(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.large.copy(bottomStart = CornerSize(0.dp), bottomEnd = CornerSize(0.dp)),
+        color = colors.surfaceContainerLow.copy(alpha = CARD_ALPHA),
+        border = BorderStroke(1.dp, colors.outlineVariant),
+    ) {
+        Column(Modifier.navigationBarsPadding().padding(top = spacing.lg, bottom = spacing.md)) {
+            Column(Modifier.onSizeChanged { onFixedHeight(it.height) }) {
+                CardHeader(demon, record.bound, Modifier.padding(horizontal = spacing.lg))
+                InfoBand(demons, demon, badge, Modifier.padding(horizontal = spacing.lg).padding(top = spacing.lg))
+                BadgeRow(
+                    demon = demon,
+                    selected = badge,
+                    onSelect = onBadge,
+                    modifier = Modifier
+                        .padding(horizontal = spacing.lg)
+                        .padding(top = spacing.lg)
+                        .onGloballyPositioned { onBadgeRowBounds(it.boundsInRoot()) },
+                )
+            }
+            DossierCarousel(
+                demon = demon,
+                record = record,
+                inkCodex = inkCodex,
+                inkBattle = inkBattle,
+                page = page,
+                onPage = onPage,
+                modifier = Modifier.weight(1f).fillMaxWidth().padding(top = CarouselTopPadding).padding(horizontal = spacing.xs),
+            )
+        }
+    }
+}
+
+/** Tarot-style header: number medallion in the House metal, name, title. */
+@Composable
+private fun CardHeader(demon: Demon, bound: Boolean, modifier: Modifier) {
+    val colors = MaterialTheme.colorScheme
+    val metal = MaterialTheme.demonColors.metal(demon.house)
+    val accent = MaterialTheme.demonColors.accent(demon.accent)
+    val roles = MaterialTheme.textRoles
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md), verticalAlignment = Alignment.CenterVertically) {
+        Box(
+            Modifier
+                .size(MedallionSize)
+                .background(colors.surfaceContainerLow, CircleShape)
+                .then(Modifier.padding(0.dp))
+                .clip(CircleShape)
+                .background(metal.copy(alpha = METAL_RING_ALPHA), CircleShape)
+                .padding(1.dp)
+                .background(colors.surfaceContainerLow, CircleShape)
+                .padding(2.dp)
+                .background(metal, CircleShape)
+                .padding(1.5.dp)
+                .background(colors.surfaceContainerLow, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(demon.number.toString(), style = roles.name.copy(fontSize = NumberSize), color = metal)
+        }
+        Column(Modifier.weight(1f)) {
+            Text(
+                demon.name,
+                style = roles.name.copy(fontSize = NameSize),
+                color = if (bound) accent else colors.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                demon.title,
+                style = roles.body.copy(fontSize = TitleSize),
+                color = colors.outline,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+/** "New Demon Received!" drops in at the top of the stage. */
+@Composable
+private fun PartyBanner(modifier: Modifier) {
+    val reduceMotion = LocalReduceMotion.current
+    val dropPx = with(LocalDensity.current) { BannerDrop.toPx() }
+    val drop = remember { Animatable(if (reduceMotion) 0f else -dropPx) }
+    LaunchedEffect(Unit) { drop.animateTo(0f, spring(Spring.DampingRatioMediumBouncy)) }
+    RibbonBanner(
+        stringResource(R.string.celebration_banner),
+        modifier.graphicsLayer {
+            translationY = drop.value
+            alpha = 1f - drop.value / -dropPx * 0.9f
+        },
+    )
 }

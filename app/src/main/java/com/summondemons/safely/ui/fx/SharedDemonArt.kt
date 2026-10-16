@@ -17,7 +17,7 @@ val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope?
 val LocalNavAnimatedVisibilityScope = staticCompositionLocalOf<AnimatedVisibilityScope?> { null }
 
 /**
- * Wraps a demon's cut-out so it glides between Grimoire, Ritual (climax) and Profile.
+ * Wraps a demon's cut-out so it glides from the Ritual climax back to the Grimoire stage.
  * Without the scopes (previews) it is a plain Box.
  */
 @OptIn(ExperimentalSharedTransitionApi::class)
