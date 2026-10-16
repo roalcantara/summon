@@ -1,10 +1,7 @@
 <resources>
     <string name="app_name">Summon Demons Safely</string>
 
-    <string name="grimoire_title">My Grimoire</string>
-    <string name="action_summon">Summon</string>
-    <string name="action_view">View</string>
-
+    <string name="action_awesome">Awesome!</string>
     <string name="action_abort">Abort Ritual</string>
     <string name="mic_rationale">The ritual listens to the rhythm of your chant. Nothing is recorded or saved — the microphone only measures loudness and pitch.</string>
     <string name="action_retry">Allow microphone</string>
@@ -15,20 +12,12 @@
     <string name="debug_hold_to_chant">Hold to Chant</string>
     <string name="debug_chanting">Chanting…</string>
 
-    <string name="profile_banner">New Demon Received!</string>
-    <string name="action_awesome">Awesome!</string>
-    <string name="action_back">Back</string>
-    <string name="grimoire_sealed_hint">Sealed · Face %1$s to summon</string>
     <string name="hint_face">Face %1$s</string>
     <string name="hint_turn_left">Turn left · Face %1$s</string>
     <string name="hint_turn_right">Turn right · Face %1$s</string>
     <string name="hint_hold_steady">Hold steady…</string>
-    <string name="hint_chant">Chant!</string>
-    <string name="hint_mic_needed">The spirits need to hear you</string>
-    <string name="hint_face_again">Face %1$s again!</string>
     <string name="hint_summoning">The seal opens…</string>
     <string name="heading_unavailable">This device can\'t sense direction, so the ritual can\'t begin.</string>
-    <string name="action_unsummon">Unsummon</string>
 
     <!-- Home (ADR-0014) -->
     <string name="home_court">In court · %1$s</string>
