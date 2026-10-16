@@ -14,6 +14,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
@@ -28,6 +30,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.summondemons.safely.AppGraph
+import com.summondemons.safely.BuildConfig
 import com.summondemons.safely.data.Demon
 import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.platform.AndroidHeadingSource
@@ -42,6 +45,7 @@ import com.summondemons.safely.ui.GameViewModel
 import com.summondemons.safely.ui.fx.LocalNavAnimatedVisibilityScope
 import com.summondemons.safely.ui.fx.LocalSharedTransitionScope
 import com.summondemons.safely.ui.screens.GrimoireScreen
+import com.summondemons.safely.ui.screens.DebugSheet
 import com.summondemons.safely.ui.screens.HomeScreen
 import com.summondemons.safely.ui.screens.RitualScreen
 
@@ -61,7 +65,9 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
         Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background))
         return
     }
-    val onDebug: (() -> Unit)? = null // Task 26
+    var debugOpen by rememberSaveable { mutableStateOf(false) }
+    val debugSettings by graph.debugSettings.settings.collectAsStateWithLifecycle()
+    val onDebug: (() -> Unit)? = if (BuildConfig.DEBUG) ({ debugOpen = true }) else null
 
     CompositionLocalProvider(LocalGameSounds provides sounds) {
         SharedTransitionLayout {
@@ -107,6 +113,24 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
                     }
                 }
             }
+        }
+        if (BuildConfig.DEBUG && debugOpen) {
+            DebugSheet(
+                state = state,
+                court = debugSettings.court,
+                demons = DemonCatalog.all,
+                onDismiss = { debugOpen = false },
+                onAdvanceDay = game::advanceDay,
+                onResetDaily = game::resetDaily,
+                onCourt = game::setCourt,
+                onBind = game::bind,
+                onUnsummon = game::unsummon,
+                onResetAll = {
+                    game.resetAll()
+                    debugOpen = false
+                    navController.popBackStack<Home>(inclusive = false)
+                },
+            )
         }
     }
 }
