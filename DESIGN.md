@@ -183,10 +183,14 @@ large sources are not density-scaled and the APK stays small.
 | `ic_game_logo` | `summon_demons_safely_game_logo/screen.png` | 1024×1024, opaque |
 | `avatar_asmodeus` | `hero_wars_style_mobile_rpg_avatar_icon_portrait_of_cute_funny_chibi_demon_1/screen.png` | 1024×1024, opaque; circle-clipped |
 | `avatar_astaroth` | `hero_wars_style_mobile_rpg_avatar_icon_portrait_of_cute_funny_chibi_demon/screen.png` | 1024×1024, opaque; circle-clipped |
-| `demon_asmodeus_full` | previous `full_body_…_demon_1/screen.png` (git history before commit 3b17683) | 896×1200 scene, already shipped |
+| `demon_asmodeus_full` | `art/etc/full_body_cute_funny_stylized_2d_cartoon_fantasy_rpg_character_artwork_of_demon.png` | 896×1200 scene |
 | `demon_astaroth_full` | `full_body_…_demon_1/screen.png` | 896×1200 scene |
 | `demon_asmodeus_cutout` | `full_body_…_demon_2/screen.png` | 896×1200, alpha |
 | `demon_astaroth_cutout` | `full_body_…_demon_3/screen.png` | 896×1200, alpha |
+| `stage_home` | `art/etc/stage_home.png` | 768×1376 scene, Home stage background |
+| `stage_sol` | `art/etc/stage_sol.png` | 768×1376 scene, Sol House stage background |
+| `stage_venus` | `art/etc/stage_venus.png` | 768×1376 scene, Venus House stage background |
+| `ic_home_grimoire` | `art/etc/RestlessGrimoire.png` | 1024×1024 opaque square asset, Home grimoire book |
 
 `full_body_…` = `full_body_cute_funny_stylized_2d_cartoon_fantasy_rpg_character_artwork_of_demon`.
 Unused references: `the_sacred_magical_sigil_of_*` (superseded by vector sigils, ADR-0009).
@@ -223,13 +227,4 @@ breach screen).
 
 ## Gaps
 
-Placeholders ship; art can replace them later. Never ship the prototype's Hero Wars
-stand-in images.
-
-| Gap | Placeholder | Stitch prompt |
-|---|---|---|
-| Home hall background (`stage_home`) | `StageBackground(Home)` gradient | "Portrait 9:19.5 mobile game background, a candle-lit stone summoning hall seen from the doorway, an inlaid brass compass rose on the floor, deep navy and violet shadows, warm gold candle glow, empty centre for a book, cute stylised 2D fantasy RPG art, no characters, no text." |
-| Sol stage (`stage_sol`) | `StageBackground(Sol)` gradient | "Portrait 9:19.5 mobile game stage background, a sunlit golden throne-room dais with a sun disc behind it, warm amber and gold fading to deep navy at the edges, soft light rays, empty centre for a character, cute stylised 2D fantasy RPG art, no characters, no text." |
-| Venus stage (`stage_venus`) | `StageBackground(Venus)` gradient | "Portrait 9:19.5 mobile game stage background, a copper-and-rose dawn garden pavilion, morning mist, dusky violet fading to deep navy at the edges, empty centre for a character, cute stylised 2D fantasy RPG art, no characters, no text." |
-| Home grimoire | `RestlessGrimoire` vector | "Square game asset on a transparent background: a thick cute chained grimoire with a glowing round lock, plum leather cover with gold corners, iron chains crossing it, slightly open with a pair of glowing eyes peeking from the pages, stylised 2D fantasy RPG art, no text." |
-| Asmodeus scene art | `demon_asmodeus_full` keeps the earlier render | (reuse the Ritual 2.0 scene prompt) |
+All gaps closed. Stage backgrounds (`stage_home`, `stage_sol`, `stage_venus`), Home grimoire (`ic_home_grimoire`), and Asmodeus scene art (`demon_asmodeus_full`) have been processed and integrated into `app/src/main/res/drawable-nodpi/`.
