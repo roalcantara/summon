@@ -129,13 +129,13 @@ class RitualViewModelTest {
         observe(vm)
         vm.onMicPermission(false)
         vm.setHoldToChant(true)
-        heading.readings.emit(0f)
+        heading.readings.emit(demon.ritualHeading)
         advanceTimeBy(1_500); runCurrent()
         val lit = vm.uiState.value.ritual.lit
         assertTrue("lit=$lit", lit > 0)
 
         vm.setHoldToChant(false)
-        heading.readings.emit(90f)
+        heading.readings.emit(demon.ritualHeading + 90f)
         advanceTimeBy(1_000); runCurrent()
         assertEquals(RitualPhase.Wavering, vm.uiState.value.ritual.phase)
         assertEquals(lit, vm.uiState.value.ritual.lit)
