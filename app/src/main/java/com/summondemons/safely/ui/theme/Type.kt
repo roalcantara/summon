@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
 
 // DESIGN.md: Cinzel (display) and Inter (body), bundled static instances.
-private val Display = FontFamily(
+internal val Display = FontFamily(
     Font(R.font.cinzel_semibold, FontWeight.SemiBold),
     Font(R.font.cinzel_bold, FontWeight.Bold),
 )

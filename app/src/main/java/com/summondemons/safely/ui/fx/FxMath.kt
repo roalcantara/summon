@@ -13,3 +13,11 @@ fun parallaxOffset(pitchDelta: Float, rollDelta: Float, maxPx: Float): Offset = 
     x = (rollDelta / PARALLAX_FULL_TILT_RAD).coerceIn(-1f, 1f) * maxPx,
     y = (pitchDelta / PARALLAX_FULL_TILT_RAD).coerceIn(-1f, 1f) * maxPx,
 )
+
+/** Value at [t] in [0, 1] of evenly spaced keyframes [values], linearly interpolated and clamped. */
+fun keyframe(t: Float, values: FloatArray): Float {
+    require(values.size >= 2) { "need at least two keyframes" }
+    val x = t.coerceIn(0f, 1f) * (values.size - 1)
+    val i = x.toInt().coerceAtMost(values.size - 2)
+    return values[i] + (values[i + 1] - values[i]) * (x - i)
+}

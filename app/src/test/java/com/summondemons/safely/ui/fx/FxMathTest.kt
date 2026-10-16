@@ -21,4 +21,14 @@ class FxMathTest {
         assertEquals(20f, beyond.x, 0.0001f)
         assertEquals(20f, beyond.y, 0.0001f)
     }
+    @Test
+    fun keyframeInterpolatesEvenlySpacedValues() {
+        val values = floatArrayOf(0f, -22f, 0f, -6f, 0f)
+        assertEquals(0f, keyframe(0f, values), 0.0001f)
+        assertEquals(-11f, keyframe(0.125f, values), 0.0001f)
+        assertEquals(-22f, keyframe(0.25f, values), 0.0001f)
+        assertEquals(-3f, keyframe(0.625f, values), 0.0001f)
+        assertEquals(0f, keyframe(1f, values), 0.0001f)
+        assertEquals(0f, keyframe(2f, values), 0.0001f) // clamped
+    }
 }

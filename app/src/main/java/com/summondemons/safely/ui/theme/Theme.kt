@@ -51,6 +51,7 @@ fun SummonDemonsSafelyTheme(content: @Composable () -> Unit) {
     CompositionLocalProvider(
         LocalDemonColors provides DefaultDemonColors,
         LocalSpacing provides Spacing(),
+        LocalTextRoles provides AppTextRoles,
         LocalReduceMotion provides rememberReduceMotion(),
     ) {
         MaterialTheme(

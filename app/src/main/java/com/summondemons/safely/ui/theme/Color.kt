@@ -42,4 +42,13 @@ internal object Palette {
     val demonAsmodeus = Color(0xFFFFD54F)
     val demonAstaroth = Color(0xFFE040FB)
     val ritualSafe = Color(0xFF4ADE80)
+    val houseSol = Color(0xFFF2C14E)
+    val houseVenus = Color(0xFFC87A3C)
+    val inkHighlight = Color(0xFFFFF6D0)
+    val stageHomeGlow = Color(0xFF3A2A55)
+    val stageHomeMid = Color(0xFF1A1530)
+    val stageSolGlow = Color(0xFF6B4A12)
+    val stageSolMid = Color(0xFF2A1D0B)
+    val stageVenusGlow = Color(0xFF3B2A4A)
+    val stageVenusMid = Color(0xFF2A1A26)
 }
