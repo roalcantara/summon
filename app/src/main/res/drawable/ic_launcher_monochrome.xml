@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer ring: radius 30dp centered at (54, 54), stroke 4dp -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 54 22 A 32 32 0 1 0 54 86 A 32 32 0 1 0 54 22 Z M 54 26 A 28 28 0 1 1 54 82 A 28 28 0 1 1 54 26 Z" />
+    <!-- Inner circle: radius 15dp centered at (54, 54), stroke 2dp -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 54 38 A 16 16 0 1 0 54 70 A 16 16 0 1 0 54 38 Z M 54 40 A 14 14 0 1 1 54 68 A 14 14 0 1 1 54 40 Z" />
+    <!-- Upward triangle inside the circle -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 54 43 L 64 61 L 44 61 Z" />
+</vector>

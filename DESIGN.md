@@ -191,8 +191,11 @@ large sources are not density-scaled and the APK stays small.
 | `stage_sol` | `art/etc/stage_sol.png` | 768×1376 scene, Sol House stage background |
 | `stage_venus` | `art/etc/stage_venus.png` | 768×1376 scene, Venus House stage background |
 | `ic_home_grimoire` | `art/etc/RestlessGrimoire.png` | 1024×1024 opaque square asset, Home grimoire book |
+| `ic_launcher_foreground` | `tools/gen_icons.py` | Generated mipmaps (`mipmap-{m,h,xh,xxh,xxxh}dpi`), adaptive icon foreground |
+| `ic_launcher_monochrome` | Hand-crafted vector | 108×108 dp vector drawable (`res/drawable/`), themed icon layer |
 
 `full_body_…` = `full_body_cute_funny_stylized_2d_cartoon_fantasy_rpg_character_artwork_of_demon`.
+Regenerate launcher and store graphics with `python3 -I tools/gen_icons.py app/src/main/res/drawable-nodpi/ic_game_logo.webp app/src/main/res docs/play-store`.
 Unused references: `the_sacred_magical_sigil_of_*` (superseded by vector sigils, ADR-0009).
 
 ### Sigils
