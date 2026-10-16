@@ -173,7 +173,8 @@ strongest, what he is for and how mighty he is, plus lore worth unlocking.
 - Each demon has a number, a rank, a legion count and an optional liege.
 - The demon card shows four badges: **Direction** (with the liege, or "He swears to no
   king"), **House**, **Calling** and **Legions** ("A {rank} at the head of {n} legions of
-  spirits."). The badge rim is the House metal; the glyph is the demon accent.
+  spirits."). The badge rim is the House metal; the glyphs are the demon accent, except the
+  House glyph, which is drawn in its metal.
 - The **dossier** holds six pages of copy per demon: Weakness, Abilities (exactly 3),
   Offices, Appearance, Summoner's warning and Secret. The copy is demon data
   (`DemonCatalog`, PRODUCT.md "Dossiers").
@@ -693,9 +694,10 @@ dark palette carries the RPG feel.
 | `InkedSigil` | The demon's vector sigil | `sigil` (raw), `inkProgress` 0–1, `ringProgress` 0–1, `rimText`, `accent`, `micLevel` (glow), `ghostAlpha`, `flash` (group, color, duration: seal flare / crack drain) |
 | `AltarRing` | Ring around the sigil on the Ritual | `azimuth`, `target`, `phase`, `lockFraction`, `accent`; outline track, `ritual-safe` lock fill / locked ring, `error` while wavering, a marker toward the target |
 | `CueChip` | One-line cue | `text`, `tone` (neutral / safe / error), `shake` |
+| `FocusBar` | Focus left under the current phrase | `fraction`, `tone` (normal / drift / court), `accent`; heartbeat below `FOCUS_LOW_FRACTION` |
 | `ChantTablet` | Framed chant panel | `phrases`, `phrase`, `lit`, `accent`, `active`, `header`, `focusFraction`, `focusTone` (normal / drift / court), `flare`, `cracked`, `micLevel`, `wavering`; contains `Medallion`, `KaraokeLine`, `FocusBar` |
 | `KaraokeLine` | Current chant phrase | `text`, `lit` syllables, `accent`, `dim`, `micLevel` (newest-syllable glow) |
-| `BadgeRow` | Direction / House / Calling / Legions tiles | `demon`, `selected`, `onSelect`; rim = House metal, glyph = accent |
+| `BadgeRow` | Direction / House / Calling / Legions tiles | `demon`, `selected`, `onSelect`; rim = House metal, glyph = accent (House glyph = metal); `BadgeIcon` draws one glyph |
 | `InfoBand` | Description or the selected badge's explanation | `demons`, `demon`, `badge`; height of the tallest text |
 | `DossierCarousel` | Six dossier pages | `demon`, `record`, `inkCodex`, `inkBattle`, `page`, `onPage`; ‹ › and swipe, wrapping |
 | `Smudge` / `InkLine` | Sealed page lines / ink-in of revealed lines | `lines`; `ink`, `index` |
@@ -708,6 +710,7 @@ dark palette carries the RPG feel.
 | Glyphs | `DirectionGlyph`, `HouseGlyph`, `CallingGlyph`, `LegionsGlyph` | vector paths in a 24-unit box; `color`, `size` |
 | `DemonCutout` | Cut-out art with accent rim glow | `art`, `accent`, `silhouette` 0–1, `alignment` |
 | `ParticleField` | Embers / smoke / converging climax sparks | `color`, `style`, `count`, `converge` 0–1 |
+| `DebugChip` | Opens the debug sheet (debug builds only) | `onClick` |
 | `HeatShimmer` | Rising heat haze | `color`; AGSL on API 33+, breathing gradient below |
 | `rememberParallax` | Gyro offset for art layers | max offset; `TYPE_GAME_ROTATION_VECTOR`, none if absent |
 
@@ -2570,7 +2573,7 @@ class GameClockTest {
     fun hoursToMidnightRoundUpAndAreAtLeastOne() {
         assertEquals(24, hoursToMidnight(at(0)))
         assertEquals(7, hoursToMidnight(at(17)))
-        assertEquals(7, hoursToMidnight(at(16, 30)))
+        assertEquals(8, hoursToMidnight(at(16, 30))) // 7.5 h rounds up
         assertEquals(1, hoursToMidnight(at(23, 30)))
         assertEquals(1, hoursToMidnight(at(23, 59, 59)))
     }
@@ -2872,8 +2875,10 @@ file in a temporary folder.
 ```kotlin
 package com.summondemons.safely.platform
 
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.summondemons.safely.progress.Progress
 import com.summondemons.safely.progress.ProgressRules
@@ -2900,8 +2905,13 @@ class DataStoreProgressStoreTest {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val logs: MutableList<String> = Collections.synchronizedList(mutableListOf())
     private val dataStore by lazy {
-        PreferenceDataStoreFactory.create(scope = scope, produceFile = { File(folder.root, "progress.preferences_pb") })
+        PreferenceDataStoreFactory.create(
+            corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+            scope = scope,
+            produceFile = { file },
+        )
     }
+    private val file by lazy { File(folder.root, "progress.preferences_pb") }
 
     private fun store() = DataStoreProgressStore(dataStore) { message, _ -> logs += message }
 
@@ -2933,6 +2943,15 @@ class DataStoreProgressStoreTest {
         assertEquals(Progress(), store.progress.first())
         assertEquals(Progress(), store.progress.first())
         assertEquals(1, logs.size)
+    }
+
+    @Test
+    fun aCorruptFileIsReplacedAndWritesKeepWorking() = runBlocking {
+        file.writeBytes(byteArrayOf(0x7f, 0x00, 0x13, 0x37, 0x42))
+        val store = store()
+        assertEquals(Progress(), store.progress.first())
+        store.update { it.copy(homeHintSeen = true) }
+        assertEquals(Progress(homeHintSeen = true), store.progress.first())
     }
 
     @Test
@@ -2968,17 +2987,26 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.summondemons.safely.progress.Progress
 import com.summondemons.safely.progress.ProgressJson
 import com.summondemons.safely.progress.ProgressStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.retryWhen
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "ProgressStore"
+private const val READ_RETRY_MS = 1_000L
 private val PROGRESS_KEY = stringPreferencesKey("progress_v1")
 
-/** Process-wide singleton: a top-level delegate, always used through the application context. */
-private val Context.progressDataStore by preferencesDataStore(name = "progress")
+/**
+ * Process-wide singleton: a top-level delegate, always used through the application context.
+ * A corrupt file is replaced by an empty one, so writes keep working (spec §10).
+ */
+private val Context.progressDataStore by preferencesDataStore(
+    name = "progress",
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+)
 
 fun Context.progressStore(): ProgressStore = DataStoreProgressStore(applicationContext.progressDataStore)
 
@@ -2991,10 +3019,14 @@ class DataStoreProgressStore(
     private val corruptLogged = AtomicBoolean(false)
 
     override val progress: Flow<Progress> = dataStore.data
-        .catch { e ->
-            if (e !is IOException) throw e
+        // An unreadable file reads as Progress() but keeps the flow alive (a plain `catch`
+        // would complete it), so later successful writes still reach the UI.
+        .retryWhen { e, _ ->
+            if (e !is IOException) return@retryWhen false
             log("progress unreadable; starting fresh", e)
             emit(emptyPreferences())
+            delay(READ_RETRY_MS)
+            true
         }
         .map { decode(it[PROGRESS_KEY]) }
 
@@ -3083,7 +3115,7 @@ class InMemoryProgressStore(initial: Progress = Progress(), loaded: Boolean = tr
 - [ ] **Step 7: Run the tests**
 
 Run: `./gradlew testDebugUnitTest --tests '*DataStoreProgressStoreTest*'`
-Expected: 4 tests pass.
+Expected: 5 tests pass.
 
 - [ ] **Step 8: Commit**
 
@@ -3246,6 +3278,7 @@ class RitualViewModelTest {
         val vm = newVm(demon, { emptyFlow() }, silentPcm())
         observe(vm)
         vm.setActive(false)
+        runCurrent()
         assertFalse(vm.uiState.value.active)
         vm.onMicPermission(false)
         vm.setSimulateHeading(true)
@@ -3919,12 +3952,15 @@ import com.summondemons.safely.time.DebugSettingsStore
 import com.summondemons.safely.time.GameClock
 import com.summondemons.safely.time.epochDay
 import com.summondemons.safely.time.hoursToMidnight
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -3965,7 +4001,10 @@ class GameViewModel(
 
     /** Null until the first stored value arrives. */
     private val stored: StateFlow<Progress?> = store.progress.stateIn(viewModelScope, SharingStarted.Eagerly, null)
-    private val time: StateFlow<ZonedDateTime> = clock.ticks.stateIn(viewModelScope, SharingStarted.Eagerly, clock.now())
+    /** Re-reads the clock on every activity start: hourly delays don't advance while the phone sleeps. */
+    private val refresh = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val time: StateFlow<ZonedDateTime> =
+        merge(clock.ticks, refresh.map { clock.now() }).stateIn(viewModelScope, SharingStarted.Eagerly, clock.now())
     private val session = MutableStateFlow(Session())
     private val selected: StateFlow<String> = savedState.getStateFlow(KEY_SELECTED, demonIds.first())
 
@@ -3985,7 +4024,8 @@ class GameViewModel(
     init {
         viewModelScope.launch {
             val first = stored.filterNotNull().first()
-            if (!savedState.contains(KEY_SELECTED)) select(ProgressRules.focusDemon(first, demonIds, today()))
+            val day = today()
+            if (!savedState.contains(KEY_SELECTED)) select(ProgressRules.focusDemon(ProgressRules.evaluate(first, day), demonIds, day))
             store.update { ProgressRules.evaluate(it, today()) }
         }
     }
@@ -3997,6 +4037,7 @@ class GameViewModel(
 
     /** On every activity start. Skipped until loaded (the first load runs its own evaluate). */
     fun evaluate() {
+        refresh.tryEmit(Unit)
         if (stored.value == null) return
         val day = today()
         update { ProgressRules.evaluate(it, day) }
@@ -6008,7 +6049,6 @@ import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
 import com.summondemons.safely.ritual.headingLabel
 import com.summondemons.safely.ritual.headingLetter
-import com.summondemons.safely.ui.fx.LocalReduceMotion
 import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.textRoles
@@ -6153,8 +6193,8 @@ fun InfoBand(demons: List<Demon>, demon: Demon, badge: BadgeKey?, modifier: Modi
 
 @Composable
 private fun BandLayer(visible: Boolean, content: @Composable () -> Unit) {
-    val reduceMotion = LocalReduceMotion.current
-    val alpha by animateFloatAsState(if (visible) 1f else 0f, tween(if (reduceMotion) 0 else LAYER_FADE_MS), label = "bandLayer")
+    // A cross-fade in every motion setting (reduced motion swaps slides for cross-fades, §4).
+    val alpha by animateFloatAsState(if (visible) 1f else 0f, tween(LAYER_FADE_MS), label = "bandLayer")
     Box(
         Modifier
             .fillMaxWidth()
@@ -6524,6 +6564,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
@@ -6551,6 +6592,8 @@ private const val SLOT_FADE_OUT_MS = 150
 val QuoteSlotHeight = 72.dp
 private val QuoteSlotMaxWidth = 320.dp
 private val QuoteSize = 15.sp
+/** Three lines + padding must fit the 72 dp slot. */
+private val QuoteLineHeight = 18.sp
 private val SmallCueSize = 10.sp
 private val DashOn = 6.dp
 private val DashOff = 4.dp
@@ -6567,7 +6610,7 @@ fun QuoteSlot(
     modifier: Modifier = Modifier,
 ) {
     val accent = MaterialTheme.demonColors.accent(demon.accent)
-    Box(modifier.fillMaxWidth().widthIn(max = QuoteSlotMaxWidth).height(QuoteSlotHeight), contentAlignment = Alignment.Center) {
+    Box(modifier.widthIn(max = QuoteSlotMaxWidth).fillMaxWidth().height(QuoteSlotHeight), contentAlignment = Alignment.Center) {
         AnimatedContent(
             targetState = state,
             transitionSpec = { fadeIn(tween(SLOT_FADE_IN_MS)) togetherWith fadeOut(tween(SLOT_FADE_OUT_MS)) },
@@ -6600,10 +6643,11 @@ private fun SpeechBubble(quote: String, accent: Color) {
     ) {
         Text(
             quote,
-            style = MaterialTheme.textRoles.body.copy(fontSize = QuoteSize, fontWeight = FontWeight.SemiBold),
+            style = MaterialTheme.textRoles.body.copy(fontSize = QuoteSize, lineHeight = QuoteLineHeight, fontWeight = FontWeight.SemiBold),
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(horizontal = MaterialTheme.spacing.lg, vertical = MaterialTheme.spacing.sm),
         )
     }
@@ -7155,7 +7199,7 @@ fun RestlessGrimoire(restless: Boolean, accent: Color, opening: Boolean, onOpen:
         }
     }
     LaunchedEffect(opening) {
-        if (opening) open.animateTo(1f, tween(if (reduceMotion) OPEN_REDUCED_MS else OPEN_MS, easing = LinearEasing))
+        if (opening) open.animateTo(1f, tween(if (reduceMotion) OPEN_REDUCED_MS else OPEN_MS, easing = LinearEasing)) else open.snapTo(0f)
     }
     val bob = if (reduceMotion) {
         null
@@ -7313,6 +7357,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
 import com.summondemons.safely.data.DemonAccent
@@ -7386,6 +7432,8 @@ fun HomeScreen(
     val sounds = LocalGameSounds.current
     val scope = rememberCoroutineScope()
     var opening by remember { mutableStateOf(false) }
+    // If the app left Home during the 700 ms opening, the navigation was dropped: show the book again.
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { opening = false }
     val open: () -> Unit = {
         if (!opening) {
             opening = true
@@ -7660,6 +7708,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -7782,7 +7831,7 @@ fun GrimoireScreen(
     val density = LocalDensity.current
 
     // Captured when this demon is first shown: the visit clears restlessness, but he still sulks for this viewing.
-    val restless = remember(demon.id) { ProgressRules.isRestless(record, state.today) }
+    val restless = remember(demon.id, state.today) { ProgressRules.isRestless(record, state.today) }
     // Ink flags are read once per viewing and consumed at once; the remembered values keep the animation alive.
     val inkCodex = remember(demon.id) { record.revealed && record.revealPending.codex }
     val inkBattle = remember(demon.id) { record.revealed && record.revealPending.battle }
@@ -7791,6 +7840,7 @@ fun GrimoireScreen(
     var badgeTaps by remember { mutableIntStateOf(0) }
     var shake by remember { mutableIntStateOf(0) }
     var badgeRowBounds by remember { mutableStateOf(Rect.Zero) }
+    var rootOrigin by remember { mutableStateOf(Offset.Zero) }
     var tadaFor by rememberSaveable { mutableStateOf<String?>(null) }
 
     LaunchedEffect(demon.id, bound, state.today) { if (bound) onVisit(demon.id) }
@@ -7841,13 +7891,14 @@ fun GrimoireScreen(
         modifier
             .fillMaxSize()
             .background(colors.background)
+            .onGloballyPositioned { rootOrigin = it.boundsInRoot().topLeft }
             // Observe presses without consuming them: a tap outside the badge row clears the
             // badge and still does its own action (e.g. summon).
             .pointerInput(demon.id) {
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent(PointerEventPass.Initial)
-                        if (event.type == PointerEventType.Press && event.changes.none { badgeRowBounds.contains(it.position) }) {
+                        if (event.type == PointerEventType.Press && event.changes.none { badgeRowBounds.contains(it.position + rootOrigin) }) {
                             badge = null
                         }
                     }
@@ -8361,10 +8412,14 @@ private fun RitualDestination(
         )
     }
     val ritual: RitualViewModel = viewModel(factory = ritualFactory)
-    val phase = ritual.uiState.collectAsStateWithLifecycle().value.ritual.phase
-    val settled = phase == RitualPhase.Climax || phase == RitualPhase.Done
-    // A restored back stack must never allow a second summon (§3).
-    val blocked = !settled && (state.record(demon.id).bound || !state.canSummonToday)
+    // Checked once, when the Ritual opens (incl. restored after process death): a restored back
+    // stack must never allow a second summon (§3). Not re-checked later, so the commit at
+    // ClimaxStart can never pop the climax.
+    val blocked = remember {
+        val phase = ritual.uiState.value.ritual.phase
+        val settled = phase == RitualPhase.Climax || phase == RitualPhase.Done
+        !settled && (state.record(demon.id).bound || !state.canSummonToday)
+    }
     if (blocked) {
         LaunchedEffect(Unit) { navController.popBackStack() }
         return
@@ -9145,7 +9200,7 @@ Fix the lower source wherever they differ (AGENTS.md: the higher source wins).
 Run: `./gradlew clean testDebugUnitTest lint assembleDebug assembleRelease`
 Expected: `BUILD SUCCESSFUL`. Test classes: `DemonCatalogTest` 8, `ProgressJsonTest` 5,
 `ProgressRulesTest` 15, `CourtHoursTest` 3, `RitualEngineTest` 26, `RitualStateTest` 6,
-`RitualViewModelTest` 16, `GameClockTest` 2, `DataStoreProgressStoreTest` 4,
+`RitualViewModelTest` 16, `GameClockTest` 2, `DataStoreProgressStoreTest` 5,
 `GameViewModelTest` 12, `RitualCueTest` 5, plus the untouched suites (`HeadingMathTest`
 +1, `FxMathTest` +1, `LatinSyllablesTest`, `VoiceAnalyzerTest`, `MicLevelTest`,
 `RmsTest`, `RotationAzimuthTest`, `SigilPathsTest`). `DemonViewModelTest` is gone.
