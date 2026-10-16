@@ -14,13 +14,14 @@ import com.summondemons.safely.ritual.LatinSyllables
 
 private const val LIT_GLOW_ALPHA = 0.6f
 private const val LIT_GLOW_BLUR = 8f
-private const val NEWEST_GLOW_BLUR = 18f
+private const val NEWEST_GLOW_MIN = 8f
+private const val NEWEST_GLOW_MIC = 14f
 
 /** The current chant phrase, lit syllable by syllable in [accent]; the newest syllable glows brightest. */
 @Composable
-fun KaraokeLine(text: String, lit: Int, accent: Color, dim: Color, style: TextStyle, modifier: Modifier = Modifier) {
+fun KaraokeLine(text: String, lit: Int, accent: Color, dim: Color, style: TextStyle, micLevel: Float = 0f, modifier: Modifier = Modifier) {
     val spans = remember(text) { LatinSyllables.spans(text) }
-    val annotated = remember(text, lit, accent, dim) {
+    val annotated = remember(text, lit, accent, dim, micLevel) {
         val newest = spans.getOrNull(lit - 1)
         val litEnd = newest?.end ?: 0
         buildAnnotatedString {
@@ -30,7 +31,7 @@ fun KaraokeLine(text: String, lit: Int, accent: Color, dim: Color, style: TextSt
                 addStyle(SpanStyle(color = accent, shadow = Shadow(accent.copy(alpha = LIT_GLOW_ALPHA), blurRadius = LIT_GLOW_BLUR)), 0, litEnd)
             }
             if (newest != null) {
-                addStyle(SpanStyle(shadow = Shadow(accent, blurRadius = NEWEST_GLOW_BLUR)), newest.start, newest.end)
+                addStyle(SpanStyle(shadow = Shadow(accent, blurRadius = NEWEST_GLOW_MIN + NEWEST_GLOW_MIC * micLevel)), newest.start, newest.end)
             }
         }
     }
