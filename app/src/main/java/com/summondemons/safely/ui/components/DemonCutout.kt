@@ -37,6 +37,7 @@ fun DemonCutout(
     accent: Color,
     modifier: Modifier = Modifier,
     silhouette: Float = 0f,
+    alignment: Alignment = Alignment.Center,
 ) {
     val shadow = MaterialTheme.colorScheme.surfaceContainerLowest
     val painter = painterResource(art)
@@ -47,6 +48,7 @@ fun DemonCutout(
             painter = painter,
             contentDescription = null,
             contentScale = ContentScale.Fit,
+            alignment = alignment,
             colorFilter = ColorFilter.tint(accent.copy(alpha = rimAlpha), BlendMode.SrcIn),
             modifier = Modifier
                 .fillMaxSize()
@@ -60,6 +62,7 @@ fun DemonCutout(
             painter = painter,
             contentDescription = contentDescription,
             contentScale = ContentScale.Fit,
+            alignment = alignment,
             colorFilter = if (silhouette > 0f) {
                 ColorFilter.tint(shadow.copy(alpha = SILHOUETTE_ALPHA * silhouette), BlendMode.SrcAtop)
             } else {
