@@ -39,14 +39,22 @@ fun headingLetter(degrees: Float): String = COMPASS_LETTERS[compassIndex(degrees
  * `SensorManager.getRotationMatrix*` (row-major, device → East/North/Up).
  *
  * `SensorManager.getOrientation` only uses the device's top (Y axis), whose horizontal
- * projection vanishes when the phone is held upright. Here the top is used while the
- * phone is closer to flat and the back (−Z axis) while it is closer to upright —
+ * projection vanishes when the phone is held upright. Here the screen's top is used while
+ * the phone is closer to flat and the back (−Z axis) while it is closer to upright —
  * whichever has the longer horizontal projection. Without roll both point the same way,
  * so the switch is seamless.
+ *
+ * [screenRotation] is the display rotation in quarter turns (`Surface.ROTATION_0..270` =
+ * 0..3). The back doesn't depend on it; the screen's top does: device +Y in portrait,
+ * −X at 90°, −Y at 180°, +X at 270° (the landscape chant screen, ADR-0019).
  */
-fun azimuthFromRotationMatrix(r: FloatArray): Float {
-    val topEast = r[1]
-    val topNorth = r[4]
+fun azimuthFromRotationMatrix(r: FloatArray, screenRotation: Int = 0): Float {
+    val (topEast, topNorth) = when (screenRotation and 3) {
+        1 -> -r[0] to -r[3]
+        2 -> -r[1] to -r[4]
+        3 -> r[0] to r[3]
+        else -> r[1] to r[4]
+    }
     val backEast = -r[2]
     val backNorth = -r[5]
     val useBack = hypot(backEast, backNorth) > hypot(topEast, topNorth)

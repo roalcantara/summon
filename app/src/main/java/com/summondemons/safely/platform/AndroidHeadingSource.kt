@@ -5,6 +5,8 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.hardware.display.DisplayManager
+import android.view.Display
 import com.summondemons.safely.ritual.AzimuthSmoother
 import com.summondemons.safely.ritual.HeadingSource
 import com.summondemons.safely.ritual.azimuthFromRotationMatrix
@@ -16,11 +18,16 @@ import kotlinx.coroutines.flow.callbackFlow
  * Rotation-vector azimuth, falling back to accelerometer + magnetometer.
  * Emits nothing if the device has neither (the UI then shows "--°").
  * The heading is where the phone's back points when held upright, or its top when
- * held flat (see [azimuthFromRotationMatrix]). Assumes portrait (the activity is locked to it).
+ * held flat, whichever way the screen is rotated (see [azimuthFromRotationMatrix]; the chant
+ * screen is landscape, ADR-0019).
  */
 class AndroidHeadingSource(context: Context) : HeadingSource {
 
     private val sensorManager: SensorManager? = context.getSystemService(SensorManager::class.java)
+    private val displayManager: DisplayManager? = context.getSystemService(DisplayManager::class.java)
+
+    /** Current display rotation in quarter turns (`Surface.ROTATION_*`), read per reading. */
+    private fun screenRotation(): Int = displayManager?.getDisplay(Display.DEFAULT_DISPLAY)?.rotation ?: 0
 
     override val available: Boolean = sensorManager?.let { manager ->
         manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) != null ||
@@ -44,7 +51,7 @@ class AndroidHeadingSource(context: Context) : HeadingSource {
         var geomagnetic: FloatArray? = null
 
         fun emitFromMatrix() {
-            trySend(smoother.next(azimuthFromRotationMatrix(rotationMatrix)))
+            trySend(smoother.next(azimuthFromRotationMatrix(rotationMatrix, screenRotation())))
         }
 
         val listener = object : SensorEventListener {

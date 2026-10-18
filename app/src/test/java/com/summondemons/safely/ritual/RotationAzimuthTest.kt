@@ -75,4 +75,24 @@ class RotationAzimuthTest {
         // The top now points slightly backwards; a Y-axis-only heading would read 180°.
         assertHeading(0f, azimuthFromRotationMatrix(pose(heading = 0f, tilt = 100f)))
     }
+
+    @Test
+    fun landscapeFlatUsesTheScreensTop() {
+        // Rolled ±90° flat: the screen's top is the device's ±X axis, not its Y axis.
+        assertHeading(30f, azimuthFromRotationMatrix(pose(heading = 30f, tilt = 0f, roll = 90f), screenRotation = 3))
+        assertHeading(30f, azimuthFromRotationMatrix(pose(heading = 30f, tilt = 0f, roll = -90f), screenRotation = 1))
+        // Ignoring the rotation would read 90° off.
+        assertHeading(300f, azimuthFromRotationMatrix(pose(heading = 30f, tilt = 0f, roll = 90f)))
+    }
+
+    @Test
+    fun landscapeUprightUsesTheBack() {
+        assertHeading(120f, azimuthFromRotationMatrix(pose(heading = 120f, tilt = 90f, roll = 90f), screenRotation = 3))
+        assertHeading(120f, azimuthFromRotationMatrix(pose(heading = 120f, tilt = 85f, roll = -90f), screenRotation = 1))
+    }
+
+    @Test
+    fun landscapeTiltedAgreesWithBothAxes() {
+        assertHeading(200f, azimuthFromRotationMatrix(pose(heading = 200f, tilt = 45f, roll = 90f), screenRotation = 3))
+    }
 }
