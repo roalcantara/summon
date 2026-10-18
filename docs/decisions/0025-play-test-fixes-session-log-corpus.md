@@ -36,3 +36,14 @@ made progress almost impossible. The judge had never been tuned on real voices: 
 ## Consequences
 No more time pressure while reading; repeated nonsense no longer cracks seals by itself (the
 chant check still rejects it). Play-test reports become log files instead of descriptions.
+
+## Finding (2026-10-18, generated corpus)
+On 271 judged chunks (8 TTS voices with augmentation, plus TTS nonsense), the vowel-alignment
+judge of ADR-0022 passes honest chunks and nonsense at about the same rate (≈ 0.36–0.45 each)
+with the starting values, without the talk veto, and with per-speaker (Lobanov) vowel
+normalisation. Mean alignment cost is 0.46 for honest chants and 0.50 for nonsense; mean rank
+against shuffles 0.61 and 0.55. Formants are in plausible ranges and only 3 % of frames are
+unmeasured, so the measurement works but carries too little information: vowel colour from a
+phone microphone cannot tell the right Latin from other speech. Tuning thresholds cannot fix
+this. Options: drop the vowel check, or replace it with a phone recogniser (see the decision
+that follows this ADR).

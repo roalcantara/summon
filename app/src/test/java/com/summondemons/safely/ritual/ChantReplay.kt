@@ -22,6 +22,28 @@ object ChantReplay {
         }
         return judged
     }
+
+    /** One judged chunk with the voiced frames it was judged on (for offline tuning, ADR-0025). */
+    data class Take(val judged: RitualEffect.Judged, val frames: List<Formants?>, val slots: List<VowelSlot>)
+
+    /** Like [judge], but also returns each chunk's frames; the last frame of the take is included. */
+    fun takes(pcm: ShortArray, rate: Int, phrases: List<String>): List<Take> {
+        var state = RitualState.start(0f, phrases, judged = true)
+        repeat((LOCK_HOLD_MS / FRAME_MS).toInt()) { state = RitualEngine.step(state, RitualInput(0f, VoiceFrame.SILENT)).state }
+        val analyzer = VoiceAnalyzer(rate)
+        val out = mutableListOf<Take>()
+        (pcm + ShortArray(rate)).frames(rate).forEach { frame ->
+            val voice = analyzer.analyze(frame, frame.size)
+            val before = state
+            val step = RitualEngine.step(state, RitualInput(0f, voice))
+            state = step.state
+            step.effects.filterIsInstance<RitualEffect.Judged>().forEach { j ->
+                val frames = before.take.frames + if (voice.voiced) listOf(voice.formants) else emptyList()
+                out += Take(j, frames, before.chunks!![j.phrase][j.chunk].slots)
+            }
+        }
+        return out
+    }
 }
 
 /** A mono PCM16 WAV file. */

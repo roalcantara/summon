@@ -67,6 +67,13 @@ android {
     }
 }
 
+// Calibration harness switches (ADR-0018, ADR-0025): -PchantClips=…, -PchantSource=real|generated, -PchantDump=1, -Psessions=…
+tasks.withType<Test>().configureEach {
+    listOf("chantClips", "chantSource", "chantDump", "sessions").forEach { key ->
+        project.findProperty(key)?.let { systemProperty(key, it.toString()) }
+    }
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(platform(libs.androidx.compose.bom))

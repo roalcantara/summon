@@ -47,12 +47,31 @@ class ChantClipReplayTest {
         println(report)
         File("build/reports").mkdirs()
         File("build/reports/chant-clips.txt").writeText(report)
+        if (System.getProperty("chantDump") != null) dumpTakes(files)
 
-        val chant = results.filter { it.clip.label == "chant" }
-        assumeTrue("not enough data", sufficiency(chant) == null)
+        // The gate is for real voices only; generated clips are for tuning and only reported (ADR-0025).
+        val chant = results.filter { it.clip.label == "chant" && source(it.clip) == "real" }
+        assumeTrue("not enough real data", sufficiency(chant) == null)
         chant.groupBy { it.clip.voice }.forEach { (voice, list) ->
             val rejected = list.count { !it.judged.verdict.passed } * 100.0 / list.size
             assertTrue("voice $voice: %.1f %% honest chunks rejected".format(rejected), rejected <= HONEST_REJECT_MAX)
+        }
+    }
+
+    /** Writes every judged chunk's frames and slots to build/reports/chant-takes.jsonl for offline tuning (ADR-0025). */
+    private fun dumpTakes(files: List<File>) {
+        File("build/reports/chant-takes.jsonl").bufferedWriter().use { out ->
+            files.forEach { file ->
+                val clip = parse(file)
+                val demon = DemonCatalog.byId(clip.demon) ?: return@forEach
+                val wav = Wav.read(file)
+                ChantReplay.takes(wav.samples, wav.rate, demon.chantPhrases).forEach { t ->
+                    val frames = t.frames.joinToString(",") { f -> if (f == null) "null" else "[%.1f,%.1f]".format(java.util.Locale.ROOT, f.f1, f.f2) }
+                    val slots = t.slots.joinToString(",") { s -> "[\"${s.vowel ?: "-"}\",${s.neutral},${s.optional},${s.word}]" }
+                    out.write("{\"clip\":\"${clip.name}\",\"label\":\"${clip.label}\",\"voice\":\"${clip.voice}\",\"phrase\":${t.judged.phrase},\"chunk\":${t.judged.chunk},\"passed\":${t.judged.verdict.passed},\"slots\":[$slots],\"frames\":[$frames]}")
+                    out.newLine()
+                }
+            }
         }
     }
 
