@@ -3,11 +3,13 @@ package com.summondemons.safely.ui.screens
 import com.summondemons.safely.ritual.ChantJudge
 import com.summondemons.safely.ritual.ChantVerdict
 import com.summondemons.safely.ritual.LatinSyllables
+import com.summondemons.safely.ritual.RitualConfig.LOCK_HOLD_MS
 import com.summondemons.safely.ritual.RitualConfig.PHRASE_COUNT
 import com.summondemons.safely.ritual.RitualPhase
 import com.summondemons.safely.ritual.RitualState
 import com.summondemons.safely.ritual.TurnDirection
 import com.summondemons.safely.ritual.WordMark
+import com.summondemons.safely.ritual.signedDelta
 import com.summondemons.safely.ritual.turnDirection
 import kotlin.math.ceil
 
@@ -17,8 +19,11 @@ enum class WordLook { Pending, Current, Heard, Doubtful, Rejected }
 /** One word: its syllables (trailing punctuation on the last), how many are lit, and its look. */
 data class ChantWord(val syllables: List<String>, val lit: Int, val look: WordLook)
 
-/** The one line under the words (ADR-0019). */
-enum class VerdictLine { ChantAloud, Paused, Sealed, ChantAgain, SealCracked }
+/** The one line under the words (ADR-0019); before the lock it guides to the direction (ADR-0020). */
+enum class VerdictLine { FindDirection, HoldSteady, ChantAloud, Paused, Sealed, ChantAgain, SealCracked }
+
+/** What the sigil's outer ring shows (ADR-0020): the track while seeking, the hold while locking, then the focus clock. */
+enum class RingMode { Seeking, Locking, Clock }
 
 /** Everything the chant screen draws, derived from the ritual (pure; ADR-0019). */
 data class ChantScreenState(
@@ -26,6 +31,16 @@ data class ChantScreenState(
     val facing: Boolean,
     /** Which way to turn while not facing the demon; null when facing or unknown. */
     val turn: TurnDirection?,
+    /** Off course after the lock (wavering): the direction line and the ring turn red. */
+    val drifting: Boolean,
+    /**
+     * Where the demon is relative to where the phone faces, in degrees clockwise in
+     * (−180, 180]: the marker on the sigil's ring (0 = at the top). Null when the heading is unknown.
+     */
+    val markerDegrees: Float?,
+    val ring: RingMode,
+    /** How much of the 0.6 s lock hold is done, 0..1 (only while locking). */
+    val lockFraction: Float,
     val verdict: VerdictLine,
     /** Phrase shown as "{I..IV} of IV", 0-based. */
     val numeral: Int,
@@ -63,7 +78,9 @@ fun chantScreenState(ritual: RitualState, phrases: List<String>, azimuth: Float?
         verdict?.kind == ChantVerdict.Kind.Rejected -> VerdictLine.ChantAgain
         verdict?.kind == ChantVerdict.Kind.Cracked -> VerdictLine.SealCracked
         verdict?.kind == ChantVerdict.Kind.Sealed -> VerdictLine.Sealed
-        ritual.phase == RitualPhase.Wavering || ritual.phase == RitualPhase.Seeking -> VerdictLine.Paused
+        ritual.phase == RitualPhase.Seeking -> VerdictLine.FindDirection
+        ritual.phase == RitualPhase.Locking -> VerdictLine.HoldSteady
+        ritual.phase == RitualPhase.Wavering -> VerdictLine.Paused
         else -> VerdictLine.ChantAloud
     }
     val clock = ritual.phrase in 1 until PHRASE_COUNT
@@ -71,6 +88,14 @@ fun chantScreenState(ritual: RitualState, phrases: List<String>, azimuth: Float?
         words = words,
         facing = ritual.aligned,
         turn = turnDirection(azimuth, target),
+        drifting = ritual.phase == RitualPhase.Wavering,
+        markerDegrees = azimuth?.let { signedDelta(it, target) },
+        ring = when (ritual.phase) {
+            RitualPhase.Seeking -> RingMode.Seeking
+            RitualPhase.Locking -> RingMode.Locking
+            else -> RingMode.Clock
+        },
+        lockFraction = if (ritual.phase == RitualPhase.Locking) (ritual.lockMs.toFloat() / LOCK_HOLD_MS).coerceIn(0f, 1f) else 0f,
         verdict = line,
         numeral = if (verdict?.kind == ChantVerdict.Kind.Sealed) verdict.phrase else phrase,
         clockFraction = if (clock) ritual.focusFraction else 1f,

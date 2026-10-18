@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -85,6 +86,11 @@ import kotlinx.coroutines.delay
 private const val SLAB_WEIGHT = 0.25f
 private const val SLAB_ALPHA = 0.7f
 private const val SIGIL_IN_RING = 0.84f
+/** The sigil before it inks, as the portrait altar showed it (ADR-0020). */
+private const val GHOST_ALPHA = 0.12f
+/** Direction marker: its length as a fraction of the sigil's side, and its half-width as a fraction of its length. */
+private const val MARKER_FRACTION = 0.045f
+private const val MARKER_HALF_WIDTH = 0.6f
 private const val RING_STROKE_FRACTION = 0.035f
 private const val CLOCK_TWEEN_MS = 120
 private const val CURRENT_WORD_SCALE = 1.15f
@@ -214,7 +220,18 @@ private fun Slab(
 ) {
     val colors = MaterialTheme.colorScheme
     val spacing = MaterialTheme.spacing
-    val ringColor = if (screen.facing) MaterialTheme.demonColors.ritualSafe else colors.error
+    val safe = MaterialTheme.demonColors.ritualSafe
+    // Red only once drifting after the lock; before it, finding the direction is not an error (ADR-0020).
+    val ringColor = when {
+        screen.facing -> safe
+        screen.drifting -> colors.error
+        else -> colors.outline
+    }
+    val lineColor = when {
+        screen.facing -> safe
+        screen.drifting -> colors.error
+        else -> colors.onSurface
+    }
     Surface(modifier, shape = MaterialTheme.shapes.large, color = colors.surfaceContainerLow.copy(alpha = SLAB_ALPHA)) {
         if (vertical) {
             Column(
@@ -227,7 +244,7 @@ private fun Slab(
                     state, screen, accent, ringColor, flash,
                     Modifier.fillMaxWidth().weight(1f, fill = false).aspectRatio(1f, matchHeightConstraintsFirst = true),
                 )
-                DirectionCue(screen, state.demon.ritualHeading, ringColor, Modifier.padding(top = spacing.sm))
+                DirectionCue(screen, state.demon.ritualHeading, lineColor, Modifier.padding(top = spacing.sm))
             }
         } else {
             Row(
@@ -236,13 +253,17 @@ private fun Slab(
                 horizontalArrangement = Arrangement.spacedBy(spacing.md),
             ) {
                 ChantSigil(state, screen, accent, ringColor, flash, Modifier.size(BandSigil))
-                DirectionCue(screen, state.demon.ritualHeading, ringColor)
+                DirectionCue(screen, state.demon.ritualHeading, lineColor)
             }
         }
     }
 }
 
-/** The sigil inside a ring that shows the direction (colour) and the focus clock (arc). */
+/**
+ * The sigil inside a ring that guides to the direction and keeps time (ADR-0019, ADR-0020):
+ * a marker points at the demon relative to the phone; the ring fills with the lock hold,
+ * then drains as the focus clock; its colour says facing / seeking / drifting.
+ */
 @Composable
 private fun ChantSigil(
     state: RitualUiState,
@@ -256,13 +277,35 @@ private fun ChantSigil(
     val track = colors.surfaceContainerHighest
     val sweep by animateFloatAsState(screen.clockFraction, tween(CLOCK_TWEEN_MS, easing = LinearEasing), label = "clock")
     val ring by animateColorAsState(ringColor, label = "ring")
+    val marker by animateColorAsState(if (screen.facing) MaterialTheme.demonColors.ritualSafe else accent, label = "marker")
     Box(modifier, contentAlignment = Alignment.Center) {
         Canvas(Modifier.fillMaxSize()) {
             val stroke = size.minDimension * RING_STROKE_FRACTION
             val side = size.minDimension - stroke
             val topLeft = Offset((size.width - side) / 2f, (size.height - side) / 2f)
             drawArc(track, 0f, 360f, false, topLeft, Size(side, side), style = Stroke(stroke))
-            drawArc(ring, -90f, 360f * sweep, false, topLeft, Size(side, side), style = Stroke(stroke, cap = StrokeCap.Round))
+            val arc = when (screen.ring) {
+                RingMode.Seeking -> 0f
+                RingMode.Locking -> screen.lockFraction
+                RingMode.Clock -> sweep
+            }
+            if (arc > 0f) drawArc(ring, -90f, 360f * arc, false, topLeft, Size(side, side), style = Stroke(stroke, cap = StrokeCap.Round))
+            // Between the ring and the sigil, pointing outwards at the demon (0° = top).
+            screen.markerDegrees?.let { degrees ->
+                val length = size.minDimension * MARKER_FRACTION
+                val tip = center.y - side / 2f + stroke
+                rotate(degrees, pivot = center) {
+                    drawPath(
+                        Path().apply {
+                            moveTo(center.x, tip)
+                            lineTo(center.x + length * MARKER_HALF_WIDTH, tip + length)
+                            lineTo(center.x - length * MARKER_HALF_WIDTH, tip + length)
+                            close()
+                        },
+                        marker,
+                    )
+                }
+            }
         }
         InkedSigil(
             sigil = state.demon.sigil,
@@ -271,6 +314,7 @@ private fun ChantSigil(
             rimText = state.demon.name.uppercase(),
             modifier = Modifier.fillMaxSize(SIGIL_IN_RING),
             micLevel = state.micLevel,
+            ghostAlpha = GHOST_ALPHA,
             flash = flash,
         )
         screen.clockSeconds?.let { seconds ->
@@ -284,11 +328,11 @@ private fun ChantSigil(
     }
 }
 
-/** "FACE EAST ✓" in green, or "← FACE EAST" in red and blinking while off course. */
+/** "FACE EAST ✓" in green; "← FACE EAST" neutral while seeking, red and blinking while drifting (ADR-0020). */
 @Composable
 private fun DirectionCue(screen: ChantScreenState, target: Float, color: Color, modifier: Modifier = Modifier) {
     val reduceMotion = LocalReduceMotion.current
-    val blink = if (!screen.facing && !reduceMotion) {
+    val blink = if (screen.drifting && !reduceMotion) {
         rememberInfiniteTransition(label = "direction").animateFloat(
             1f, BLINK_MIN, infiniteRepeatable(tween(BLINK_HALF_MS), RepeatMode.Reverse), label = "directionBlink",
         ).value
@@ -433,12 +477,14 @@ private fun VerdictLine(screen: ChantScreenState, accent: Color, micLevel: Float
     val colors = MaterialTheme.colorScheme
     val safe = MaterialTheme.demonColors.ritualSafe
     val color = when (screen.verdict) {
-        VerdictLine.Sealed -> safe
+        VerdictLine.Sealed, VerdictLine.HoldSteady -> safe
         VerdictLine.ChantAgain, VerdictLine.SealCracked -> colors.error
-        VerdictLine.ChantAloud, VerdictLine.Paused -> colors.outline
+        VerdictLine.ChantAloud, VerdictLine.Paused, VerdictLine.FindDirection -> colors.outline
     }
     val label = stringResource(
         when (screen.verdict) {
+            VerdictLine.FindDirection -> R.string.verdict_find_direction
+            VerdictLine.HoldSteady -> R.string.verdict_hold_steady
             VerdictLine.ChantAloud -> R.string.verdict_chant_aloud
             VerdictLine.Paused -> R.string.verdict_paused
             VerdictLine.Sealed -> R.string.verdict_sealed

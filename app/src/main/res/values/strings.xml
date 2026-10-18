@@ -96,6 +96,8 @@
     <string name="verdict_chant_again">Chant again</string>
     <string name="verdict_seal_cracked">Seal cracked</string>
     <string name="verdict_of">of</string>
+    <string name="verdict_find_direction">Find the direction</string>
+    <string name="verdict_hold_steady">Hold steady</string>
     <string name="chant_turn_sideways">Turn your phone sideways</string>
     <string name="chant_keep_mic_clear">Hold it in front of your mouth, and keep the bottom edge clear so the microphone can hear you.</string>
     <string name="chant_help">How to chant</string>

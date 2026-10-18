@@ -95,4 +95,43 @@ class ChantScreenStateTest {
         assertTrue(s.words.all { it.look == WordLook.Heard })
         assertEquals(3, s.numeral)
     }
+
+    // --- Direction in the sigil (ADR-0020) ---
+
+    private val seeking = RitualState.start(90f, phrases, judged = true)
+
+    @Test
+    fun beforeTheLockTheLineGuidesToTheDirection() {
+        val s = state(seeking.copy(azimuth = 0f), azimuth = 0f)
+        assertEquals(VerdictLine.FindDirection, s.verdict)
+        assertEquals(RingMode.Seeking, s.ring)
+        assertFalse(s.facing)
+        assertFalse("not an error before the lock", s.drifting)
+    }
+
+    @Test
+    fun theMarkerPointsAtTheDemonRelativeToThePhone() {
+        // Demon at 90° (East): facing North puts him a quarter turn clockwise, facing South a quarter turn back.
+        assertEquals(90f, state(seeking.copy(azimuth = 0f), azimuth = 0f).markerDegrees!!, 0.01f)
+        assertEquals(-90f, state(seeking.copy(azimuth = 180f), azimuth = 180f).markerDegrees!!, 0.01f)
+        assertEquals(0f, state(seeking.copy(azimuth = 90f), azimuth = 90f).markerDegrees!!, 0.01f)
+        assertNull(state(seeking, azimuth = null).markerDegrees)
+    }
+
+    @Test
+    fun lockingFillsTheRingAndAsksToHoldSteady() {
+        val s = state(seeking.copy(phase = RitualPhase.Locking, azimuth = 90f, lockMs = 300L))
+        assertEquals(RingMode.Locking, s.ring)
+        assertEquals(0.5f, s.lockFraction, 0.001f)
+        assertEquals(VerdictLine.HoldSteady, s.verdict)
+    }
+
+    @Test
+    fun afterTheLockTheRingIsTheClockAndDriftingIsRed() {
+        assertEquals(RingMode.Clock, state(chanting).ring)
+        assertEquals(0f, state(chanting).lockFraction, 0f)
+        val drift = state(chanting.copy(phase = RitualPhase.Wavering, azimuth = 0f), azimuth = 0f)
+        assertTrue(drift.drifting)
+        assertEquals(90f, drift.markerDegrees!!, 0.01f)
+    }
 }
