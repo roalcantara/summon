@@ -18,6 +18,27 @@ object RitualConfig {
     const val FOCUS_BUDGET_MS = 60_000L
     /** After the display rotates, the last heading is held this long while the phone turns (ADR-0025). */
     const val ROTATION_GRACE_MS = 1_500L
+
+    // On-device Whisper chant check (ADR-0027)
+    /** Whisper's input rate. */
+    const val WHISPER_RATE = 16_000
+    /** A line is found when the best-matching stretch of the transcript is within this distance. */
+    const val LINE_MATCH_MAX = 0.60
+    /** A word is covered (green) when this share of its letters align to equal letters. */
+    const val WORD_COVER_MIN = 0.6
+    /** Transcript segments Whisper rates as likelier silence than this are dropped. */
+    const val NO_SPEECH_MAX = 0.6f
+    /** Loops of up to this many words, repeated three times or more, collapse to one. */
+    const val LOOP_MAX_WORDS = 6
+    const val CHECK_PAUSE_MS = 600L
+    const val CHECK_MIN_VOICED_MS = 800L
+    const val CHECK_CONTINUOUS_MS = 6_000L
+    const val CHECK_WINDOW_MS = 25_000L
+    /** Lenient mode when a 5 s device check takes longer than this. */
+    const val DEVICE_MAX_CHECK_MS = 4_000L
+    /** Once locked, the ritual wavers beyond this and resumes within [DRIFT_EXIT_DEG]. */
+    const val DRIFT_ENTER_DEG = 25f
+    const val DRIFT_EXIT_DEG = 20f
     const val FOCUS_DRIFT_MULTIPLIER = 3
     const val COURT_BONUS = 0.25f
     /** Below this focus fraction the focus bar beats. */
