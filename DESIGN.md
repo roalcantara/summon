@@ -120,6 +120,8 @@ strings are upper-cased at the call site with `upper()` (`uppercase(Locale.ROOT)
 |---|---|---|
 | `cue` | `label-medium`, letter spacing 0.08 em, upper case | What to do now: cue chips, "Tap to summon", "Circle cooling" |
 | `incantation` | Cinzel 15 sp Bold, line 22 sp, letter spacing 0.02 em | Every chant phrase on the tablet |
+| `incantationLarge` | Cinzel Bold, line 1.3 em, letter spacing 0.02 em, auto-sized 18–96 sp | The phrase on the chant screen (ADR-0019) |
+| `ritualCue` | Inter Bold, upper case, letter spacing 0.05 em; 18 sp (direction) or 22 sp (verdict) | The two lines of the chant screen, read at mouth distance (ADR-0019) |
 | `meta` | `label-small`, letter spacing 0.14 em, upper case, `outline` | Small headers and counters: "Sacred chant", "1 / 6", "2 of 2 spirits bound" |
 | `name` | Cinzel Bold; size per use (`title` / `headline-*`, or a size fixed by the screen spec) | Demon names, numbers, badge labels, ability names |
 | `body` | `body-medium` | Descriptions, quotes, dossier pages |
@@ -153,7 +155,10 @@ dark palette carries the RPG feel.
 | `AltarRing` | Ring around the sigil on the Ritual | `azimuth`, `target`, `phase`, `lockFraction`, `accent`; outline track, `ritual-safe` lock fill / locked ring, `error` while wavering, a marker toward the target |
 | `CueChip` | One-line cue | `text`, `tone` (neutral / safe / error), `shake` |
 | `FocusBar` | Focus left under the current phrase | `fraction`, `tone` (normal / drift / court), `accent`; heartbeat below `FOCUS_LOW_FRACTION` |
-| `ChantTablet` | Framed chant panel | `phrases`, `phrase`, `lit`, `accent`, `active`, `header`, `focusFraction`, `focusTone` (normal / drift / court), `flare`, `cracked`, `micLevel`, `wavering`; contains `Medallion`, `KaraokeLine`, `FocusBar` |
+| `ChantScreen` | Landscape chant screen (ADR-0019) | `state`, `flash`, `showClose`, `onClose`, `debug`; House-stage backdrop (scrim strongest behind the words), slab (surface-container-low 70 %, `large` shape) with name, `ChantSigil` and the direction line; the phrase (`incantationLarge`) with a line per word: pending outline-variant, current on-surface-variant, heard ritual-safe, doubtful primary 70 %, rejected error wavy + ✕ badge; verdict line (`ritualCue`) with `VoiceMeter`. Portrait (large screens) puts the slab in a top band. |
+| `ChantSigil` | `InkedSigil` inside a ring | Ring colour = direction (ritual-safe / error), arc = focus clock (full on phrase I), seconds or "Paused" under it |
+| `VoiceMeter` | Five ember bars | `level` (mic level, 0–1), `color`; flat at 22 % when silent; decides nothing |
+| `ChantTablet` | Framed chant panel |
 | `KaraokeLine` | Current chant phrase | `text`, `lit` syllables, `accent`, `dim`, `micLevel` (newest-syllable glow) |
 | `BadgeRow` | Direction / House / Calling / Legions tiles | `demon`, `selected`, `onSelect`; rim = House metal, glyph = accent (House glyph = metal); `BadgeIcon` draws one glyph |
 | `InfoBand` | Description or the selected badge's explanation | `demons`, `demon`, `badge`; height of the tallest text |
@@ -230,4 +235,12 @@ breach screen).
 
 ## Gaps
 
-All gaps closed. Stage backgrounds (`stage_home`, `stage_sol`, `stage_venus`), Home grimoire (`ic_home_grimoire`), and Asmodeus scene art (`demon_asmodeus_full`) have been processed and integrated into `app/src/main/res/drawable-nodpi/`.
+Stage backgrounds (`stage_home`, `stage_sol`, `stage_venus`), Home grimoire (`ic_home_grimoire`), and Asmodeus scene art (`demon_asmodeus_full`) have been processed and integrated into `app/src/main/res/drawable-nodpi/`.
+
+Open gaps (the intro card of the chant screen, ADR-0019). Full specs and prompts: `docs/superpowers/plans/2026-10-18-chant-screen.md`, Task 10.
+
+| Gap                                               | Placeholder                        | Stitch prompt (short)                                                                                 |
+| ------------------------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Intro singer (`chant_intro_singer`)               | The demon's avatar, circle-clipped | A generic cute chibi demon belting into a vintage karaoke microphone, transparent background, no text |
+| Intro banner (`chant_intro_banner`)               | `RibbonBanner`                     | An empty parchment ribbon banner with folded tails, transparent background, no text                   |
+| Summon button (`chant_summon_button`, `_pressed`) | `PrimaryActionButton`              | A glowing plum-enamel stone plaque with a gold rim, transparent background, no text                   |

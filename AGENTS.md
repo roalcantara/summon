@@ -62,7 +62,8 @@ cd ../mydemon && npm install && npm run dev   # http://localhost:3000
   `docs/superpowers/specs/2026-10-16-screen-system-design.md` (builds on
   `2026-10-15-ritual-2-design.md`).
 - Release prep: ADR-0017. Chant plausibility check (vowels + rhythm): ADR-0018, plan
-  `docs/superpowers/plans/2026-10-18-chant-check.md`.
+  `docs/superpowers/plans/2026-10-18-chant-check.md`. Landscape chant screen: ADR-0019,
+  plan `docs/superpowers/plans/2026-10-18-chant-screen.md`.
 - Packages: `data/` (demons, Houses, Callings), `progress/` (pure progress rules, JSON
   model, court hours, `ProgressStore`), `time/` (`GameClock`, debug settings), `ritual/`,
   `platform/` (Android implementations), `ui/`, `navigation/`.

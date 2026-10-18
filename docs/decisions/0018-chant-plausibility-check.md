@@ -1,7 +1,7 @@
 # 0018 — Chant plausibility check (vowels + rhythm)
 
 - Date: 2026-10-18
-- Status: Accepted (direction); thresholds pending measurement. Amends ADR-0008.
+- Status: Accepted (direction); thresholds pending measurement. Amends ADR-0008. The scoff cue is replaced by the chant screen's verdict line and word hints (ADR-0019).
 
 ## Context
 Play-testing with real people showed that any voiced speech completes a phrase: one

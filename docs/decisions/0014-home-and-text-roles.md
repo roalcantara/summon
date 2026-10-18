@@ -1,7 +1,7 @@
 # 0014 — Home, text roles and the chant tablet
 
 - Date: 2026-10-16
-- Status: Accepted
+- Status: Accepted; text roles `ritualCue` and `incantationLarge` added by ADR-0019 (chant screen)
 
 ## Context
 The app opened straight on the Grimoire pager, with no place to show what changed
