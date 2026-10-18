@@ -4,6 +4,7 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -23,6 +24,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.summondemons.safely.R
+import com.summondemons.safely.ritual.ChantScore
+import com.summondemons.safely.ritual.ClipLabel
 import com.summondemons.safely.ui.theme.PillShape
 import com.summondemons.safely.ui.theme.spacing
 
@@ -34,15 +37,66 @@ fun DebugControls(
     simulateHeading: Boolean,
     onSimulateHeadingChange: (Boolean) -> Unit,
     onHoldToChantChange: (Boolean) -> Unit,
+    /** The chant check's latest verdict (ADR-0018). */
+    lastScore: ChantScore?,
+    /** Clip recorder label; null = not recording (ADR-0018). */
+    clipLabel: ClipLabel?,
+    onCycleClipLabel: () -> Unit,
     modifier: Modifier = Modifier,
+) {
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs)) {
+        ChantControls(simulateHeading, onSimulateHeadingChange, onHoldToChantChange)
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            FilterChip(
+                selected = clipLabel != null,
+                onClick = onCycleClipLabel,
+                label = {
+                    Text(
+                        stringResource(
+                            when (clipLabel) {
+                                null -> R.string.debug_clip_off
+                                ClipLabel.Chant -> R.string.debug_clip_chant
+                                ClipLabel.Nonsense -> R.string.debug_clip_nonsense
+                            },
+                        ),
+                    )
+                },
+            )
+            Text(
+                if (lastScore == null) {
+                    stringResource(R.string.debug_chant_score_none)
+                } else {
+                    stringResource(
+                        R.string.debug_chant_score,
+                        lastScore.total,
+                        if (lastScore.passed) "✓" else "✗",
+                        lastScore.vowels,
+                        lastScore.rhythm,
+                    )
+                },
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChantControls(
+    simulateHeading: Boolean,
+    onSimulateHeadingChange: (Boolean) -> Unit,
+    onHoldToChantChange: (Boolean) -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
     val onHold by rememberUpdatedState(onHoldToChantChange)
     var holding by remember { mutableStateOf(false) }
     Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
-        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth(),
     ) {
         FilterChip(
             selected = simulateHeading,

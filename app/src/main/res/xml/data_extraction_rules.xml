@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Everything is backed up or transferred except the debug-only settings (ADR-0013). -->
+<!-- Everything is backed up or transferred except the debug-only settings (ADR-0013) and tester clips (ADR-0018). -->
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="file" path="datastore/debug_settings.preferences_pb" />
+        <exclude domain="file" path="chant-clips/" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="file" path="datastore/debug_settings.preferences_pb" />
+        <exclude domain="file" path="chant-clips/" />
     </device-transfer>
 </data-extraction-rules>

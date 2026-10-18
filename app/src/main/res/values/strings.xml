@@ -11,6 +11,11 @@
     <string name="debug_simulate_heading">Simulate heading</string>
     <string name="debug_hold_to_chant">Hold to Chant</string>
     <string name="debug_chanting">Chanting…</string>
+    <string name="debug_clip_off">Record clip</string>
+    <string name="debug_clip_chant">Recording · chant</string>
+    <string name="debug_clip_nonsense">Recording · nonsense</string>
+    <string name="debug_chant_score">Chant check %1$.2f %2$s · vowels %3$.2f · rhythm %4$.2f</string>
+    <string name="debug_chant_score_none">Chant check · no verdict yet</string>
 
     <string name="hint_face">Face %1$s</string>
     <string name="hint_turn_left">Turn left · Face %1$s</string>

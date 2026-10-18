@@ -229,6 +229,7 @@ fun RitualScreen(
         },
         onSimulateHeadingChange = viewModel::setSimulateHeading,
         onHoldToChantChange = viewModel::setHoldToChant,
+        onCycleClipLabel = viewModel::cycleClipLabel,
         onAbort = onAbort,
         modifier = modifier,
     )
@@ -246,6 +247,7 @@ private fun RitualContent(
     onOpenSettings: () -> Unit,
     onSimulateHeadingChange: (Boolean) -> Unit,
     onHoldToChantChange: (Boolean) -> Unit,
+    onCycleClipLabel: () -> Unit,
     onAbort: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -371,6 +373,9 @@ private fun RitualContent(
                     simulateHeading = state.simulateHeading,
                     onSimulateHeadingChange = onSimulateHeadingChange,
                     onHoldToChantChange = onHoldToChantChange,
+                    lastScore = state.lastScore,
+                    clipLabel = state.clipLabel,
+                    onCycleClipLabel = onCycleClipLabel,
                 )
             }
         }

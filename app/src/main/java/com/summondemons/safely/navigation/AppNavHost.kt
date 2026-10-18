@@ -35,6 +35,7 @@ import com.summondemons.safely.data.Demon
 import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.platform.AndroidHeadingSource
 import com.summondemons.safely.platform.AndroidPcmSource
+import com.summondemons.safely.platform.ClipRecorders
 import com.summondemons.safely.platform.GameSounds
 import com.summondemons.safely.platform.LocalGameSounds
 import com.summondemons.safely.progress.ProgressRules
@@ -172,6 +173,7 @@ private fun RitualDestination(
             AndroidPcmSource(),
             inCourt = { game.inCourtNow(demon.house) },
             commitSummon = { flawless -> game.commitSummon(demon.id, startDay, flawless) },
+            clipRecorder = ClipRecorders.create(appContext),
         )
     }
     val ritual: RitualViewModel = viewModel(factory = ritualFactory)
