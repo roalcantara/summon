@@ -28,8 +28,8 @@ data class SessionHeader(
     val demon: String,
     val target: Float,
     val phrases: List<String>,
-    val judged: Boolean,
-    /** Wall-clock start, epoch ms. */
+    /** CheckMode name (ADR-0027). */
+    val mode: String,
     val startedMs: Long,
 )
 
@@ -49,11 +49,15 @@ data class SessionTick(
     val hold: Boolean = false,
     val ph: String? = null,
     val p: Int = 0,
+    /** Words of the current line covered so far (ADR-0027). */
     val c: Int = 0,
     val lit: Int = 0,
     val fm: Long = 0L,
     val fx: List<String> = emptyList(),
-    val judged: JudgedRecord? = null,
+    /** The check result fed to the engine on this tick (input; replayed). */
+    val heard: HeardRecord? = null,
+    /** Details of a check that finished on this tick (debug readout, threshold re-check). */
+    val check: CheckRecord? = null,
     val note: String? = null,
 ) {
     val isTick: Boolean get() = ph != null
@@ -62,24 +66,25 @@ data class SessionTick(
         azimuth = az,
         voice = VoiceFrame(rms, voiced = v, onset = o, formants = if (f1 != null && f2 != null) Formants(f1, f2) else null),
         inCourt = court,
+        heard = heard?.let { LineHeard(it.phrase, it.found, it.distance, it.covered.toSet()) },
     )
 }
 
-/** A chunk verdict with its aligned path (ADR-0022). */
 @Serializable
-data class JudgedRecord(
-    val phrase: Int,
-    val chunk: Int,
-    val passed: Boolean,
-    val cost: Double,
-    val rank: Double? = null,
-    val shuffles: Int,
-    val talk: Boolean,
-    val slotCosts: List<Double?>,
-    val slotFrames: List<Int>,
-    val skipped: Int,
-)
+data class HeardRecord(val phrase: Int, val found: Boolean, val distance: Double, val covered: List<Int>)
 
+/** One Whisper check (ADR-0027). */
+@Serializable
+data class CheckRecord(
+    val phrase: Int,
+    val found: Boolean,
+    val distance: Double,
+    val transcript: String,
+    val letters: String,
+    val windowMs: Long,
+    val voicedMs: Long,
+    val checkMs: Long,
+)
 object SessionRecords {
     val json = Json {
         encodeDefaults = false
@@ -87,9 +92,8 @@ object SessionRecords {
         ignoreUnknownKeys = true
     }
 
-    fun tick(t: Long, input: RitualInput, step: Step, hold: Boolean): SessionTick {
+    fun tick(t: Long, input: RitualInput, step: Step, hold: Boolean, check: CheckReport? = null): SessionTick {
         val s = step.state
-        val judged = step.effects.filterIsInstance<RitualEffect.Judged>().lastOrNull()
         return SessionTick(
             t = t,
             az = input.azimuth,
@@ -102,35 +106,18 @@ object SessionRecords {
             hold = hold,
             ph = s.phase.name,
             p = s.phrase,
-            c = s.chunk,
+            c = s.covered.size,
             lit = s.lit,
             fm = s.focusMs,
             fx = step.effects.map(::effectName),
-            judged = judged?.let(::record),
+            heard = input.heard?.let { HeardRecord(it.phrase, it.found, it.distance, it.covered.sorted()) },
+            check = check?.let {
+                CheckRecord(it.heard.phrase, it.heard.found, it.heard.distance, it.transcript, it.letters, it.windowMs, it.voicedMs, it.checkMs)
+            },
         )
     }
 
-    /** Short, stable effect names; a verdict's details go to [JudgedRecord]. */
-    fun effectName(effect: RitualEffect): String = when (effect) {
-        is RitualEffect.Judged -> "Judged(${effect.phrase},${effect.chunk})"
-        else -> effect.toString()
-    }
-
-    fun record(j: RitualEffect.Judged): JudgedRecord {
-        val v = j.verdict
-        return JudgedRecord(
-            phrase = j.phrase,
-            chunk = j.chunk,
-            passed = v.passed,
-            cost = v.cost,
-            rank = v.rank,
-            shuffles = v.shuffles,
-            talk = v.talk,
-            slotCosts = v.alignment.slotCosts,
-            slotFrames = v.alignment.slotFrames,
-            skipped = v.alignment.skippedFrames,
-        )
-    }
+    fun effectName(effect: RitualEffect): String = effect.toString()
 
     fun encode(header: SessionHeader): String = json.encodeToString(SessionHeader.serializer(), header)
 

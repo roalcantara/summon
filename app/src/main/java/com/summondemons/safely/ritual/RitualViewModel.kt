@@ -53,15 +53,20 @@ data class RitualUiState(
     val headingUnavailable: Boolean = false,
     /** The Ritual screen is started; no ticks run otherwise, so the focus clock pauses (§2). */
     val active: Boolean = true,
-    /** The chant check's latest verdict, for the debug readout (ADR-0022). */
-    val lastJudged: RitualEffect.Judged? = null,
-    /** Phrases rejected this attempt; picks the scoff line (ADR-0018). */
-    val rejections: Int = 0,
+    /** The latest Whisper check, for the debug readout (ADR-0027). */
+    val lastCheck: CheckReport? = null,
+    /** A Whisper check is running (the current seal pulses faster). */
+    val checking: Boolean = false,
+    /** Why the ritual runs in lenient mode, for the debug readout; empty in Whisper mode. */
+    val modeReason: String = "",
     /** Debug clip recorder label; null = not recording (ADR-0018). */
     val clipLabel: ClipLabel? = null,
     /** The intro card is on screen; the microphone is ignored meanwhile (ADR-0019). */
     val introVisible: Boolean = false,
 )
+
+/** One analysed mic frame plus its 16 kHz audio for the line listener (null when silent or synthetic). */
+class MicFrame(val voice: VoiceFrame, val pcm16k: FloatArray?)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RitualViewModel(
@@ -79,16 +84,25 @@ class RitualViewModel(
     private val analysisDispatcher: CoroutineDispatcher = Dispatchers.Default,
     /** Debug builds log every ritual here; release builds pass [SessionLog.None] (ADR-0025). */
     private val sessionLog: SessionLog = SessionLog.None,
+    /** Whisper on device; null in tests and in lenient mode (ADR-0027). */
+    private val transcriber: Transcriber? = null,
+    /** The device's check mode and its reason, read once when the ritual opens (ADR-0027). */
+    private val checkMode: () -> Pair<CheckMode, String> = { CheckMode.Lenient to "" },
 ) : ViewModel() {
 
+    private val mode = checkMode()
     private val state = MutableStateFlow(
         RitualUiState(
             demon = demon,
-            ritual = RitualState.start(demon.ritualHeading, demon.chantPhrases, judged = true),
+            ritual = RitualState.start(demon.ritualHeading, demon.chantPhrases, mode = mode.first),
             headingUnavailable = !headingSource.available,
             introVisible = showIntro,
+            modeReason = mode.second,
         ),
     )
+
+    private val listener: LineListener? =
+        if (mode.first == CheckMode.Whisper && transcriber != null) LineListener(transcriber, viewModelScope) else null
     private val _effects = MutableSharedFlow<RitualEffect>(extraBufferCapacity = EFFECT_BUFFER)
 
     /** One-shot events for haptics, sounds and flashes. Lossy by design: nothing durable depends on them. */
@@ -107,7 +121,7 @@ class RitualViewModel(
             }
         }
 
-    private val voiceFrames: Flow<VoiceFrame> = state
+    private val voiceFrames: Flow<MicFrame> = state
         .map { it.micGranted == true && it.active }
         .distinctUntilChanged()
         .flatMapLatest { live -> if (live) micFrames() else silentFrames() }
@@ -164,7 +178,8 @@ class RitualViewModel(
     private fun note(text: String) = sessionLog.write(SessionTick(t = ticks * RitualConfig.FRAME_MS, note = text))
 
     init {
-        sessionLog.start(SessionHeader(demon.id, demon.ritualHeading, demon.chantPhrases, judged = true, startedMs = System.currentTimeMillis()))
+        sessionLog.start(SessionHeader(demon.id, demon.ritualHeading, demon.chantPhrases, mode = mode.first.name, startedMs = System.currentTimeMillis()))
+        if (mode.second.isNotEmpty()) note("mode:${mode.first}:${mode.second}")
     }
 
     /** Called from the Ritual screen's ON_START / ON_STOP. */
@@ -174,27 +189,44 @@ class RitualViewModel(
     }
 
     /** One 20 ms tick. Only this collector changes `ritual`, so read-then-update is safe. */
-    private fun tick(micFrame: VoiceFrame) {
+    private fun tick(mic: MicFrame) {
         val current = state.value
         if (!current.active || awaitingHeading(current)) return
         val voice = when {
             current.introVisible -> VoiceFrame.SILENT // nothing counts while the rules are up
             current.holdToChant -> syntheticVoice(current.ritual)
-            else -> micFrame
+            else -> mic.voice
+        }
+        val ritual = current.ritual
+        val listening = ritual.phase == RitualPhase.Chanting || ritual.phase == RitualPhase.Wavering
+        var report: CheckReport? = null
+        if (listener != null && listening && ritual.phrase < RitualConfig.PHRASE_COUNT) {
+            listener.start(ritual.phrase, demon.chantPhrases[ritual.phrase])
+            val pcm = mic.pcm16k
+            if (pcm != null && !current.introVisible && !current.holdToChant) listener.onFrame(pcm, voice.voiced)
+            report = listener.poll()
+        }
+        var heard = report?.heard
+        // Debug "Hold to Chant" can't speak: once every syllable is lit, the line counts as heard.
+        if (current.holdToChant && ritual.mode == CheckMode.Whisper && ritual.phase == RitualPhase.Chanting &&
+            ritual.phrase < RitualConfig.PHRASE_COUNT && ritual.lit >= ritual.syllables[ritual.phrase]
+        ) {
+            val words = LatinSyllables.wordSizes(demon.chantPhrases[ritual.phrase]).indices.toSet()
+            heard = LineHeard(ritual.phrase, found = true, distance = 0.0, covered = words)
         }
 
-        val inCourt = if (RitualEngine.canLock(current.ritual, current.azimuth)) inCourt() else false
-        val input = RitualInput(current.azimuth, voice, inCourt)
-        val step = RitualEngine.step(current.ritual, input)
-        sessionLog.write(SessionRecords.tick(ticks++ * RitualConfig.FRAME_MS, input, step, hold = current.holdToChant))
+        val inCourt = if (RitualEngine.canLock(ritual, current.azimuth)) inCourt() else false
+        val input = RitualInput(current.azimuth, voice, inCourt, heard)
+        val step = RitualEngine.step(ritual, input)
+        sessionLog.write(SessionRecords.tick(ticks++ * RitualConfig.FRAME_MS, input, step, hold = current.holdToChant, check = report))
         // The summon is saved here, not through the lossy effects flow, before the climax plays.
         step.effects.filterIsInstance<RitualEffect.ClimaxStart>().firstOrNull()?.let { commitSummon(it.flawless) }
         state.update {
             it.copy(
                 ritual = step.state,
                 micLevel = smoothMicLevel(it.micLevel, voice.rms),
-                lastJudged = step.effects.filterIsInstance<RitualEffect.Judged>().lastOrNull() ?: it.lastJudged,
-                rejections = it.rejections + step.effects.count { effect -> effect is RitualEffect.Rejected },
+                lastCheck = report ?: it.lastCheck,
+                checking = listener?.checking ?: false,
             )
         }
         step.effects.forEach { _effects.tryEmit(it) }
@@ -208,25 +240,28 @@ class RitualViewModel(
     private fun awaitingHeading(s: RitualUiState): Boolean =
         s.azimuth == null && !s.simulateHeading && !s.headingUnavailable
 
-    /**
-     * Debug "Hold to Chant": continuous voicing with an onset every ~240 ms, sounding the
-     * vowel the chant check expects (ADR-0018): the next syllable's on an onset, else the current one's.
-     */
+    /** Debug "Hold to Chant": continuous voicing with an onset every ~240 ms (ADR-0027). */
     private fun syntheticVoice(ritual: RitualState): VoiceFrame {
         val onset = holdFrames++ % HOLD_TO_CHANT_ONSET_FRAMES == 0
-        val slots = ritual.chunks?.getOrNull(ritual.phrase)?.flatMap { it.slots }.orEmpty()
-        val index = (if (onset) ritual.lit else ritual.lit - 1).coerceIn(0, maxOf(0, slots.lastIndex))
-        return VoiceFrame(HOLD_TO_CHANT_RMS, voiced = true, onset = onset, formants = slots.getOrNull(index)?.vowel?.formants())
+        return VoiceFrame(HOLD_TO_CHANT_RMS, voiced = true, onset = onset)
     }
 
     /** Mic frames → analysed voice; if the mic dies (error or end), flag it and fall back to silence. */
-    private fun micFrames(): Flow<VoiceFrame> = flow {
+    private fun micFrames(): Flow<MicFrame> = flow {
         var analyzer: VoiceAnalyzer? = null
+        var resampler: Resampler16k? = null
         pcmSource.frames().collect { frame ->
             clipRecorder.write(frame)
             val current = analyzer?.takeIf { it.sampleRate == frame.sampleRate }
                 ?: VoiceAnalyzer(frame.sampleRate).also { analyzer = it }
-            emit(current.analyze(frame.samples, frame.count))
+            val voice = current.analyze(frame.samples, frame.count)
+            val pcm = if (listener != null) {
+                val r = resampler?.takeIf { it.rate == frame.sampleRate } ?: Resampler16k(frame.sampleRate).also { resampler = it }
+                r.convert(frame.samples, frame.count)
+            } else {
+                null
+            }
+            emit(MicFrame(voice, pcm))
         }
     }
         .flowOn(analysisDispatcher)
@@ -240,10 +275,10 @@ class RitualViewModel(
             }
         }
 
-    private fun silentFrames(): Flow<VoiceFrame> = flow {
+    private fun silentFrames(): Flow<MicFrame> = flow {
         while (true) {
             delay(FRAME_MS)
-            emit(VoiceFrame.SILENT)
+            emit(MicFrame(VoiceFrame.SILENT, null))
         }
     }
 
@@ -259,9 +294,11 @@ class RitualViewModel(
             clipRecorder: ClipRecorder = ClipRecorder.None,
             showIntro: Boolean = false,
             sessionLog: SessionLog = SessionLog.None,
+            transcriber: Transcriber? = null,
+            checkMode: () -> Pair<CheckMode, String> = { CheckMode.Lenient to "" },
         ): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                RitualViewModel(demon, headingSource, pcmSource, inCourt, commitSummon, clipRecorder, showIntro, sessionLog = sessionLog)
+                RitualViewModel(demon, headingSource, pcmSource, inCourt, commitSummon, clipRecorder, showIntro, sessionLog = sessionLog, transcriber = transcriber, checkMode = checkMode)
             }
         }
     }

@@ -4,7 +4,7 @@ import com.summondemons.safely.ritual.RitualConfig.WHISPER_RATE
 import kotlin.math.floor
 
 /** Mic PCM16 at [rate] → 16 kHz floats in [-1, 1] for Whisper, by linear interpolation (ADR-0027). */
-class Resampler16k(private val rate: Int) {
+class Resampler16k(val rate: Int) {
     private val step = rate.toDouble() / WHISPER_RATE
     /** Position of the next output sample, in input samples relative to the frame being converted. */
     private var pos = 0.0

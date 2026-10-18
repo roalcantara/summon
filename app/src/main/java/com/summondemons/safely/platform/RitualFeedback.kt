@@ -102,9 +102,7 @@ private fun handle(
             fadeBed(BED_DUCKED, DUCK_MS)
         }
         RitualEffect.Resumed -> fadeBed(BED_VOLUME, DUCK_MS)
-        is RitualEffect.Judged -> Unit
-        is RitualEffect.ChunkPassed -> Haptics.tick(context)
-        is RitualEffect.Rejected -> Haptics.warn(context)
+        is RitualEffect.LineChecked -> Unit
         is RitualEffect.ClimaxStart -> {
             Haptics.crescendo(context)
             sounds.play(Cue.Riser)

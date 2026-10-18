@@ -39,6 +39,9 @@ import com.summondemons.safely.platform.AndroidHeadingSource
 import com.summondemons.safely.platform.AndroidPcmSource
 import com.summondemons.safely.platform.ClipRecorders
 import com.summondemons.safely.platform.SessionLogs
+import com.summondemons.safely.platform.DeviceCheck
+import com.summondemons.safely.platform.WhisperTranscriber
+import com.summondemons.safely.ritual.CheckMode
 import com.summondemons.safely.platform.GameSounds
 import com.summondemons.safely.platform.LocalGameSounds
 import com.summondemons.safely.progress.ProgressRules
@@ -180,6 +183,15 @@ private fun RitualDestination(
             commitSummon = { flawless -> game.commitSummon(demon.id, startDay, flawless) },
             clipRecorder = ClipRecorders.create(appContext),
             sessionLog = SessionLogs.create(appContext),
+            transcriber = WhisperTranscriber.get(appContext),
+            checkMode = {
+                val result = DeviceCheck.cached(appContext)
+                when {
+                    result == null -> CheckMode.Lenient to "device check still running"
+                    result.mode == CheckMode.Lenient -> CheckMode.Lenient to result.reason
+                    else -> CheckMode.Whisper to ""
+                }
+            },
             // Before every ritual; "?" on the chant screen reopens it (ADR-0021).
             showIntro = true,
         )
