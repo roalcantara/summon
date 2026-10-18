@@ -5,6 +5,15 @@
 set -euo pipefail
 app=com.summondemons.safely
 root="$(cd "$(dirname "$0")/.." && pwd)"
+sdk_adb() { # adb from PATH, $ANDROID_HOME, local.properties' sdk.dir, or the default macOS SDK
+  command -v adb && return
+  for d in "${ANDROID_HOME:-}" "$(sed -n 's/^sdk.dir=//p' "$root/local.properties" 2>/dev/null)" "$HOME/Library/Android/sdk"; do
+    [ -n "$d" ] && [ -x "$d/platform-tools/adb" ] && { echo "$d/platform-tools/adb"; return; }
+  done
+  return 1
+}
+adb() { "$ADB" "$@"; }
+ADB="$(sdk_adb)" || { echo "adb not found: install platform-tools or set ANDROID_HOME" >&2; exit 1; }
 serial="${1:-${ANDROID_SERIAL:-}}"
 if [ -z "$serial" ]; then
   devices=$(adb devices | awk 'NR > 1 && $2 == "device" { print $1 }')
