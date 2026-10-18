@@ -8,13 +8,15 @@ import com.summondemons.safely.ritual.RitualConfig.WHISPER_RATE
 import kotlin.random.Random
 
 /**
- * Once per install (ADR-0027): can this phone run Whisper fast enough? Loads the model and times
- * a 5 s transcription; the result is cached. Until it has run, rituals use [CheckMode.Lenient].
+ * Once per install (ADR-0027): can this phone run Whisper fast enough? Copies and loads the model
+ * and warms it up untimed, then times a 5 s transcription; the result is cached. Until it has run,
+ * rituals use [CheckMode.Lenient].
  */
 object DeviceCheck {
     private const val PREFS = "device_check"
-    private const val KEY_MODE = "mode_v1"
-    private const val KEY_REASON = "reason_v1"
+    // v2: v1 timed the model copy, load and first-run warm-up, which marked fast phones as slow (ADR-0027).
+    private const val KEY_MODE = "mode_v2"
+    private const val KEY_REASON = "reason_v2"
 
     data class Result(val mode: CheckMode, val reason: String)
 
@@ -29,6 +31,8 @@ object DeviceCheck {
         cached(context)?.let { return it }
         val result = try {
             val transcriber = WhisperTranscriber.get(context)
+            // Untimed: the first call copies the model out of the APK, loads it and pays the first-run warm-up.
+            transcriber.transcribeNow(FloatArray(WHISPER_RATE))
             val random = Random(5)
             val pcm = FloatArray(5 * WHISPER_RATE) { (random.nextFloat() - 0.5f) * 0.02f }
             val t0 = SystemClock.elapsedRealtime()

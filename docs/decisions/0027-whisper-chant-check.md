@@ -36,3 +36,14 @@ Measured on emulator (arm64-v8a, 2 threads):
 - spike.wav (88.54s): transcribed recognisably in Latin with `shrink=true` ("Da emuniung residente ostende mihi facim, toam, potincham..."). Text is identical between `shrink=true` and `shrink=false`.
 
 Decision: Go. `shrinkContext = true` is kept; device check enables lenient mode on slow devices (emulator / low-end) and Whisper on fast hardware (Galaxy S24 completes a 10 s check in under 1.0 s).
+
+## Fix: device check timing (2026-10-18)
+The first device check timed the model copy out of the APK, the model load and whisper.cpp's
+first-run warm-up together with the 5 s transcription. On a fresh install of the Galaxy S24 that
+took 7.4 s, so the phone was marked "slow" and every ritual ran in lenient mode (nonsense sealed
+lines by lighting syllables). The check now loads and warms up untimed; the cache key moved to
+`v2` so earlier verdicts are re-checked. Result on the S24: Whisper mode, 396 ms for 5 s.
+
+Desktop Whisper on the nonsense clip of that session heard gibberish and rejected lines I–III
+(0.61–0.71), but line IV scored 0.56: short lines against long babble are the weak spot to watch
+in the threshold re-check (`TranscriptRescoreTest`).
