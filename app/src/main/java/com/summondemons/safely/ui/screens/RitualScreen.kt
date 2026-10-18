@@ -2,6 +2,7 @@ package com.summondemons.safely.ui.screens
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
@@ -23,11 +24,13 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -38,6 +41,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -122,6 +126,9 @@ private val NameSize = 20.sp
 
 /** Phases in which the sigil's rings are inked (the ritual is or was locked this attempt). */
 private val SEALED_PHASES = setOf(RitualPhase.Chanting, RitualPhase.Wavering, RitualPhase.Climax, RitualPhase.Done)
+
+/** Before the lock the portrait altar stays; from the lock the chant screen takes over (ADR-0019). */
+private val PRE_LOCK_PHASES = setOf(RitualPhase.Seeking, RitualPhase.Locking)
 
 /** A phrase that just sealed or cracked; [id] keeps repeats distinct. */
 private data class Mark(val phrase: Int, val id: Long)
@@ -271,112 +278,142 @@ private fun RitualContent(
     )
     val wavering = ritual.phase == RitualPhase.Wavering
     val heartbeat = if (wavering && !reduceMotion) rememberHeartbeat() else null
+    // Errors (no mic, no heading) keep the portrait screen and its panels.
+    val chantLayout = ritual.phase !in PRE_LOCK_PHASES &&
+        state.micGranted != false &&
+        !(state.micGranted == true && state.micUnavailable) &&
+        !(state.headingUnavailable && !state.simulateHeading)
+    RequestLandscape(chantLayout)
 
     BoxWithConstraints(modifier.fillMaxSize().background(colors.background)) {
         val sigilSide = minOf(maxWidth * SIGIL_WIDTH_FRACTION, maxHeight * SIGIL_MAX_HEIGHT_FRACTION)
-        ParticleField(accent.copy(alpha = EMBER_ALPHA), ParticleStyle.Embers, Modifier.fillMaxSize())
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .safeDrawingPadding()
-                .padding(spacing.lg)
-                .graphicsLayer { alpha = chromeAlpha },
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(spacing.md),
-        ) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    demon.name,
-                    style = MaterialTheme.textRoles.name.copy(fontSize = NameSize),
-                    color = accent,
-                    modifier = Modifier.weight(1f),
-                )
-                if (!inClimax) {
-                    IconButton(onClick = requestClose) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_close),
-                            contentDescription = stringResource(R.string.action_abort),
-                            tint = colors.onSurfaceVariant,
+        if (chantLayout) {
+            ChantScreen(
+                state = state,
+                flash = flash,
+                showClose = !inClimax,
+                onClose = requestClose,
+                debug = if (BuildConfig.DEBUG && !inClimax) {
+                    {
+                        DebugControls(
+                            simulateHeading = state.simulateHeading,
+                            onSimulateHeadingChange = onSimulateHeadingChange,
+                            onHoldToChantChange = onHoldToChantChange,
+                            lastScore = state.lastScore,
+                            clipLabel = state.clipLabel,
+                            onCycleClipLabel = onCycleClipLabel,
+                        )
+                    }
+                } else {
+                    null
+                },
+                modifier = Modifier.fillMaxSize().graphicsLayer { alpha = chromeAlpha },
+            )
+        } else {
+            ParticleField(accent.copy(alpha = EMBER_ALPHA), ParticleStyle.Embers, Modifier.fillMaxSize())
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .safeDrawingPadding()
+                    .padding(spacing.lg)
+                    .graphicsLayer { alpha = chromeAlpha },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(spacing.md),
+            ) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        demon.name,
+                        style = MaterialTheme.textRoles.name.copy(fontSize = NameSize),
+                        color = accent,
+                        modifier = Modifier.weight(1f),
+                    )
+                    if (!inClimax) {
+                        IconButton(onClick = requestClose) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_close),
+                                contentDescription = stringResource(R.string.action_abort),
+                                tint = colors.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+
+                val cue = ritualCue(state, cracked, rejected)
+                CueChip(cueText(cue, demon), cue.kind.tone)
+
+                Box(Modifier.size(sigilSide), contentAlignment = Alignment.Center) {
+                    AltarRing(
+                        azimuth = state.azimuth,
+                        target = demon.ritualHeading,
+                        phase = ritual.phase,
+                        lockFraction = ritual.lockMs.toFloat() / LOCK_HOLD_MS,
+                        accent = accent,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                    InkedSigil(
+                        sigil = demon.sigil,
+                        inkProgress = ritual.inkProgress,
+                        accent = accent,
+                        rimText = demon.name.uppercase(),
+                        modifier = Modifier.fillMaxSize(SIGIL_IN_RING_FRACTION).graphicsLayer {
+                            if (wavering) alpha = heartbeat?.value ?: WAVER_MIN_ALPHA
+                        },
+                        ringProgress = ringProgress,
+                        micLevel = state.micLevel,
+                        ghostAlpha = GHOST_ALPHA,
+                        flash = flash,
+                    )
+                }
+
+                when {
+                    !inClimax && state.micGranted == false -> ErrorPanel(stringResource(R.string.mic_rationale)) {
+                        PrimaryActionButton(
+                            text = stringResource(if (permanentlyDenied) R.string.action_open_settings else R.string.action_retry),
+                            onClick = if (permanentlyDenied) onOpenSettings else onRetryPermission,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                    !inClimax && state.micGranted == true && state.micUnavailable -> ErrorPanel(stringResource(R.string.mic_unavailable))
+                    !inClimax && state.headingUnavailable && !state.simulateHeading -> ErrorPanel(stringResource(R.string.heading_unavailable))
+                    else -> {
+                        val header = chantHeader(ritual)
+                        ChantTablet(
+                            phrases = demon.chantPhrases,
+                            phrase = ritual.phrase.coerceAtMost(demon.chantPhrases.size),
+                            lit = ritual.lit,
+                            accent = accent,
+                            active = ritual.phase != RitualPhase.Seeking && ritual.phase != RitualPhase.Locking,
+                            header = chantHeaderText(header),
+                            headerColor = when (header) {
+                                ChantHeader.Drifting -> colors.error
+                                is ChantHeader.Seconds -> accent
+                                is ChantHeader.SealedCount -> colors.outline
+                            },
+                            focusFraction = if (ritual.clockActive) ritual.focusFraction else null,
+                            focusTone = when {
+                                wavering -> FocusTone.Drift
+                                ritual.courtMultiplier > 1f -> FocusTone.Court
+                                else -> FocusTone.Normal
+                            },
+                            flare = flare,
+                            cracked = cracked,
+                            micLevel = state.micLevel,
+                            wavering = wavering,
+                            modifier = Modifier.fillMaxWidth().weight(1f, fill = false).verticalScroll(rememberScrollState()),
                         )
                     }
                 }
-            }
 
-            val cue = ritualCue(state, cracked, rejected)
-            CueChip(cueText(cue, demon), cue.kind.tone)
-
-            Box(Modifier.size(sigilSide), contentAlignment = Alignment.Center) {
-                AltarRing(
-                    azimuth = state.azimuth,
-                    target = demon.ritualHeading,
-                    phase = ritual.phase,
-                    lockFraction = ritual.lockMs.toFloat() / LOCK_HOLD_MS,
-                    accent = accent,
-                    modifier = Modifier.fillMaxSize(),
-                )
-                InkedSigil(
-                    sigil = demon.sigil,
-                    inkProgress = ritual.inkProgress,
-                    accent = accent,
-                    rimText = demon.name.uppercase(),
-                    modifier = Modifier.fillMaxSize(SIGIL_IN_RING_FRACTION).graphicsLayer {
-                        if (wavering) alpha = heartbeat?.value ?: WAVER_MIN_ALPHA
-                    },
-                    ringProgress = ringProgress,
-                    micLevel = state.micLevel,
-                    ghostAlpha = GHOST_ALPHA,
-                    flash = flash,
-                )
-            }
-
-            when {
-                !inClimax && state.micGranted == false -> ErrorPanel(stringResource(R.string.mic_rationale)) {
-                    PrimaryActionButton(
-                        text = stringResource(if (permanentlyDenied) R.string.action_open_settings else R.string.action_retry),
-                        onClick = if (permanentlyDenied) onOpenSettings else onRetryPermission,
-                        modifier = Modifier.fillMaxWidth(),
+                if (BuildConfig.DEBUG && !inClimax) {
+                    DebugControls(
+                        simulateHeading = state.simulateHeading,
+                        onSimulateHeadingChange = onSimulateHeadingChange,
+                        onHoldToChantChange = onHoldToChantChange,
+                        lastScore = state.lastScore,
+                        clipLabel = state.clipLabel,
+                        onCycleClipLabel = onCycleClipLabel,
                     )
                 }
-                !inClimax && state.micGranted == true && state.micUnavailable -> ErrorPanel(stringResource(R.string.mic_unavailable))
-                !inClimax && state.headingUnavailable && !state.simulateHeading -> ErrorPanel(stringResource(R.string.heading_unavailable))
-                else -> {
-                    val header = chantHeader(ritual)
-                    ChantTablet(
-                        phrases = demon.chantPhrases,
-                        phrase = ritual.phrase.coerceAtMost(demon.chantPhrases.size),
-                        lit = ritual.lit,
-                        accent = accent,
-                        active = ritual.phase != RitualPhase.Seeking && ritual.phase != RitualPhase.Locking,
-                        header = chantHeaderText(header),
-                        headerColor = when (header) {
-                            ChantHeader.Drifting -> colors.error
-                            is ChantHeader.Seconds -> accent
-                            is ChantHeader.SealedCount -> colors.outline
-                        },
-                        focusFraction = if (ritual.clockActive) ritual.focusFraction else null,
-                        focusTone = when {
-                            wavering -> FocusTone.Drift
-                            ritual.courtMultiplier > 1f -> FocusTone.Court
-                            else -> FocusTone.Normal
-                        },
-                        flare = flare,
-                        cracked = cracked,
-                        micLevel = state.micLevel,
-                        wavering = wavering,
-                        modifier = Modifier.fillMaxWidth().weight(1f, fill = false).verticalScroll(rememberScrollState()),
-                    )
-                }
-            }
-
-            if (BuildConfig.DEBUG && !inClimax) {
-                DebugControls(
-                    simulateHeading = state.simulateHeading,
-                    onSimulateHeadingChange = onSimulateHeadingChange,
-                    onHoldToChantChange = onHoldToChantChange,
-                    lastScore = state.lastScore,
-                    clipLabel = state.clipLabel,
-                    onCycleClipLabel = onCycleClipLabel,
-                )
             }
         }
         if (inClimax) ClimaxOverlay(demon, accent, ritual.climaxFraction, reduceMotion)
@@ -401,6 +438,17 @@ private fun RitualContent(
     }
 }
 
+
+/** The chant screen is landscape (ADR-0019); portrait comes back when it closes or the Ritual leaves. */
+@Composable
+private fun RequestLandscape(landscape: Boolean) {
+    val activity = LocalActivity.current ?: return
+    DisposableEffect(activity, landscape) {
+        activity.requestedOrientation =
+            if (landscape) ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        onDispose { activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+    }
+}
 @Composable
 private fun rememberHeartbeat(): State<Float> = rememberInfiniteTransition(label = "heartbeat").animateFloat(
     1f, WAVER_MIN_ALPHA, infiniteRepeatable(tween(HEARTBEAT_HALF_MS), RepeatMode.Reverse), label = "heartbeatAlpha",
@@ -476,7 +524,10 @@ private fun ClimaxOverlay(demon: Demon, accent: Color, fraction: Float, reduceMo
         SharedDemonArt(
             demonId = demon.id,
             modifier = Modifier
+                // Fits both dimensions: the climax plays in landscape too (ADR-0019).
                 .fillMaxWidth(CUTOUT_WIDTH_FRACTION)
+                .fillMaxHeight(CUTOUT_WIDTH_FRACTION)
+                .wrapContentSize()
                 .aspectRatio(CUTOUT_ASPECT)
                 .graphicsLayer {
                     alpha = rise
