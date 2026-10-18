@@ -113,9 +113,47 @@ class RitualViewModelTest {
         assertEquals(RitualPhase.Done, vm.uiState.value.ritual.phase)
         assertEquals(
             listOf(Locked, Sealed(0), Sealed(1), Sealed(2), Sealed(3), ClimaxStart(flawless = true), Summoned),
-            effects.filter { it != SyllableLit && it != ProximityTick },
+            effects.filter { it != SyllableLit && it != ProximityTick && it !is RitualEffect.Judged },
         )
         assertEquals(0, pcm.subscriptions)
+        // Hold to Chant sounds the expected vowels, so every phrase passes the chant check (ADR-0018).
+        assertEquals(4, effects.count { it is RitualEffect.Judged && it.score.passed })
+        assertTrue(vm.uiState.value.lastScore!!.passed)
+        assertEquals(0, vm.uiState.value.rejections)
+    }
+
+    private class FakeRecorder : ClipRecorder {
+        val calls = mutableListOf<String>()
+        var frames = 0
+        override fun start(name: String) {
+            calls += "start $name"
+        }
+        override fun write(frame: PcmFrame) {
+            frames++
+        }
+        override fun stop() {
+            calls += "stop"
+        }
+    }
+
+    @Test
+    fun clipLabelCyclesAndTheRecorderGetsMicFrames() = runTest(dispatcher) {
+        val recorder = FakeRecorder()
+        val vm = RitualViewModel(demon, { emptyFlow() }, chantingPcm(), clipRecorder = recorder, analysisDispatcher = dispatcher)
+        observe(vm)
+        vm.onMicPermission(true)
+        vm.cycleClipLabel()
+        runCurrent()
+        assertEquals(ClipLabel.Chant, vm.uiState.value.clipLabel)
+        advanceTimeBy(1_000); runCurrent()
+        vm.cycleClipLabel()
+        runCurrent()
+        assertEquals(ClipLabel.Nonsense, vm.uiState.value.clipLabel)
+        vm.cycleClipLabel()
+        runCurrent()
+        assertNull(vm.uiState.value.clipLabel)
+        assertEquals(listOf("stop", "start asmodeus-chant", "stop", "start asmodeus-nonsense", "stop"), recorder.calls)
+        assertTrue(recorder.frames > 0)
     }
 
     @Test

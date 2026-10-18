@@ -53,6 +53,12 @@ data class RitualUiState(
     val headingUnavailable: Boolean = false,
     /** The Ritual screen is started; no ticks run otherwise, so the focus clock pauses (§2). */
     val active: Boolean = true,
+    /** The chant check's latest verdict, for the debug readout (ADR-0018). */
+    val lastScore: ChantScore? = null,
+    /** Phrases rejected this attempt; picks the scoff line (ADR-0018). */
+    val rejections: Int = 0,
+    /** Debug clip recorder label; null = not recording (ADR-0018). */
+    val clipLabel: ClipLabel? = null,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -64,13 +70,15 @@ class RitualViewModel(
     private val inCourt: () -> Boolean = { false },
     /** Saves the summon. Called inside the tick, exactly once, on the step that starts the climax (ADR-0013). */
     private val commitSummon: (flawless: Boolean) -> Unit = {},
+    /** Debug builds record tester clips here; release builds pass [ClipRecorder.None] (ADR-0018). */
+    private val clipRecorder: ClipRecorder = ClipRecorder.None,
     private val analysisDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(
         RitualUiState(
             demon = demon,
-            ritual = RitualState.start(demon.ritualHeading, demon.chantPhrases),
+            ritual = RitualState.start(demon.ritualHeading, demon.chantPhrases, judged = true),
             headingUnavailable = !headingSource.available,
         ),
     )
@@ -115,6 +123,20 @@ class RitualViewModel(
         state.update { it.copy(holdToChant = on) }
     }
 
+    /** Debug: Off → Chant → Nonsense → Off. Each label starts a new clip (ADR-0018). */
+    fun cycleClipLabel() {
+        val next = when (state.value.clipLabel) {
+            null -> ClipLabel.Chant
+            ClipLabel.Chant -> ClipLabel.Nonsense
+            ClipLabel.Nonsense -> null
+        }
+        clipRecorder.stop()
+        if (next != null) clipRecorder.start("${demon.id}-${next.tag}")
+        state.update { it.copy(clipLabel = next) }
+    }
+
+    override fun onCleared() = clipRecorder.stop()
+
     /** Called from the Ritual screen's ON_START / ON_STOP. */
     fun setActive(active: Boolean) = state.update {
         if (!active && !it.simulateHeading) it.copy(active = false, azimuth = null)
@@ -125,12 +147,19 @@ class RitualViewModel(
     private fun tick(micFrame: VoiceFrame) {
         val current = state.value
         if (!current.active || awaitingHeading(current)) return
-        val voice = if (current.holdToChant) syntheticVoice() else micFrame
+        val voice = if (current.holdToChant) syntheticVoice(current.ritual) else micFrame
         val inCourt = if (RitualEngine.canLock(current.ritual, current.azimuth)) inCourt() else false
         val step = RitualEngine.step(current.ritual, RitualInput(current.azimuth, voice, inCourt))
         // The summon is saved here, not through the lossy effects flow, before the climax plays.
         step.effects.filterIsInstance<RitualEffect.ClimaxStart>().firstOrNull()?.let { commitSummon(it.flawless) }
-        state.update { it.copy(ritual = step.state, micLevel = smoothMicLevel(it.micLevel, voice.rms)) }
+        state.update {
+            it.copy(
+                ritual = step.state,
+                micLevel = smoothMicLevel(it.micLevel, voice.rms),
+                lastScore = step.effects.filterIsInstance<RitualEffect.Judged>().lastOrNull()?.score ?: it.lastScore,
+                rejections = it.rejections + step.effects.count { effect -> effect is RitualEffect.Rejected },
+            )
+        }
         step.effects.forEach { _effects.tryEmit(it) }
     }
 
@@ -142,14 +171,22 @@ class RitualViewModel(
     private fun awaitingHeading(s: RitualUiState): Boolean =
         s.azimuth == null && !s.simulateHeading && !s.headingUnavailable
 
-    /** Debug "Hold to Chant": continuous voicing with an onset every ~240 ms. */
-    private fun syntheticVoice(): VoiceFrame =
-        VoiceFrame(HOLD_TO_CHANT_RMS, voiced = true, onset = holdFrames++ % HOLD_TO_CHANT_ONSET_FRAMES == 0)
+    /**
+     * Debug "Hold to Chant": continuous voicing with an onset every ~240 ms, sounding the
+     * vowel the chant check expects (ADR-0018): the next syllable's on an onset, else the current one's.
+     */
+    private fun syntheticVoice(ritual: RitualState): VoiceFrame {
+        val onset = holdFrames++ % HOLD_TO_CHANT_ONSET_FRAMES == 0
+        val vowels = ritual.vowels?.getOrNull(ritual.phrase).orEmpty()
+        val index = (if (onset) ritual.lit else ritual.lit - 1).coerceIn(0, maxOf(0, vowels.lastIndex))
+        return VoiceFrame(HOLD_TO_CHANT_RMS, voiced = true, onset = onset, formants = vowels.getOrNull(index)?.formants())
+    }
 
     /** Mic frames → analysed voice; if the mic dies (error or end), flag it and fall back to silence. */
     private fun micFrames(): Flow<VoiceFrame> = flow {
         var analyzer: VoiceAnalyzer? = null
         pcmSource.frames().collect { frame ->
+            clipRecorder.write(frame)
             val current = analyzer?.takeIf { it.sampleRate == frame.sampleRate }
                 ?: VoiceAnalyzer(frame.sampleRate).also { analyzer = it }
             emit(current.analyze(frame.samples, frame.count))
@@ -182,7 +219,9 @@ class RitualViewModel(
             pcmSource: PcmSource,
             inCourt: () -> Boolean = { false },
             commitSummon: (flawless: Boolean) -> Unit = {},
-        ): ViewModelProvider.Factory =
-            viewModelFactory { initializer { RitualViewModel(demon, headingSource, pcmSource, inCourt, commitSummon) } }
+            clipRecorder: ClipRecorder = ClipRecorder.None,
+        ): ViewModelProvider.Factory = viewModelFactory {
+            initializer { RitualViewModel(demon, headingSource, pcmSource, inCourt, commitSummon, clipRecorder) }
+        }
     }
 }
