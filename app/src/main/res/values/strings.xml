@@ -17,11 +17,6 @@
     <string name="debug_chant_score">Chant check %1$.2f %2$s · vowels %3$.2f · rhythm %4$.2f</string>
     <string name="debug_chant_score_none">Chant check · no verdict yet</string>
 
-    <string name="hint_face">Face %1$s</string>
-    <string name="hint_turn_left">Turn left · Face %1$s</string>
-    <string name="hint_turn_right">Turn right · Face %1$s</string>
-    <string name="hint_hold_steady">Hold steady…</string>
-    <string name="hint_summoning">The seal opens…</string>
     <string name="heading_unavailable">This device can\'t sense direction, so the ritual can\'t begin.</string>
 
     <!-- Home (ADR-0014) -->
@@ -64,25 +59,6 @@
     <string name="dossier_previous">Previous page</string>
     <string name="dossier_next">Next page</string>
 
-    <!-- Ritual (ADR-0010, ADR-0014) -->
-    <string name="cue_mic_denied">The spirits can\'t hear you</string>
-    <string name="cue_mic_unavailable">The microphone wouldn\'t start</string>
-    <string name="cue_no_heading">This device can\'t sense direction</string>
-    <string name="cue_cracked">The seal cracked · Chant %1$s again</string>
-    <!-- Chant check (ADR-0018): shown in turn, one per rejected phrase. -->
-    <string-array name="cue_rejected">
-        <item>That wasn\'t Latin · Chant it again</item>
-        <item>He\'s heard better from a parrot · Again</item>
-        <item>The demon yawns · Read the tablet</item>
-        <item>Nice try · The real words, please</item>
-    </string-array>
-    <string name="cue_chant">Locked · Chant aloud</string>
-    <string name="cue_wavering">Face %1$s!</string>
-    <string name="cue_wavering_focus">Face %1$s! · Focus slipping</string>
-    <string name="chant_title">Sacred chant</string>
-    <string name="chant_sealed_count">%1$s / IV</string>
-    <string name="chant_seconds">⏱ %1$d s</string>
-    <string name="chant_drift">⏱ 3×</string>
     <!-- Chant screen (ADR-0019) -->
     <string name="chant_face">Face %1$s</string>
     <string name="chant_a11y_facing">Facing %1$s</string>
@@ -111,7 +87,6 @@
     <string name="intro_seal_title">Seal</string>
     <string name="intro_seal_body">Seal all four lines to summon the demon.</string>
     <string name="intro_summon">Summon</string>
-    <string name="focus_label">Focus</string>
     <string name="abandon_title">Abandon the ritual?</string>
     <string name="abandon_body">Your seals will fade.</string>
     <string name="action_abandon">Abandon</string>
