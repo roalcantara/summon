@@ -30,6 +30,16 @@ android {
         targetSdk = 37
         versionCode = 1
         versionName = "1.0.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+        }
+        externalNativeBuild {
+            cmake {
+                // whisper.cpp is unusably slow at -O0, so native code is always optimised (ADR-0027).
+                arguments += listOf("-DCMAKE_BUILD_TYPE=Release", "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON")
+            }
+        }
     }
     signingConfigs {
         if (hasUploadKey) {
@@ -65,7 +75,34 @@ android {
         compose = true
         buildConfig = true
     }
+    ndkVersion = "28.2.13676358"
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
+    }
+    androidResources {
+        noCompress += "bin"
+    }
 }
+
+// The Whisper model is downloaded, not committed (ADR-0027).
+abstract class VerifyWhisperModelTask : DefaultTask() {
+    @get:InputFile
+    abstract val modelFile: RegularFileProperty
+
+    @TaskAction
+    fun verify() {
+        val file = modelFile.get().asFile
+        check(file.exists()) { "Whisper model missing: run tools/fetch_whisper_model.sh (ADR-0027)" }
+    }
+}
+
+val verifyWhisperModel = tasks.register<VerifyWhisperModelTask>("verifyWhisperModel") {
+    modelFile.set(layout.projectDirectory.file("src/main/assets/whisper/ggml-base-q5_1.bin"))
+}
+tasks.named("preBuild") { dependsOn(verifyWhisperModel) }
 
 // Calibration harness switches (ADR-0018, ADR-0025): -PchantClips=…, -PchantSource=real|generated, -PchantDump=1, -Psessions=…
 tasks.withType<Test>().configureEach {
@@ -93,4 +130,6 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.ext.junit)
 }

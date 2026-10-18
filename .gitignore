@@ -25,3 +25,6 @@ app/src/test/sessions/
 
 # Calibration corpus downloads (Piper voices, LibriSpeech; ADR-0025)
 tools/.cache/
+
+# Whisper model, downloaded by tools/fetch_whisper_model.sh (ADR-0027)
+app/src/main/assets/whisper/
