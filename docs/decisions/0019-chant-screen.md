@@ -3,7 +3,8 @@
 - Date: 2026-10-18
 - Status: Accepted. Amends ADR-0010 (clock length, verdict hold), ADR-0014 (two text
   roles), ADR-0018 (word hints, verdict shown until the next syllable) and the
-  "Portrait only" rule in PRODUCT.md.
+  "Portrait only" rule in PRODUCT.md. Amended by ADR-0020: the chant screen covers the
+  whole Ritual and its sigil carries the direction marker and the lock fill.
 
 ## Context
 Device testing of the chant check (ADR-0018) showed two problems. The scoff appeared in

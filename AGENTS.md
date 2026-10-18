@@ -63,7 +63,9 @@ cd ../mydemon && npm install && npm run dev   # http://localhost:3000
   `2026-10-15-ritual-2-design.md`).
 - Release prep: ADR-0017. Chant plausibility check (vowels + rhythm): ADR-0018, plan
   `docs/superpowers/plans/2026-10-18-chant-check.md`. Landscape chant screen: ADR-0019,
-  plan `docs/superpowers/plans/2026-10-18-chant-screen.md`.
+  plan `docs/superpowers/plans/2026-10-18-chant-screen.md`; it covers the whole Ritual and
+  its sigil guides to the direction: ADR-0020, plan
+  `docs/superpowers/plans/2026-10-18-chant-direction.md`.
 - Packages: `data/` (demons, Houses, Callings), `progress/` (pure progress rules, JSON
   model, court hours, `ProgressStore`), `time/` (`GameClock`, debug settings), `ritual/`,
   `platform/` (Android implementations), `ui/`, `navigation/`.

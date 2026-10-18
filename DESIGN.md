@@ -152,14 +152,11 @@ dark palette carries the RPG feel.
 | `RibbonBanner` | "New Demon Received!" on the Grimoire celebration; "Seal broken!" on Home | `text`; primary container color |
 | `RotatingSunburstBackground` | Rays behind the demon during the Grimoire celebration | `color`, `rotating` |
 | `InkedSigil` | The demon's vector sigil | `sigil` (raw), `inkProgress` 0–1, `ringProgress` 0–1, `rimText`, `accent`, `micLevel` (glow), `ghostAlpha`, `flash` (group, color, duration: seal flare / crack drain) |
-| `AltarRing` | Ring around the sigil on the Ritual | `azimuth`, `target`, `phase`, `lockFraction`, `accent`; outline track, `ritual-safe` lock fill / locked ring, `error` while wavering, a marker toward the target |
 | `CueChip` | One-line cue | `text`, `tone` (neutral / safe / error), `shake` |
-| `FocusBar` | Focus left under the current phrase | `fraction`, `tone` (normal / drift / court), `accent`; heartbeat below `FOCUS_LOW_FRACTION` |
 | `ChantScreen` | Landscape chant screen (ADR-0019) | `state`, `flash`, `showClose`, `onClose`, `debug`; House-stage backdrop (scrim strongest behind the words), slab (surface-container-low 70 %, `large` shape) with name, `ChantSigil` and the direction line; the phrase (`incantationLarge`) with a line per word: pending outline-variant, current on-surface-variant, heard ritual-safe, doubtful primary 70 %, rejected error wavy + ✕ badge; verdict line (`ritualCue`) with `VoiceMeter`. Portrait (large screens) puts the slab in a top band. |
-| `ChantSigil` | `InkedSigil` inside a ring | Ring colour = direction (ritual-safe / error), arc = focus clock (full on phrase I), seconds or "Paused" under it |
+| `ChantSigil` | `InkedSigil` (12 % ghost before it inks) inside a ring | Marker triangle between ring and sigil pointing at the demon relative to the phone (ritual-safe when facing, accent otherwise; ADR-0020). Ring: track while seeking, ritual-safe fill with the lock hold, then the focus clock (full on phrase I); colour ritual-safe facing / outline seeking / error drifting; seconds or "Paused" under it |
 | `VoiceMeter` | Five ember bars | `level` (mic level, 0–1), `color`; flat at 22 % when silent; decides nothing |
-| `ChantTablet` | Framed chant panel |
-| `KaraokeLine` | Current chant phrase | `text`, `lit` syllables, `accent`, `dim`, `micLevel` (newest-syllable glow) |
+| ~~`ChantTablet`~~ | Removed with the portrait altar (ADR-0020) |
 | `BadgeRow` | Direction / House / Calling / Legions tiles | `demon`, `selected`, `onSelect`; rim = House metal, glyph = accent (House glyph = metal); `BadgeIcon` draws one glyph |
 | `InfoBand` | Description or the selected badge's explanation | `demons`, `demon`, `badge`; height of the tallest text |
 | `DossierCarousel` | Six dossier pages | `demon`, `record`, `inkCodex`, `inkBattle`, `page`, `onPage`; ‹ › and swipe, wrapping |
