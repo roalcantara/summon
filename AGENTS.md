@@ -61,12 +61,13 @@ cd ../mydemon && npm install && npm run dev   # http://localhost:3000
   focus-clock ritual, persistent progress (Preferences DataStore). Design:
   `docs/superpowers/specs/2026-10-16-screen-system-design.md` (builds on
   `2026-10-15-ritual-2-design.md`).
-- Release prep: ADR-0017.
+- Release prep: ADR-0017. Chant plausibility check (vowels + rhythm): ADR-0018, plan
+  `docs/superpowers/plans/2026-10-18-chant-check.md`.
 - Packages: `data/` (demons, Houses, Callings), `progress/` (pure progress rules, JSON
   model, court hours, `ProgressStore`), `time/` (`GameClock`, debug settings), `ritual/`,
   `platform/` (Android implementations), `ui/`, `navigation/`.
 - Open items: the "LOVIS" question in ADR-0005; per-device tuning of the voice
-  thresholds (ADR-0008); the chant plausibility check and its thresholds (ADR-0018);
+  thresholds (ADR-0008); calibrating the chant check's thresholds from tester clips (ADR-0018);
   Stitch art for the DESIGN.md Gaps.
 
 ## Conventions
