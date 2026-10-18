@@ -24,8 +24,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.summondemons.safely.R
-import com.summondemons.safely.ritual.ChantScore
 import com.summondemons.safely.ritual.ClipLabel
+import com.summondemons.safely.ritual.RitualEffect
 import com.summondemons.safely.ui.theme.PillShape
 import com.summondemons.safely.ui.theme.spacing
 
@@ -41,8 +41,8 @@ fun DebugControls(
     simulateHeading: Boolean,
     onSimulateHeadingChange: (Boolean) -> Unit,
     onHoldToChantChange: (Boolean) -> Unit,
-    /** The chant check's latest verdict (ADR-0018). */
-    lastScore: ChantScore?,
+    /** The chant check's latest chunk verdict (ADR-0022). */
+    lastJudged: RitualEffect.Judged?,
     /** Clip recorder label; null = not recording (ADR-0018). */
     clipLabel: ClipLabel?,
     onCycleClipLabel: () -> Unit,
@@ -77,15 +77,17 @@ fun DebugControls(
             },
         )
         Text(
-            if (lastScore == null) {
+            if (lastJudged == null) {
                 stringResource(R.string.debug_chant_score_none)
             } else {
+                val v = lastJudged.verdict
                 stringResource(
                     R.string.debug_chant_score,
-                    lastScore.total,
-                    if (lastScore.passed) "✓" else "✗",
-                    lastScore.vowels,
-                    lastScore.rhythm,
+                    ROMAN_NUMERALS[lastJudged.phrase],
+                    lastJudged.chunk + 1,
+                    v.cost,
+                    v.rank?.let { "%.0f %%".format(it * 100) } ?: "–",
+                    if (v.passed) "✓" else if (v.talk) "✗ talk" else "✗",
                 )
             },
             style = small,

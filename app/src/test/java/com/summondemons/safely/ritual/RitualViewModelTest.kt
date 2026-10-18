@@ -113,12 +113,14 @@ class RitualViewModelTest {
         assertEquals(RitualPhase.Done, vm.uiState.value.ritual.phase)
         assertEquals(
             listOf(Locked, Sealed(0), Sealed(1), Sealed(2), Sealed(3), ClimaxStart(flawless = true), Summoned),
-            effects.filter { it != SyllableLit && it != ProximityTick && it !is RitualEffect.Judged },
+            effects.filter { it != SyllableLit && it != ProximityTick && it !is RitualEffect.Judged && it !is RitualEffect.ChunkPassed },
         )
         assertEquals(0, pcm.subscriptions)
         // Hold to Chant sounds the expected vowels, so every phrase passes the chant check (ADR-0018).
-        assertEquals(4, effects.count { it is RitualEffect.Judged && it.score.passed })
-        assertTrue(vm.uiState.value.lastScore!!.passed)
+        val judged = effects.filterIsInstance<RitualEffect.Judged>()
+        assertTrue(judged.size >= 4)
+        assertTrue(judged.all { it.verdict.passed })
+        assertTrue(vm.uiState.value.lastJudged!!.verdict.passed)
         assertEquals(0, vm.uiState.value.rejections)
     }
 

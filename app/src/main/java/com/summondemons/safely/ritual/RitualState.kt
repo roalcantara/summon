@@ -31,11 +31,14 @@ sealed interface RitualEffect {
     data object Drift : RitualEffect
     data object Resumed : RitualEffect
 
-    /** The chant check judged [phrase] (ADR-0018); always followed by [Sealed] or [Rejected]. */
-    data class Judged(val phrase: Int, val score: ChantScore) : RitualEffect
+    /** The chant check judged [chunk] of [phrase] (ADR-0022); followed by [ChunkPassed], [Sealed] or [Rejected]. */
+    data class Judged(val phrase: Int, val chunk: Int, val verdict: ChunkVerdict) : RitualEffect
 
-    /** [phrase] didn't sound like its text: it stays open with no syllable lit (ADR-0018). */
-    data class Rejected(val phrase: Int) : RitualEffect
+    /** [chunk] of [phrase] passed and was not its last: the next chunk opens (ADR-0022). */
+    data class ChunkPassed(val phrase: Int, val chunk: Int) : RitualEffect
+
+    /** [chunk] of [phrase] didn't sound like its text: it reopens at its first syllable (ADR-0022). */
+    data class Rejected(val phrase: Int, val chunk: Int) : RitualEffect
     data class ClimaxStart(val flawless: Boolean) : RitualEffect
     data object Summoned : RitualEffect
 }
@@ -65,11 +68,13 @@ data class RitualState(
     val voicedRunMs: Long = 0L,
     /** Last 5 degree proximity bucket while seeking; null when out of range or unknown. */
     val proximityBucket: Int? = null,
-    /** Expected vowel per syllable of each phrase; null turns the chant check off (ADR-0018). */
-    val vowels: List<List<Vowel?>>? = null,
-    /** What has been heard of the current phrase; only advanced while the chant check is on. */
+    /** Each phrase's chunks; null turns the chant check off (ADR-0018, ADR-0022). */
+    val chunks: List<List<ChantChunk>>? = null,
+    /** Index of the open chunk in the current phrase. */
+    val chunk: Int = 0,
+    /** What has been heard of the current chunk; only advanced while the chant check is on. */
     val take: ChantTake = ChantTake(),
-    /** Syllables of each word, per phrase; set with [vowels] (ADR-0019 word hints). */
+    /** Syllables of each word, per phrase; set with [chunks] (ADR-0019 word hints). */
     val wordSizes: List<List<Int>>? = null,
     /** The last verdict, until the next syllable lights; only while the chant check is on (ADR-0019). */
     val verdict: ChantVerdict? = null,
@@ -77,7 +82,7 @@ data class RitualState(
     init {
         require(syllables.size == PHRASE_COUNT) { "need exactly $PHRASE_COUNT phrases" }
         require(syllables.all { it >= 1 }) { "every phrase needs at least one syllable" }
-        require(vowels == null || vowels.size == PHRASE_COUNT) { "need vowels for exactly $PHRASE_COUNT phrases" }
+        require(chunks == null || chunks.size == PHRASE_COUNT) { "need chunks for exactly $PHRASE_COUNT phrases" }
     }
 
     val aligned: Boolean get() = azimuth != null && isAligned(azimuth, target)
@@ -112,7 +117,7 @@ data class RitualState(
             target = target,
             syllables = phrases.map { LatinSyllables.count(it).coerceAtLeast(1) },
             phase = phase,
-            vowels = if (judged) phrases.map(ChantJudge::expectedVowels) else null,
+            chunks = if (judged) phrases.map(ChantChunks::of) else null,
             wordSizes = if (judged) phrases.map(LatinSyllables::wordSizes) else null,
         )
     }

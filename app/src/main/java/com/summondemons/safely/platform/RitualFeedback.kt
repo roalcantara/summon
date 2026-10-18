@@ -103,6 +103,7 @@ private fun handle(
         }
         RitualEffect.Resumed -> fadeBed(BED_VOLUME, DUCK_MS)
         is RitualEffect.Judged -> Unit
+        is RitualEffect.ChunkPassed -> Haptics.tick(context)
         is RitualEffect.Rejected -> Haptics.warn(context)
         is RitualEffect.ClimaxStart -> {
             Haptics.crescendo(context)

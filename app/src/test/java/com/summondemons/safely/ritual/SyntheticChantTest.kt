@@ -23,19 +23,19 @@ class SyntheticChantTest {
     fun aMaleVoiceChantingPhraseISealsIt() {
         val judged = judge(SyntheticVoice(f0 = 110.0).syllables(vowels(0)))
         assertEquals(1, judged.size)
-        assertTrue("score=${judged.single().score}", judged.single().score.passed)
+        assertTrue("verdict=${judged.single().verdict}", judged.single().verdict.passed)
     }
 
     @Test
     fun aFemaleVoiceChantingPhraseISealsIt() {
         val judged = judge(SyntheticVoice(f0 = 210.0, scale = 1.2).syllables(vowels(0)))
-        assertTrue("score=${judged.single().score}", judged.single().score.passed)
+        assertTrue("verdict=${judged.single().verdict}", judged.single().verdict.passed)
     }
 
     @Test
     fun aChantRecordedAt44kHzSealsIt() {
         val judged = judge(SyntheticVoice(rate = 44_100, f0 = 120.0).syllables(vowels(0)), 44_100)
-        assertTrue("score=${judged.single().score}", judged.single().score.passed)
+        assertTrue("verdict=${judged.single().verdict}", judged.single().verdict.passed)
     }
 
     @Test
@@ -43,12 +43,13 @@ class SyntheticChantTest {
         val voice = SyntheticVoice(f0 = 130.0)
         val pcm = voice.syllables(vowels(0)) + voice.vowel(null, 600) + voice.syllables(vowels(1))
         val judged = judge(pcm)
-        assertEquals(listOf(0, 1), judged.map { it.phrase })
-        assertTrue(judged.all { it.score.passed })
+        assertEquals(listOf(0, 1), judged.map { it.phrase }.distinct())
+        assertEquals(3, judged.count { it.phrase == 1 })
+        assertTrue(judged.all { it.verdict.passed })
     }
 
     @Test
-    fun repeatingOlaMeuAmigoNeverSealsPhraseI() {
+    fun repeatingOlaMeuAmigoIsRejected() {
         // "O-lá meu a-mi-go, co-mo es-tá ho-je?" three times, as in the play-test.
         val ola = listOf(Vowel.O, Vowel.A, Vowel.E, Vowel.U, Vowel.A, Vowel.I, Vowel.O, Vowel.O, Vowel.O, Vowel.E, Vowel.A, Vowel.O, Vowel.E)
         val voice = SyntheticVoice(f0 = 120.0)
@@ -56,15 +57,14 @@ class SyntheticChantTest {
             .fold(ShortArray(0)) { acc, s -> acc + s }
         val judged = judge(pcm)
         assertTrue("judged ${judged.size}", judged.size >= 3)
-        assertTrue("scores=${judged.map { it.score.total }}", judged.none { it.score.passed })
+        assertTrue("verdicts=${judged.map { it.verdict }}", judged.any { !it.verdict.passed })
     }
 
     @Test
     fun holdingOneVowelNeverSealsPhraseI() {
-        // E is half of phrase I; holding it is close enough to chanting and may pass (ADR-0018).
-        (Vowel.entries - Vowel.E).forEach { v ->
+        Vowel.entries.forEach { v ->
             val judged = judge(SyntheticVoice(f0 = 120.0).syllables(List(16) { v }))
-            assertTrue("$v scores=${judged.map { it.score.total }}", judged.isNotEmpty() && judged.none { it.score.passed })
+            assertTrue("$v verdicts=${judged.map { it.verdict }}", judged.isNotEmpty() && judged.none { it.verdict.passed })
         }
     }
 }

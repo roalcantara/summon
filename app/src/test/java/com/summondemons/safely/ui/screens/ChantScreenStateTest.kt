@@ -1,12 +1,9 @@
 package com.summondemons.safely.ui.screens
 
 import com.summondemons.safely.ritual.ChantVerdict
-import com.summondemons.safely.ritual.Formants
-import com.summondemons.safely.ritual.ChantTake
 import com.summondemons.safely.ritual.RitualPhase
 import com.summondemons.safely.ritual.RitualState
 import com.summondemons.safely.ritual.TurnDirection
-import com.summondemons.safely.ritual.Vowel
 import com.summondemons.safely.ritual.WordMark
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -38,13 +35,12 @@ class ChantScreenStateTest {
     }
 
     @Test
-    fun aHeardWordGetsItsHintOnceItsSyllablesClose() {
-        val good = listOf(Vowel.E, Vowel.O, Vowel.I, Vowel.U).map { it.formants() }
-        val s = state(chanting.copy(lit = 5, take = ChantTake(nuclei = good)))
-        assertEquals(WordLook.Heard, s.words[0].look)
-        assertEquals(WordLook.Current, s.words[1].look)
-        val bad = List(4) { Vowel.A.formants() }
-        assertEquals(WordLook.Doubtful, state(chanting.copy(lit = 5, take = ChantTake(nuclei = bad))).words[0].look)
+    fun wordsOfPassedChunksAreHeard() {
+        val long = listOf("DAEMONIUM RESIDENTE,", "OSTENDE MIHI FACIEM TUAM POTENTIAM, VENIT AD ME.", "HIC EST", "UT VOTA")
+        val r = RitualState.start(90f, long, judged = true).copy(phase = RitualPhase.Chanting, azimuth = 90f, phrase = 1, chunk = 1, lit = 8)
+        val s = chantScreenState(r, long, 90f, 90f)
+        assertEquals(List(3) { WordLook.Heard } + WordLook.Current, s.words.take(4).map { it.look })
+        assertEquals(WordLook.Pending, s.words[4].look)
     }
 
     @Test

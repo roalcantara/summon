@@ -248,7 +248,7 @@ private fun RitualContent(
                         simulateHeading = state.simulateHeading,
                         onSimulateHeadingChange = onSimulateHeadingChange,
                         onHoldToChantChange = onHoldToChantChange,
-                        lastScore = state.lastScore,
+                        lastJudged = state.lastJudged,
                         clipLabel = state.clipLabel,
                         onCycleClipLabel = onCycleClipLabel,
                     )

@@ -53,8 +53,8 @@ data class RitualUiState(
     val headingUnavailable: Boolean = false,
     /** The Ritual screen is started; no ticks run otherwise, so the focus clock pauses (§2). */
     val active: Boolean = true,
-    /** The chant check's latest verdict, for the debug readout (ADR-0018). */
-    val lastScore: ChantScore? = null,
+    /** The chant check's latest verdict, for the debug readout (ADR-0022). */
+    val lastJudged: RitualEffect.Judged? = null,
     /** Phrases rejected this attempt; picks the scoff line (ADR-0018). */
     val rejections: Int = 0,
     /** Debug clip recorder label; null = not recording (ADR-0018). */
@@ -172,7 +172,7 @@ class RitualViewModel(
             it.copy(
                 ritual = step.state,
                 micLevel = smoothMicLevel(it.micLevel, voice.rms),
-                lastScore = step.effects.filterIsInstance<RitualEffect.Judged>().lastOrNull()?.score ?: it.lastScore,
+                lastJudged = step.effects.filterIsInstance<RitualEffect.Judged>().lastOrNull() ?: it.lastJudged,
                 rejections = it.rejections + step.effects.count { effect -> effect is RitualEffect.Rejected },
             )
         }
@@ -193,9 +193,9 @@ class RitualViewModel(
      */
     private fun syntheticVoice(ritual: RitualState): VoiceFrame {
         val onset = holdFrames++ % HOLD_TO_CHANT_ONSET_FRAMES == 0
-        val vowels = ritual.vowels?.getOrNull(ritual.phrase).orEmpty()
-        val index = (if (onset) ritual.lit else ritual.lit - 1).coerceIn(0, maxOf(0, vowels.lastIndex))
-        return VoiceFrame(HOLD_TO_CHANT_RMS, voiced = true, onset = onset, formants = vowels.getOrNull(index)?.formants())
+        val slots = ritual.chunks?.getOrNull(ritual.phrase)?.flatMap { it.slots }.orEmpty()
+        val index = (if (onset) ritual.lit else ritual.lit - 1).coerceIn(0, maxOf(0, slots.lastIndex))
+        return VoiceFrame(HOLD_TO_CHANT_RMS, voiced = true, onset = onset, formants = slots.getOrNull(index)?.vowel?.formants())
     }
 
     /** Mic frames → analysed voice; if the mic dies (error or end), flag it and fall back to silence. */

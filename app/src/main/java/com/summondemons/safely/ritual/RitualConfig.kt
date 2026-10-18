@@ -43,24 +43,15 @@ object RitualConfig {
     const val FORMANT_F1_MAX_HZ = 1_200.0
     const val FORMANT_F2_MAX_HZ = 3_400.0
 
-    // Chant plausibility check (ADR-0018)
+    // Chant check (ADR-0018, ADR-0022)
     /** Vocal-tract scales tried per phrase: adult male (1.0) to child (~1.45). */
     val VOWEL_SCALES = listOf(0.9, 1.0, 1.1, 1.2, 1.3, 1.45)
     /** Log-formant distance (natural log units) at which two vowels count as fully different. */
     const val VOWEL_MAX_DISTANCE = 0.8
     const val CHANT_GAP_COST = 0.7
     const val CHANT_UNMEASURED_COST = 0.5
-    const val CHANT_SYLLABLES_PER_PAUSE = 6
-    const val CHANT_PAUSE_PENALTY = 0.25f
-    const val CHANT_FAST_INTERVAL_MS = 170L
-    const val CHANT_RHYTHM_WEIGHT = 0.2f
-    /** A phrase seals only when its [ChantScore.total] reaches this. Calibrated from tester clips. */
-    const val CHANT_PASS_SCORE = 0.6f
     /** After the last syllable lights, its vowel is heard until voicing stops or this elapses. */
     const val SEAL_LISTEN_MS = 300L
-    /** An unvoiced run at least this long inside a phrase counts as a pause (breath). */
-    const val CHANT_PAUSE_MS = 250L
-
     // Chant check v2 (ADR-0022): frame-level alignment and shuffle baseline
     /** A neutral "uh" (adult male); accepted on the unstressed last syllable of longer words. */
     val NEUTRAL_VOWEL = Formants(500.0, 1_500.0)

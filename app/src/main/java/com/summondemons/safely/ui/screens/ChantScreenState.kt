@@ -1,6 +1,5 @@
 package com.summondemons.safely.ui.screens
 
-import com.summondemons.safely.ritual.ChantJudge
 import com.summondemons.safely.ritual.ChantVerdict
 import com.summondemons.safely.ritual.LatinSyllables
 import com.summondemons.safely.ritual.RitualConfig.LOCK_HOLD_MS
@@ -69,7 +68,11 @@ fun chantScreenState(ritual: RitualState, phrases: List<String>, azimuth: Float?
     val words = when {
         ritual.phrase >= PHRASE_COUNT -> text.map { ChantWord(it, it.size, WordLook.Heard) }
         verdict?.kind == ChantVerdict.Kind.Rejected -> text.mapIndexed { i, syllables ->
-            val look = if (verdict.marks.getOrNull(i) == WordMark.Doubtful) WordLook.Rejected else WordLook.Heard
+            val look = when (verdict.marks.getOrNull(i)) {
+                WordMark.Doubtful -> WordLook.Rejected
+                WordMark.Pending -> WordLook.Pending
+                else -> WordLook.Heard
+            }
             ChantWord(syllables, 0, look)
         }
         else -> chantingWords(ritual, phrase, text)
@@ -103,11 +106,9 @@ fun chantScreenState(ritual: RitualState, phrases: List<String>, azimuth: Float?
     )
 }
 
-/** While chanting: lit syllables, the current word, and hints for words already heard. */
+/** While chanting: lit syllables, the current word, and the words of chunks already passed (ADR-0022). */
 private fun chantingWords(ritual: RitualState, phrase: Int, text: List<List<String>>): List<ChantWord> {
-    val marks = ritual.vowels?.let { vowels ->
-        ritual.wordSizes?.let { ChantJudge.wordMarks(vowels[phrase], ritual.take.nuclei, it[phrase]) }
-    }
+    val passedWords = ritual.chunks?.getOrNull(phrase)?.getOrNull(ritual.chunk)?.words?.first ?: 0
     var start = 0
     return text.mapIndexed { i, syllables ->
         val lit = (ritual.lit - start).coerceIn(0, syllables.size)
@@ -115,8 +116,7 @@ private fun chantingWords(ritual: RitualState, phrase: Int, text: List<List<Stri
         start += syllables.size
         val look = when {
             current -> WordLook.Current
-            marks?.getOrNull(i) == WordMark.Heard -> WordLook.Heard
-            marks?.getOrNull(i) == WordMark.Doubtful -> WordLook.Doubtful
+            i < passedWords -> WordLook.Heard
             else -> WordLook.Pending
         }
         ChantWord(syllables, lit, look)
