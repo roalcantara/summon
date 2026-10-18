@@ -65,7 +65,9 @@ cd ../mydemon && npm install && npm run dev   # http://localhost:3000
   `docs/superpowers/plans/2026-10-18-chant-check.md`. Landscape chant screen: ADR-0019,
   plan `docs/superpowers/plans/2026-10-18-chant-screen.md`; it covers the whole Ritual and
   its sigil guides to the direction: ADR-0020, plan
-  `docs/superpowers/plans/2026-10-18-chant-direction.md`.
+  `docs/superpowers/plans/2026-10-18-chant-direction.md`. Intro card before every ritual,
+  "?"/"D" buttons on the slab and the floating debug panel: ADR-0021, plan
+  `docs/superpowers/plans/2026-10-18-chant-intro-and-debug.md`.
 - Packages: `data/` (demons, Houses, Callings), `progress/` (pure progress rules, JSON
   model, court hours, `ProgressStore`), `time/` (`GameClock`, debug settings), `ritual/`,
   `platform/` (Android implementations), `ui/`, `navigation/`.

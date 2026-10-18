@@ -4,7 +4,10 @@
 - Status: Accepted. Amends ADR-0010 (clock length, verdict hold), ADR-0014 (two text
   roles), ADR-0018 (word hints, verdict shown until the next syllable) and the
   "Portrait only" rule in PRODUCT.md. Amended by ADR-0020: the chant screen covers the
-  whole Ritual and its sigil carries the direction marker and the lock fill.
+  whole Ritual and its sigil carries the direction marker and the lock fill. Amended by
+  ADR-0021: the intro card shows before every ritual and replaces the turn-sideways hint,
+  its ✕ starts the chant, "?" moves above the name, and the debug controls move to a
+  floating panel.
 
 ## Context
 Device testing of the chant check (ADR-0018) showed two problems. The scoff appeared in

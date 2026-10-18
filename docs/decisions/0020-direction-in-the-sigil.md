@@ -2,7 +2,8 @@
 
 - Date: 2026-10-18
 - Status: Accepted. Amends ADR-0019 (the chant screen now covers the whole ritual) and
-  supersedes the portrait altar of ADR-0014.
+  supersedes the portrait altar of ADR-0014. Amended by ADR-0021: no verdict text
+  before the lock (only the count), and the intro card shows before every ritual.
 
 ## Context
 Commit `a7f4c27` made the landscape chant screen (ADR-0019) run from the very start of

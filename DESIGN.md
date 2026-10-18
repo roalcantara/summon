@@ -153,7 +153,7 @@ dark palette carries the RPG feel.
 | `RotatingSunburstBackground` | Rays behind the demon during the Grimoire celebration | `color`, `rotating` |
 | `InkedSigil` | The demon's vector sigil | `sigil` (raw), `inkProgress` 0–1, `ringProgress` 0–1, `rimText`, `accent`, `micLevel` (glow), `ghostAlpha`, `flash` (group, color, duration: seal flare / crack drain) |
 | `CueChip` | One-line cue | `text`, `tone` (neutral / safe / error), `shake` |
-| `ChantScreen` | Landscape chant screen (ADR-0019) | `state`, `flash`, `showClose`, `onClose`, `debug`; House-stage backdrop (scrim strongest behind the words), slab (surface-container-low 70 %, `large` shape) with name, `ChantSigil` and the direction line; the phrase (`incantationLarge`) with a line per word: pending outline-variant, current on-surface-variant, heard ritual-safe, doubtful primary 70 %, rejected error wavy + ✕ badge; verdict line (`ritualCue`) with `VoiceMeter`. Portrait (large screens) puts the slab in a top band. |
+| `ChantScreen` | Landscape chant screen (ADR-0019) | `state`, `flash`, `showClose`, `onClose`, `debug`, `onHelp`, `blocker`; House-stage backdrop (scrim strongest behind the words), slab (surface-container-low 70 %, `large` shape) with a row of round buttons (36 dp disc, 48 dp target: "?" outline; "D" dashed outline in debug builds, primary fill while its panel is open; ADR-0021), name, `ChantSigil` and the direction line; the phrase (`incantationLarge`) with a line per word: pending outline-variant, current on-surface-variant, heard ritual-safe, doubtful primary 70 %, rejected error wavy + ✕ badge; verdict line (`ritualCue`) with `VoiceMeter` (only the count before the lock). Portrait (large screens) puts the slab in a top band. |
 | `ChantSigil` | `InkedSigil` (12 % ghost before it inks) inside a ring | Marker triangle between ring and sigil pointing at the demon relative to the phone (ritual-safe when facing, accent otherwise; ADR-0020). Ring: track while seeking, ritual-safe fill with the lock hold, then the focus clock (full on phrase I); colour ritual-safe facing / outline seeking / error drifting; seconds or "Paused" under it |
 | `VoiceMeter` | Five ember bars | `level` (mic level, 0–1), `color`; flat at 22 % when silent; decides nothing |
 | ~~`ChantTablet`~~ | Removed with the portrait altar (ADR-0020) |
@@ -171,6 +171,7 @@ dark palette carries the RPG feel.
 | `DemonCutout` | Cut-out art with accent rim glow | `art`, `accent`, `silhouette` 0–1, `alignment` |
 | `ParticleField` | Embers / smoke / converging climax sparks | `color`, `style`, `count`, `converge` 0–1 |
 | `DebugChip` | Opens the debug sheet (debug builds only) | `onClick` |
+| `DebugControls` | The chant screen's debug panel (debug builds only) | Simulate heading, Hold to Chant and Record clip chips plus the last chant-check score, `labelSmall`; shown in a 300 dp popover (surface-container-lowest, outline-variant border, `medium` shape) under "D", never in the layout (ADR-0021) |
 | `HeatShimmer` | Rising heat haze | `color`; AGSL on API 33+, breathing gradient below |
 | `rememberParallax` | Gyro offset for art layers | max offset; `TYPE_GAME_ROTATION_VECTOR`, none if absent |
 
