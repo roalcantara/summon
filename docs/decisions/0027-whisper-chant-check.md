@@ -18,7 +18,15 @@ re-checks the threshold on logged sessions.
 
 ## Spike
 
-Measured on Android (arm64-v8a, 2 threads):
+Measured on Galaxy S24 (SM-S921B, arm64-v8a, 4 threads):
+
+- Model load: 106 ms
+- Native heap: +678 MB (peak ~698 MB)
+- 3s noise shrink=true: 440 ms (vs 1993 ms shrink=false)
+- 5s noise shrink=true: 565 ms (vs 2015 ms shrink=false)
+- 10s noise shrink=true: 954 ms (vs 2078 ms shrink=false)
+
+Measured on emulator (arm64-v8a, 2 threads):
 
 - Model load: 3137 ms
 - Native heap: +678 MB (peak ~699 MB)
@@ -27,4 +35,4 @@ Measured on Android (arm64-v8a, 2 threads):
 - 10s noise shrink=true: 7.1 s (vs 10.5 s shrink=false)
 - spike.wav (88.54s): transcribed recognisably in Latin with `shrink=true` ("Da emuniung residente ostende mihi facim, toam, potincham..."). Text is identical between `shrink=true` and `shrink=false`.
 
-Decision: Go. `shrinkContext = true` is kept; device check enables lenient mode on slow devices (emulator / low-end) and Whisper on fast hardware.
+Decision: Go. `shrinkContext = true` is kept; device check enables lenient mode on slow devices (emulator / low-end) and Whisper on fast hardware (Galaxy S24 completes a 10 s check in under 1.0 s).
