@@ -103,9 +103,15 @@ data class RitualState(
 
     companion object {
         /** [judged] turns the chant check on (ADR-0018); the app always does, most engine tests don't. */
-        fun start(target: Float, phrases: List<String>, judged: Boolean = false): RitualState = RitualState(
+        fun start(
+            target: Float,
+            phrases: List<String>,
+            judged: Boolean = false,
+            phase: RitualPhase = RitualPhase.Seeking,
+        ): RitualState = RitualState(
             target = target,
             syllables = phrases.map { LatinSyllables.count(it).coerceAtLeast(1) },
+            phase = phase,
             vowels = if (judged) phrases.map(ChantJudge::expectedVowels) else null,
             wordSizes = if (judged) phrases.map(LatinSyllables::wordSizes) else null,
         )

@@ -63,7 +63,7 @@ fun chantScreenState(ritual: RitualState, phrases: List<String>, azimuth: Float?
         verdict?.kind == ChantVerdict.Kind.Rejected -> VerdictLine.ChantAgain
         verdict?.kind == ChantVerdict.Kind.Cracked -> VerdictLine.SealCracked
         verdict?.kind == ChantVerdict.Kind.Sealed -> VerdictLine.Sealed
-        ritual.phase == RitualPhase.Wavering -> VerdictLine.Paused
+        ritual.phase == RitualPhase.Wavering || ritual.phase == RitualPhase.Seeking -> VerdictLine.Paused
         else -> VerdictLine.ChantAloud
     }
     val clock = ritual.phrase in 1 until PHRASE_COUNT
