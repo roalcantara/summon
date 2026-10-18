@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace the portrait chant tablet, from the lock on, with a dedicated **landscape chant screen** that a player can read at mouth distance: the demon's sigil shows progress, direction and the focus clock; the phrase fills the screen; one line says what is happening; words are marked as they are heard and stay marked after a rejection (ADR-0019).
+**Goal:** Replace the portrait chant tablet, from the lock on, with a dedicated **landscape chant screen**, introduced on the first ritual by a "How to chant" card, that a player can read at mouth distance: the demon's sigil shows progress, direction and the focus clock; the phrase fills the screen; one line says what is happening; words are marked as they are heard and stay marked after a rejection (ADR-0019).
 
 **Architecture:** Pure, JVM-tested core first: the heading follows the screen rotation (`azimuthFromRotationMatrix(r, screenRotation)`); `LatinSyllables.wordSizes` and `ChantJudge.wordMarks` give per-word hints; `RitualState.verdict` keeps the last verdict (sealed / rejected with word marks / cracked) until the next syllable and holds the focus clock up to 3 s; the clock becomes 4 s + 0.75 s per syllable; `chantScreenState(...)` maps the ritual to exactly what the screen draws. Then Compose: two text roles, `ChantScreen` (backdrop, slab, `ChantSigil`, phrase with word lines, verdict line, `VoiceMeter`, turn-sideways hint), and `RitualScreen` switches to it from the lock and requests landscape. The activity handles the rotation itself so nothing restarts.
 
-**Tech Stack:** unchanged: AGP 9.4.1 (Kotlin 2.2.10), Compose BOM 2026.09.00 (uses `BasicText(autoSize = TextAutoSize.StepBased(...))` from foundation), JUnit 4. **No new dependency, no new art** (the backdrop reuses `stage_sol` / `stage_venus` through `StageBackground`). Decision record: `docs/decisions/0019-chant-screen.md`; read it first. Approved design: the claude.ai artifact "Chant Screen Prototype", version 6 (ask the product owner for the link if you want to see it; the ADR describes it fully).
+**Tech Stack:** unchanged: AGP 9.4.1 (Kotlin 2.2.10), Compose BOM 2026.09.00 (uses `BasicText(autoSize = TextAutoSize.StepBased(...))` from foundation), JUnit 4. **No new dependency, no new art** (the backdrop reuses `stage_sol` / `stage_venus` through `StageBackground`). Decision record: `docs/decisions/0019-chant-screen.md`; read it first. Approved design: the claude.ai artifact "Chant Screen Prototype", version 9 (ask the product owner for the link if you want to see it; the ADR describes it fully).
 
 **Prerequisite:** `docs/superpowers/plans/2026-10-18-chant-check.md` Tasks 1–9 are on `main` (the chant check, ADR-0018). Its Task 11 (calibration with tester clips) may run before or after this plan; Task 10 below adds two numbers to calibrate.
 
@@ -55,22 +55,26 @@ Expected: `BUILD SUCCESSFUL`. Lint warnings are allowed; lint errors are not.
 
 ## File map
 
-| Path | Action | Responsibility |
-|---|---|---|
-| `docs/decisions/0019-chant-screen.md` | Exists | The decision (already committed) |
-| `PRODUCT.md`, `DESIGN.md`, `AGENTS.md`, `docs/decisions/0010-*.md`, `0014-*.md`, `0018-*.md` | Modify | Canon |
-| `MAIN/ritual/HeadingMath.kt` | Replace | `azimuthFromRotationMatrix(r, screenRotation)` |
-| `MAIN/platform/AndroidHeadingSource.kt` | Modify | Pass the display rotation |
-| `MAIN/ritual/LatinSyllables.kt` | Replace | `wordSizes` |
-| `MAIN/ritual/ChantJudge.kt` | Replace | `WordMark`, `wordMarks` |
-| `MAIN/ritual/RitualConfig.kt`, `RitualState.kt`, `RitualEngine.kt` | Replace | Longer clock, `ChantVerdict`, verdict hold |
-| `MAIN/ui/screens/ChantScreenState.kt` | Create | Pure mapper: ritual → what the chant screen draws |
-| `MAIN/ui/theme/TextRoles.kt`, `app/src/main/res/values/strings.xml` | Modify | `ritualCue`, `incantationLarge`; chant screen copy |
-| `MAIN/ui/screens/ChantScreen.kt` | Create | The landscape chant screen |
-| `MAIN/ui/screens/RitualScreen.kt`, `app/src/main/AndroidManifest.xml` | Modify | Switch to the chant screen, landscape, climax fit, rotation without restart |
-| `TEST/ritual/RotationAzimuthTest.kt`, `LatinSyllablesTest.kt`, `ChantJudgeTest.kt`, `RitualEngineTest.kt` | Modify | New cases; clock numbers |
-| `TEST/ritual/ChantCheckTest.kt` | Replace | Verdict hold replaces "a rejection drains" |
-| `TEST/ui/screens/ChantScreenStateTest.kt` | Create | Mapper tests |
+| Path                                                                                                                       | Action           | Responsibility                                                              |
+| -------------------------------------------------------------------------------------------------------------------------- | ---------------- | --------------------------------------------------------------------------- |
+| `docs/decisions/0019-chant-screen.md`                                                                                      | Exists           | The decision (already committed)                                            |
+| `PRODUCT.md`, `DESIGN.md`, `AGENTS.md`, `docs/decisions/0010-*.md`, `0014-*.md`, `0018-*.md`                               | Modify           | Canon                                                                       |
+| `MAIN/ritual/HeadingMath.kt`                                                                                               | Replace          | `azimuthFromRotationMatrix(r, screenRotation)`                              |
+| `MAIN/platform/AndroidHeadingSource.kt`                                                                                    | Modify           | Pass the display rotation                                                   |
+| `MAIN/ritual/LatinSyllables.kt`                                                                                            | Replace          | `wordSizes`                                                                 |
+| `MAIN/ritual/ChantJudge.kt`                                                                                                | Replace          | `WordMark`, `wordMarks`                                                     |
+| `MAIN/ritual/RitualConfig.kt`, `RitualState.kt`, `RitualEngine.kt`                                                         | Replace          | Longer clock, `ChantVerdict`, verdict hold                                  |
+| `MAIN/ui/screens/ChantScreenState.kt`                                                                                      | Create           | Pure mapper: ritual → what the chant screen draws                           |
+| `MAIN/ui/theme/TextRoles.kt`, `app/src/main/res/values/strings.xml`                                                        | Modify           | `ritualCue`, `incantationLarge`; chant screen copy                          |
+| `MAIN/ui/screens/ChantScreen.kt`                                                                                           | Create           | The landscape chant screen                                                  |
+| `MAIN/ui/screens/RitualScreen.kt`, `app/src/main/AndroidManifest.xml`                                                      | Modify           | Switch to the chant screen, landscape, climax fit, rotation without restart |
+| `TEST/ritual/RotationAzimuthTest.kt`, `LatinSyllablesTest.kt`, `ChantJudgeTest.kt`, `RitualEngineTest.kt`                  | Modify           | New cases; clock numbers                                                    |
+| `TEST/ritual/ChantCheckTest.kt`                                                                                            | Replace          | Verdict hold replaces "a rejection drains"                                  |
+| `TEST/ui/screens/ChantScreenStateTest.kt`                                                                                  | Create           | Mapper tests                                                                |
+| `MAIN/ui/screens/ChantIntro.kt`                                                                                            | Create           | "How to chant" card                                                         |
+| `MAIN/progress/Progress.kt`, `MAIN/ui/GameViewModel.kt`, `MAIN/ritual/RitualViewModel.kt`, `MAIN/navigation/AppNavHost.kt` | Modify           | `chantIntroSeen`, mic ignored while the card is up, "?" reopens it          |
+| `TEST/progress/ProgressJsonTest.kt`, `TEST/ritual/RitualViewModelTest.kt`                                                  | Modify           | Intro flag and mic gate                                                     |
+| `app/src/main/res/drawable-nodpi/chant_intro_singer.webp`, `chant_intro_banner.webp`, `chant_summon_button*.webp`          | Create (Task 10) | Stitch art                                                                  |
 
 ---
 
@@ -180,6 +184,26 @@ with:
 | `ChantSigil` | `InkedSigil` inside a ring | Ring colour = direction (ritual-safe / error), arc = focus clock (full on phrase I), seconds or "Paused" under it |
 | `VoiceMeter` | Five ember bars | `level` (mic level, 0–1), `color`; flat at 22 % when silent; decides nothing |
 | `ChantTablet` | Framed chant panel |
+```
+
+(c) Replace:
+
+```markdown
+All gaps closed. Stage backgrounds (`stage_home`, `stage_sol`, `stage_venus`), Home grimoire (`ic_home_grimoire`), and Asmodeus scene art (`demon_asmodeus_full`) have been processed and integrated into `app/src/main/res/drawable-nodpi/`.
+```
+
+with:
+
+```markdown
+Stage backgrounds (`stage_home`, `stage_sol`, `stage_venus`), Home grimoire (`ic_home_grimoire`), and Asmodeus scene art (`demon_asmodeus_full`) have been processed and integrated into `app/src/main/res/drawable-nodpi/`.
+
+Open gaps (the intro card of the chant screen, ADR-0019). Full specs and prompts: `docs/superpowers/plans/2026-10-18-chant-screen.md`, Task 10.
+
+| Gap                                               | Placeholder                        | Stitch prompt (short)                                                                                 |
+| ------------------------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Intro singer (`chant_intro_singer`)               | The demon's avatar, circle-clipped | A generic cute chibi demon belting into a vintage karaoke microphone, transparent background, no text |
+| Intro banner (`chant_intro_banner`)               | `RibbonBanner`                     | An empty parchment ribbon banner with folded tails, transparent background, no text                   |
+| Summon button (`chant_summon_button`, `_pressed`) | `PrimaryActionButton`              | A glowing plum-enamel stone plaque with a gold rim, transparent background, no text                   |
 ```
 
 - [ ] **Step 4: Edit `docs/decisions/0010-focus-clock.md`**
@@ -1739,6 +1763,7 @@ with:
     <string name="verdict_of">of</string>
     <string name="chant_turn_sideways">Turn your phone sideways</string>
     <string name="chant_keep_mic_clear">Hold it in front of your mouth, and keep the bottom edge clear so the microphone can hear you.</string>
+    <string name="chant_help">How to chant</string>
 
 ```
 
@@ -1900,13 +1925,17 @@ fun ChantScreen(
     /** Debug controls, shown under the verdict (debug builds only). */
     debug: (@Composable () -> Unit)?,
     modifier: Modifier = Modifier,
+    /** Reopens the intro card ("?"); null hides the button. */
+    onHelp: (() -> Unit)? = null,
+    /** False right after the intro card, which already asked to turn sideways. */
+    showTurnHint: Boolean = true,
 ) {
     val demon = state.demon
     val accent = MaterialTheme.demonColors.accent(demon.accent)
     val screen = remember(state.ritual, state.azimuth) {
         chantScreenState(state.ritual, demon.chantPhrases, state.azimuth, demon.ritualHeading)
     }
-    var hint by rememberSaveable { mutableStateOf(true) }
+    var hint by rememberSaveable { mutableStateOf(showTurnHint) }
     LaunchedEffect(Unit) {
         delay(HINT_MS)
         hint = false
@@ -1916,7 +1945,7 @@ fun ChantScreen(
     BoxWithConstraints(modifier) {
         val landscape = maxWidth > maxHeight
         val spacing = MaterialTheme.spacing
-        Backdrop(demon.house.stage(), landscape, Modifier.fillMaxSize())
+        ChantBackdrop(demon.house.stage(), landscape, Modifier.fillMaxSize())
         if (landscape) {
             Row(Modifier.fillMaxSize().safeDrawingPadding().padding(spacing.lg), horizontalArrangement = Arrangement.spacedBy(spacing.lg)) {
                 Slab(state, screen, accent, flash, vertical = true, Modifier.fillMaxHeight().weight(SLAB_WEIGHT))
@@ -1928,22 +1957,34 @@ fun ChantScreen(
                 Words(state, screen, accent, debug, Modifier.fillMaxWidth().weight(1f))
             }
         }
-        if (showClose) {
-            IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).safeDrawingPadding()) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_close),
-                    contentDescription = stringResource(R.string.action_abort),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+        Row(Modifier.align(Alignment.TopEnd).safeDrawingPadding(), verticalAlignment = Alignment.CenterVertically) {
+            if (onHelp != null) {
+                val helpLabel = stringResource(R.string.chant_help)
+                IconButton(onClick = onHelp, modifier = Modifier.semantics { contentDescription = helpLabel }) {
+                    Text(
+                        "?",
+                        style = MaterialTheme.textRoles.ritualCue.copy(fontSize = DirectionSize),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            if (showClose) {
+                IconButton(onClick = onClose) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_close),
+                        contentDescription = stringResource(R.string.action_abort),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
         if (hint) TurnSidewaysHint(accent, Modifier.fillMaxSize())
     }
 }
 
-/** The House stage, darkened most behind the words so the phrase keeps its contrast. */
+/** The House stage, darkened most behind the words so the phrase keeps its contrast (also behind the intro card). */
 @Composable
-private fun Backdrop(stage: Stage, landscape: Boolean, modifier: Modifier) {
+internal fun ChantBackdrop(stage: Stage, landscape: Boolean, modifier: Modifier) {
     val scrim = MaterialTheme.colorScheme.surfaceContainerLowest
     Box(modifier) {
         StageBackground(stage, dim = BACKDROP_DIM, modifier = Modifier.fillMaxSize())
@@ -2525,11 +2566,745 @@ git add app/src/main/java/com/summondemons/safely/ui/screens/RitualScreen.kt app
 git commit -q -m "feat(ui): Chant screen from the lock, in landscape (ADR-0019)" -m "$TRAILER"
 ```
 
+### Task 9: The intro card ("How to chant")
+
+On the first ritual the card comes down from the top at the lock, over the chant screen;
+**Summon** sends it back up and the chant starts listening. A "?" on the chant screen
+reopens it. While it is up the view model feeds silence to the engine (the heading still
+counts). Seen once, `Progress.chantIntroSeen` keeps it from showing automatically again.
+
+**Files:**
+- Create: `MAIN/ui/screens/ChantIntro.kt`
+- Modify: `MAIN/progress/Progress.kt`, `TEST/progress/ProgressJsonTest.kt`, `MAIN/ui/GameViewModel.kt`, `MAIN/ritual/RitualViewModel.kt`, `TEST/ritual/RitualViewModelTest.kt`, `MAIN/ui/screens/RitualScreen.kt`, `MAIN/navigation/AppNavHost.kt`, `app/src/main/res/values/strings.xml`
+
+`ChantScreen.kt` from Task 7 already has the `onHelp` ("?") and `showTurnHint` parameters
+and the shared `ChantBackdrop`; this task only passes them.
+
+- [ ] **Step 1: Edit `app/src/main/java/com/summondemons/safely/progress/Progress.kt`**
+
+Replace:
+
+```kotlin
+    val homeHintSeen: Boolean = false,
+
+```
+
+with:
+
+```kotlin
+    val homeHintSeen: Boolean = false,
+    /** The chant screen's "How to chant" card was dismissed once (ADR-0019). */
+    val chantIntroSeen: Boolean = false,
+
+```
+
+- [ ] **Step 2: Edit `app/src/test/java/com/summondemons/safely/progress/ProgressJsonTest.kt`**
+
+(a) Replace:
+
+```kotlin
+        homeHintSeen = true,
+        lastViewed = "astaroth",
+    )
+```
+
+with:
+
+```kotlin
+        homeHintSeen = true,
+        chantIntroSeen = true,
+        lastViewed = "astaroth",
+    )
+```
+
+(b) Replace:
+
+```kotlin
+    @Test
+    fun aMissingRecordIsTheDefault() {
+```
+
+with:
+
+```kotlin
+    @Test
+    fun olderSavesHaveNotSeenTheChantIntro() {
+        assertEquals(false, ProgressJson.decode("""{"homeHintSeen":true}""").chantIntroSeen)
+    }
+
+    @Test
+    fun aMissingRecordIsTheDefault() {
+```
+
+- [ ] **Step 3: Edit `app/src/main/java/com/summondemons/safely/ui/GameViewModel.kt`**
+
+Replace:
+
+```kotlin
+        update { it.copy(homeHintSeen = true) }
+    }
+
+```
+
+with:
+
+```kotlin
+        update { it.copy(homeHintSeen = true) }
+    }
+
+    /** The chant screen's intro card was dismissed: show it automatically only once (ADR-0019). */
+    fun markChantIntroSeen() = update { it.copy(chantIntroSeen = true) }
+
+```
+
+- [ ] **Step 4: Edit `app/src/main/java/com/summondemons/safely/ritual/RitualViewModel.kt`**
+
+(a) Replace:
+
+```kotlin
+    /** Debug clip recorder label; null = not recording (ADR-0018). */
+    val clipLabel: ClipLabel? = null,
+)
+```
+
+with:
+
+```kotlin
+    /** Debug clip recorder label; null = not recording (ADR-0018). */
+    val clipLabel: ClipLabel? = null,
+    /** The intro card is on screen; the microphone is ignored meanwhile (ADR-0019). */
+    val introVisible: Boolean = false,
+    /** The card was shown automatically this ritual, so the chant screen skips its turn-sideways hint. */
+    val introOffered: Boolean = false,
+)
+```
+
+(b) Replace:
+
+```kotlin
+    /** Debug builds record tester clips here; release builds pass [ClipRecorder.None] (ADR-0018). */
+    private val clipRecorder: ClipRecorder = ClipRecorder.None,
+    private val analysisDispatcher
+```
+
+with:
+
+```kotlin
+    /** Debug builds record tester clips here; release builds pass [ClipRecorder.None] (ADR-0018). */
+    private val clipRecorder: ClipRecorder = ClipRecorder.None,
+    /** Show the intro card from the lock: the player's first ritual (ADR-0019). */
+    private val showIntro: Boolean = false,
+    /** Called once, the first time the player dismisses the intro card. */
+    private val onIntroSeen: () -> Unit = {},
+    private val analysisDispatcher
+```
+
+(c) Replace:
+
+```kotlin
+            headingUnavailable = !headingSource.available,
+        ),
+    )
+```
+
+with:
+
+```kotlin
+            headingUnavailable = !headingSource.available,
+            introVisible = showIntro,
+            introOffered = showIntro,
+        ),
+    )
+```
+
+(d) Replace:
+
+```kotlin
+    /** Debug: Off → Chant → Nonsense → Off. Each label starts a new clip (ADR-0018). */
+```
+
+with:
+
+```kotlin
+    private var introSeenReported = false
+
+    /** **Summon** on the intro card: the chant starts listening (ADR-0019). */
+    fun dismissIntro() {
+        if (!state.value.introVisible) return
+        state.update { it.copy(introVisible = false) }
+        if (!introSeenReported) {
+            introSeenReported = true
+            onIntroSeen()
+        }
+    }
+
+    /** "?" on the chant screen: show the intro card again. */
+    fun openIntro() = state.update { it.copy(introVisible = true) }
+
+    /** Debug: Off → Chant → Nonsense → Off. Each label starts a new clip (ADR-0018). */
+```
+
+(e) Replace:
+
+```kotlin
+        val voice = if (current.holdToChant) syntheticVoice(current.ritual) else micFrame
+```
+
+with:
+
+```kotlin
+        val voice = when {
+            current.introVisible -> VoiceFrame.SILENT // nothing counts while the rules are up
+            current.holdToChant -> syntheticVoice(current.ritual)
+            else -> micFrame
+        }
+```
+
+(f) Replace:
+
+```kotlin
+            clipRecorder: ClipRecorder = ClipRecorder.None,
+        ): ViewModelProvider.Factory = viewModelFactory {
+            initializer { RitualViewModel(demon, headingSource, pcmSource, inCourt, commitSummon, clipRecorder) }
+```
+
+with:
+
+```kotlin
+            clipRecorder: ClipRecorder = ClipRecorder.None,
+            showIntro: Boolean = false,
+            onIntroSeen: () -> Unit = {},
+        ): ViewModelProvider.Factory = viewModelFactory {
+            initializer { RitualViewModel(demon, headingSource, pcmSource, inCourt, commitSummon, clipRecorder, showIntro, onIntroSeen) }
+```
+
+- [ ] **Step 5: Edit `app/src/test/java/com/summondemons/safely/ritual/RitualViewModelTest.kt`**
+
+Replace:
+
+```kotlin
+    private class FakeRecorder : ClipRecorder {
+```
+
+with:
+
+```kotlin
+    @Test
+    fun theIntroCardMutesTheMicUntilSummon() = runTest(dispatcher) {
+        var seen = 0
+        val vm = RitualViewModel(
+            demon, { emptyFlow() }, chantingPcm(),
+            showIntro = true, onIntroSeen = { seen++ }, analysisDispatcher = dispatcher,
+        )
+        observe(vm)
+        vm.onMicPermission(true)
+        vm.setSimulateHeading(true)
+        advanceTimeBy(2_000); runCurrent()
+        assertEquals(RitualPhase.Chanting, vm.uiState.value.ritual.phase) // the lock still happens
+        assertEquals(0, vm.uiState.value.ritual.lit)
+        assertTrue(vm.uiState.value.introVisible)
+        assertTrue(vm.uiState.value.introOffered)
+
+        vm.dismissIntro()
+        advanceTimeBy(2_000); runCurrent()
+        assertTrue("lit=${vm.uiState.value.ritual.lit}", vm.uiState.value.ritual.lit >= 4)
+
+        vm.openIntro()
+        assertTrue(vm.uiState.value.introVisible)
+        vm.dismissIntro()
+        assertEquals(1, seen) // reported once
+    }
+
+    private class FakeRecorder : ClipRecorder {
+```
+
+- [ ] **Step 6: Edit `app/src/main/java/com/summondemons/safely/ui/screens/RitualScreen.kt`**
+
+(a) Replace:
+
+```kotlin
+import androidx.compose.animation.core.RepeatMode
+
+```
+
+with:
+
+```kotlin
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.core.RepeatMode
+
+```
+
+(b) Replace:
+
+```kotlin
+        onCycleClipLabel = viewModel::cycleClipLabel,
+        onAbort = onAbort,
+```
+
+with:
+
+```kotlin
+        onCycleClipLabel = viewModel::cycleClipLabel,
+        onDismissIntro = viewModel::dismissIntro,
+        onShowIntro = viewModel::openIntro,
+        onAbort = onAbort,
+```
+
+(c) Replace:
+
+```kotlin
+    onCycleClipLabel: () -> Unit,
+    onAbort: () -> Unit,
+```
+
+with:
+
+```kotlin
+    onCycleClipLabel: () -> Unit,
+    onDismissIntro: () -> Unit,
+    onShowIntro: () -> Unit,
+    onAbort: () -> Unit,
+```
+
+(d) Replace:
+
+```kotlin
+                onClose = requestClose,
+                debug = if
+```
+
+with:
+
+```kotlin
+                onClose = requestClose,
+                onHelp = onShowIntro,
+                showTurnHint = !state.introOffered,
+                debug = if
+```
+
+(e) Replace:
+
+```kotlin
+                modifier = Modifier.fillMaxSize().graphicsLayer { alpha = chromeAlpha },
+            )
+        } else {
+```
+
+with:
+
+```kotlin
+                modifier = Modifier.fillMaxSize().graphicsLayer { alpha = chromeAlpha },
+            )
+            // The intro card comes down over the chant screen and goes back up to reveal it (ADR-0019).
+            AnimatedVisibility(
+                visible = state.introVisible && !inClimax,
+                enter = if (reduceMotion) fadeIn(tween(INTRO_MS)) else slideInVertically(tween(INTRO_MS)) { -it } + fadeIn(tween(INTRO_MS)),
+                exit = if (reduceMotion) fadeOut(tween(INTRO_MS)) else slideOutVertically(tween(INTRO_MS)) { -it } + fadeOut(tween(INTRO_MS)),
+            ) {
+                ChantIntro(demon = demon, onSummon = onDismissIntro, showClose = true, onClose = requestClose, modifier = Modifier.fillMaxSize())
+            }
+        } else {
+```
+
+(f) Replace:
+
+```kotlin
+private const val REJECT_MS = 1_500
+
+```
+
+with:
+
+```kotlin
+private const val REJECT_MS = 1_500
+private const val INTRO_MS = 500
+
+```
+
+- [ ] **Step 7: Edit `app/src/main/java/com/summondemons/safely/navigation/AppNavHost.kt`**
+
+Replace:
+
+```kotlin
+            clipRecorder = ClipRecorders.create(appContext),
+        )
+```
+
+with:
+
+```kotlin
+            clipRecorder = ClipRecorders.create(appContext),
+            showIntro = !state.progress.chantIntroSeen,
+            onIntroSeen = game::markChantIntroSeen,
+        )
+```
+
+- [ ] **Step 8: Edit `app/src/main/res/values/strings.xml`**
+
+Replace:
+
+```xml
+    <string name="chant_help">How to chant</string>
+
+```
+
+with:
+
+```xml
+    <string name="chant_help">How to chant</string>
+    <string name="intro_title">How to chant</string>
+    <string name="intro_direction_title">Direction</string>
+    <string name="intro_direction_body">Turn until the symbol turns green.</string>
+    <string name="intro_chant_title">Chant</string>
+    <string name="intro_chant_body">Read each line aloud, following the glowing syllables.</string>
+    <string name="intro_lines_title">Lines</string>
+    <string name="intro_lines_body">Green: heard. Red: say it again.</string>
+    <string name="intro_seal_title">Seal</string>
+    <string name="intro_seal_body">Seal all four lines to summon the demon.</string>
+    <string name="intro_summon">Summon</string>
+
+```
+
+- [ ] **Step 9: Create the card**
+
+`app/src/main/java/com/summondemons/safely/ui/screens/ChantIntro.kt` (not compiled; same
+caveat as Task 7):
+
+```kotlin
+package com.summondemons.safely.ui.screens
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.summondemons.safely.R
+import com.summondemons.safely.data.Demon
+import com.summondemons.safely.ui.components.PrimaryActionButton
+import com.summondemons.safely.ui.components.ROMAN_NUMERALS
+import com.summondemons.safely.ui.components.RibbonBanner
+import com.summondemons.safely.ui.theme.demonColors
+import com.summondemons.safely.ui.theme.spacing
+import com.summondemons.safely.ui.theme.stage
+import com.summondemons.safely.ui.theme.textRoles
+import com.summondemons.safely.ui.theme.upper
+
+private const val INTRO_SLAB_WEIGHT = 0.25f
+private const val INTRO_SLAB_ALPHA = 0.7f
+private const val ART_FRACTION = 0.8f
+private val RuleTitleSize = 18.sp
+private val RuleBodySize = 16.sp
+private val NumeralSize = 11.sp
+private val RuleIcon = 40.dp
+private val BandHeight = 112.dp
+
+/**
+ * The intro card (ADR-0019): shown at the lock on the first ritual, and from the chant
+ * screen's "?". Mirrors the chant screen: art where the sigil goes, the rules where the
+ * words go. Generic: nothing in it names a demon or a direction. The microphone is ignored
+ * while it is up (RitualViewModel); **Summon** starts the chant.
+ *
+ * Placeholders until the Stitch art lands (DESIGN.md "Gaps"): the demon's avatar for the
+ * singer, `RibbonBanner` for the banner, `PrimaryActionButton` for the button.
+ */
+@Composable
+fun ChantIntro(
+    demon: Demon,
+    onSummon: () -> Unit,
+    showClose: Boolean,
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val accent = MaterialTheme.demonColors.accent(demon.accent)
+    val spacing = MaterialTheme.spacing
+    BoxWithConstraints(modifier) {
+        val landscape = maxWidth > maxHeight
+        ChantBackdrop(demon.house.stage(), landscape, Modifier.fillMaxSize())
+        if (landscape) {
+            Row(Modifier.fillMaxSize().safeDrawingPadding().padding(spacing.lg), horizontalArrangement = Arrangement.spacedBy(spacing.lg)) {
+                ArtSlab(demon, Modifier.fillMaxHeight().weight(INTRO_SLAB_WEIGHT))
+                Rules(accent, onSummon, Modifier.fillMaxHeight().weight(1f - INTRO_SLAB_WEIGHT))
+            }
+        } else {
+            Column(Modifier.fillMaxSize().safeDrawingPadding().padding(spacing.lg), verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
+                ArtSlab(demon, Modifier.fillMaxWidth().height(BandHeight))
+                Rules(accent, onSummon, Modifier.fillMaxWidth().weight(1f))
+            }
+        }
+        if (showClose) {
+            IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).safeDrawingPadding()) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_close),
+                    contentDescription = stringResource(R.string.action_abort),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ArtSlab(demon: Demon, modifier: Modifier) {
+    val colors = MaterialTheme.colorScheme
+    Surface(modifier, shape = MaterialTheme.shapes.large, color = colors.surfaceContainerLow.copy(alpha = INTRO_SLAB_ALPHA)) {
+        BoxWithConstraints(contentAlignment = Alignment.Center) {
+            // Placeholder: the demon's avatar, circle-clipped. Swap for R.drawable.chant_intro_singer
+            // (no clip, ContentScale.Fit) when the Stitch art lands.
+            Image(
+                painter = painterResource(demon.avatarArt),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(ART_FRACTION).aspectRatio(1f).clip(CircleShape),
+            )
+        }
+    }
+}
+
+@Composable
+private fun Rules(accent: Color, onSummon: () -> Unit, modifier: Modifier) {
+    val spacing = MaterialTheme.spacing
+    Column(modifier.padding(horizontal = spacing.sm), verticalArrangement = Arrangement.spacedBy(spacing.md, Alignment.CenterVertically)) {
+        RibbonBanner(stringResource(R.string.intro_title).upper(), Modifier.semantics { heading() })
+        Rule(R.string.intro_direction_title, R.string.intro_direction_body) { CheckIcon() }
+        Rule(R.string.intro_chant_title, R.string.intro_chant_body) { VoiceMeter(0.8f, accent, Modifier.size(RuleIcon, RuleIcon * 0.7f)) }
+        Rule(R.string.intro_lines_title, R.string.intro_lines_body) { LinesIcon() }
+        Rule(R.string.intro_seal_title, R.string.intro_seal_body) {
+            Text(
+                ROMAN_NUMERALS.joinToString(" "),
+                style = MaterialTheme.textRoles.name.copy(fontSize = NumeralSize),
+                color = accent,
+                maxLines = 1,
+            )
+        }
+        PrimaryActionButton(stringResource(R.string.intro_summon).upper(), onClick = onSummon)
+    }
+}
+
+/** One rule: an icon that matches the chant screen, a short title, a one-line description. */
+@Composable
+private fun Rule(title: Int, body: Int, icon: @Composable () -> Unit) {
+    val colors = MaterialTheme.colorScheme
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md)) {
+        BoxWithConstraints(Modifier.size(RuleIcon), contentAlignment = Alignment.Center) { icon() }
+        Column {
+            Text(
+                stringResource(title).upper(),
+                style = MaterialTheme.textRoles.ritualCue.copy(fontSize = RuleTitleSize),
+                color = colors.onSurface,
+            )
+            Text(
+                stringResource(body),
+                style = MaterialTheme.textRoles.body.copy(fontSize = RuleBodySize),
+                color = colors.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CheckIcon() {
+    val safe = MaterialTheme.demonColors.ritualSafe
+    Canvas(Modifier.size(RuleIcon * 0.8f)) {
+        val w = size.minDimension * 0.08f
+        drawCircle(safe, radius = size.minDimension / 2f - w, style = Stroke(w))
+        val path = Path().apply {
+            moveTo(size.width * 0.3f, size.height * 0.52f)
+            lineTo(size.width * 0.45f, size.height * 0.66f)
+            lineTo(size.width * 0.72f, size.height * 0.36f)
+        }
+        drawPath(path, safe, style = Stroke(w, cap = StrokeCap.Round))
+    }
+}
+
+@Composable
+private fun LinesIcon() {
+    val safe = MaterialTheme.demonColors.ritualSafe
+    val error = MaterialTheme.colorScheme.error
+    Canvas(Modifier.size(RuleIcon, RuleIcon * 0.7f)) {
+        val w = size.height * 0.12f
+        drawLine(safe, Offset(0f, size.height * 0.3f), Offset(size.width * 0.42f, size.height * 0.3f), w, StrokeCap.Round)
+        val path = Path().apply {
+            val y = size.height * 0.72f
+            moveTo(size.width * 0.55f, y)
+            var x = size.width * 0.55f
+            var up = true
+            val step = size.width * 0.11f
+            while (x < size.width) {
+                val next = minOf(x + step, size.width)
+                quadraticTo((x + next) / 2f, if (up) y - w * 1.5f else y + w * 1.5f, next, y)
+                x = next
+                up = !up
+            }
+        }
+        drawPath(path, error, style = Stroke(w * 0.8f, cap = StrokeCap.Round))
+    }
+}
+```
+
+- [ ] **Step 10: Run the tests**
+
+Run: `./gradlew testDebugUnitTest --tests '*ProgressJsonTest*' --tests '*RitualViewModelTest*'`
+Expected: all pass, including `olderSavesHaveNotSeenTheChantIntro` and
+`theIntroCardMutesTheMicUntilSummon`. Existing view-model tests don't pass `showIntro`, so
+they run without the card.
+
+- [ ] **Step 11: Gate, then commit**
+
+Run the verification gate. Expected: `BUILD SUCCESSFUL`.
+
+```bash
+git add app/src/main/java/com/summondemons/safely app/src/test/java/com/summondemons/safely app/src/main/res/values/strings.xml
+git commit -q -m "feat(ui): How-to-chant intro card on the first ritual (ADR-0019)" -m "$TRAILER"
+```
+
+### Task 10: Stitch art for the intro card
+
+Three assets replace the card's placeholders. Generate them with Stitch (the repo's art
+flow, DESIGN.md "Gaps"), review them with the product owner, then integrate. The card
+already works without them, so this task can land any time after Task 9.
+
+**Common rules for all three:** cute stylised 2D fantasy RPG art matching the app's chibi
+demon avatars and stage backgrounds (clean outlines, soft shading, warm gold glow on deep
+navy/plum); transparent background (WebP with alpha); **no text, letters, numbers or
+logos baked in** (labels are drawn in code so they can be translated); delivered as
+lossless or quality ≥ 90 WebP in `app/src/main/res/drawable-nodpi/`; list each in
+DESIGN.md's asset catalog (source, size, alpha) and remove its row from "Gaps".
+
+**1. Singing demon: `chant_intro_singer.webp`**
+
+| Spec           | Value                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| Canvas         | 1024 × 1024, alpha; figure centred with ≥ 8 % padding                                     |
+| Subject        | A **generic** chibi demon: not Asmodeus or Astaroth (no crown, no dragon, no serpent)     |
+| Pose           | Facing right (towards the rules), singing into a karaoke microphone, eyes closed with joy |
+| Size on screen | 120–220 dp wide on the slab; must read at 96 dp in the portrait band                      |
+| File size      | ≤ 200 KB                                                                                  |
+
+Stitch prompt:
+
+```text
+Square game asset on a transparent background, 1024x1024: a cute comedic chibi demon,
+full body, centred with generous padding, facing slightly to the right. Small curved
+horns, round head, big closed happy eyes, tiny bat wings, short pointed tail with a
+heart-shaped tip, plum-violet skin with a lighter belly. It belts out a song into a
+vintage silver karaoke microphone held in one clawed hand, mouth wide open, the other arm
+raised dramatically. A few golden music notes and small amber embers float around it.
+Warm imperial-gold rim light (#ffc174), deep navy and plum shadows. Clean outlines, soft
+cel shading, cute stylised 2D fantasy RPG art like a mobile game character avatar. No
+background, no floor, no text, no letters, no logo.
+```
+
+Integration: in `ChantIntro.kt` `ArtSlab`, replace the avatar `Image` with
+`painterResource(R.drawable.chant_intro_singer)`, `ContentScale.Fit`, no `clip`, and
+`Modifier.fillMaxSize(ART_FRACTION)`.
+
+**2. Banner: `chant_intro_banner.webp`**
+
+| Spec      | Value                                                                                                                               |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Canvas    | 1200 × 300, alpha                                                                                                                   |
+| Shape     | Horizontal parchment ribbon; folded tails inside the outer 15 % on each side; flat, even centre (≈ 70 % of the width) for the title |
+| Stretch   | The centre must tolerate horizontal scaling (draw it at a fixed height, width to fit the title + 2 × tail)                          |
+| Title     | Drawn in code over the centre: "HOW TO CHANT", Cinzel Bold (`name` role), colour `#3a2400`                                          |
+| File size | ≤ 120 KB                                                                                                                            |
+
+Stitch prompt:
+
+```text
+Wide game UI asset on a transparent background, 1200x300: an empty horizontal parchment
+ribbon banner with folded tails on both ends, aged cream-to-gold parchment with a soft
+vertical gradient from pale cream (#ffe7b0) to warm amber (#d99a3c), a thin dark bronze
+outline, small brass rivets at the folds, a subtle drop shadow beneath. The centre is
+flat and evenly lit, empty, for a title to be added later. Cute stylised 2D fantasy RPG
+game UI art. No text, no letters, no symbols, no background.
+```
+
+Integration: replace `RibbonBanner(...)` in `ChantIntro.kt` `Rules` with a `Box` whose
+background is `painterResource(R.drawable.chant_intro_banner)` (`ContentScale.FillBounds`,
+height 56 dp) holding the title `Text` (`name` role, 24 sp, `#3a2400` via a theme-safe
+constant in that file), padded so the text stays inside the flat centre.
+
+**3. SUMMON button: `chant_summon_button.webp` and `chant_summon_button_pressed.webp`**
+
+| Spec      | Value                                                                                                  |
+| --------- | ------------------------------------------------------------------------------------------------------ |
+| Canvas    | 800 × 240 each, alpha                                                                                  |
+| Shape     | Rounded-rectangle stone plaque; raised gold rim with four small corner studs; empty face for the label |
+| Pressed   | Same art, face 10 % darker, glow halved, rim 2 px lower (shifted)                                      |
+| Label     | Drawn in code: "SUMMON", Cinzel Bold, 20 sp, `ink-highlight` with a soft accent glow                   |
+| Touch     | Rendered at ≥ 56 dp tall (min touch 48 dp); content description = the label                            |
+| File size | ≤ 120 KB each                                                                                          |
+
+Stitch prompt (generate the normal state, then ask for the pressed variant of the same image):
+
+```text
+Game UI button asset on a transparent background, 800x240: a rounded rectangular magic
+stone plaque button. Deep plum-violet enamel face with a gentle top-lit gradient
+(#5a3d7a to #2a1c45), a faint glowing gold summoning-circle pattern etched into the face,
+inside a raised polished imperial-gold rim (#ffc174) with four small round studs at the
+corners, a soft magical gold outer glow. The face is empty in the middle for a label.
+Cute stylised 2D fantasy RPG game UI art. No text, no letters, no symbols, no background.
+```
+
+Integration: replace `PrimaryActionButton(...)` in `ChantIntro.kt` with a clickable `Box`
+(`Modifier.clickable(interactionSource, indication = null, role = Role.Button)`) that
+draws the normal or pressed image from `collectIsPressedAsState()`, with the label `Text`
+centred on it.
+
+- [ ] **Step 1: Generate and review** the three assets with the prompts above; get the
+  product owner's approval.
+- [ ] **Step 2: Add the files** to `app/src/main/res/drawable-nodpi/`.
+- [ ] **Step 3: Integrate** as described under each asset.
+- [ ] **Step 4: DESIGN.md:** add the assets to the asset catalog and remove their rows
+  from "Gaps".
+- [ ] **Step 5: Gate, then commit**
+
+```bash
+git add app/src/main/res/drawable-nodpi app/src/main/java/com/summondemons/safely/ui/screens/ChantIntro.kt DESIGN.md
+git commit -q -m "feat(art): Intro card singer, banner and Summon button (ADR-0019)" -m "$TRAILER"
+```
+
 ---
 
 ## Phase 4 — Device check and calibration
 
-### Task 9: Device checklist
+### Task 11: Device checklist
 
 Install with `./gradlew installDebug`, on a phone, and with glasses if you wear them:
 
@@ -2563,11 +3338,16 @@ Install with `./gradlew installDebug`, on a phone, and with glasses if you wear 
     verdict line is announced when it changes.
 13. **Large screen or foldable** (or an emulator ≥ 600 dp): if the app stays portrait, the
     slab becomes a top band and everything still fits.
-14. `./gradlew installRelease`: no debug controls under the verdict.
+14. **Intro card** (fresh install, or debug sheet → Reset all): at the lock the card
+    slides down from the top over the chant screen; talking while it is up lights nothing;
+    **Summon** slides it up and the chant listens; the turn-sideways hint does not show
+    after it. "?" on the chant screen brings it back; with reduced motion it fades.
+    A second ritual doesn't show it automatically, even after restarting the app.
+15. `./gradlew installRelease`: no debug controls under the verdict.
 
-Fix anything that fails before Task 10.
+Fix anything that fails before Task 12.
 
-### Task 10: Calibrate the two new numbers
+### Task 12: Calibrate the two new numbers
 
 Run with the tester clips of `2026-10-18-chant-check.md` Task 11 (same consent rules, same
 `ChantClipReplayTest`). Two first guesses from ADR-0019 need checking on real voices:
@@ -2603,19 +3383,21 @@ git commit -q -m "tune(ritual): Calibrate word hints and the verdict hold (ADR-0
 
 ## Spec coverage
 
-| ADR-0019 item | Task |
-|---|---|
-| Dedicated screen from the lock; portrait altar before it | 8 |
-| Landscape, rotation without restart, portrait fallback, turn-sideways hint | 7, 8 |
-| Heading follows the screen rotation | 2 |
-| Slab: name, sigil (progress, direction ring, clock arc), direction line | 5, 7 |
-| Phrase auto-sized, syllable dots, current word larger, word lines | 5, 7 |
-| Verdict line with numeral and voice meter | 5, 7 |
-| Word hints (never decide) | 3, 5 |
-| Verdicts stay until the next syllable; 3 s clock hold; rejection never refills | 4 |
-| Longer clock (4 s + 0.75 s per syllable) | 4 |
-| Text roles `ritualCue`, `incantationLarge` | 6 |
-| House-stage backdrop with scrim strongest behind the words | 7 |
-| Climax fits landscape | 8 |
-| Canon: PRODUCT.md, DESIGN.md, ADR-0010/0014/0018 status lines, AGENTS.md | 1 |
-| Calibration of the word-hint distance and the hold | 10 |
+| ADR-0019 item                                                                             | Task |
+| ----------------------------------------------------------------------------------------- | ---- |
+| Dedicated screen from the lock; portrait altar before it                                  | 8    |
+| Landscape, rotation without restart, portrait fallback, turn-sideways hint                | 7, 8 |
+| Heading follows the screen rotation                                                       | 2    |
+| Slab: name, sigil (progress, direction ring, clock arc), direction line                   | 5, 7 |
+| Phrase auto-sized, syllable dots, current word larger, word lines                         | 5, 7 |
+| Verdict line with numeral and voice meter                                                 | 5, 7 |
+| Word hints (never decide)                                                                 | 3, 5 |
+| Verdicts stay until the next syllable; 3 s clock hold; rejection never refills            | 4    |
+| Longer clock (4 s + 0.75 s per syllable)                                                  | 4    |
+| Text roles `ritualCue`, `incantationLarge`                                                | 6    |
+| House-stage backdrop with scrim strongest behind the words                                | 7    |
+| Climax fits landscape                                                                     | 8    |
+| Canon: PRODUCT.md, DESIGN.md (incl. art gaps), ADR-0010/0014/0018 status lines, AGENTS.md | 1    |
+| Calibration of the word-hint distance and the hold                                        | 12   |
+| Intro card: first ritual, slide down / up, mic ignored, "?" reopens, `chantIntroSeen`     | 9    |
+| Intro card art: singer, banner, SUMMON button (Stitch prompts and specs)                  | 10   |
