@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -44,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
-import com.summondemons.safely.ui.components.ROMAN_NUMERALS
 import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.stage
@@ -61,7 +61,6 @@ private val SummonButtonHeight = 56.dp
 private val SummonLabelSize = 20.sp
 private val RuleTitleSize = 18.sp
 private val RuleBodySize = 16.sp
-private val NumeralSize = 11.sp
 private val RuleIcon = 40.dp
 private val BandHeight = 112.dp
 
@@ -150,16 +149,9 @@ private fun Rules(accent: Color, onSummon: () -> Unit, modifier: Modifier) {
             )
         }
         Rule(R.string.intro_direction_title, R.string.intro_direction_body) { CheckIcon() }
-        Rule(R.string.intro_chant_title, R.string.intro_chant_body) { VoiceMeter(0.8f, accent, Modifier.size(RuleIcon, RuleIcon * 0.7f)) }
+        Rule(R.string.intro_chant_title, R.string.intro_chant_body) { SealsIcon(accent) }
         Rule(R.string.intro_lines_title, R.string.intro_lines_body) { LinesIcon() }
-        Rule(R.string.intro_seal_title, R.string.intro_seal_body) {
-            Text(
-                ROMAN_NUMERALS.joinToString(" "),
-                style = MaterialTheme.textRoles.name.copy(fontSize = NumeralSize),
-                color = accent,
-                maxLines = 1,
-            )
-        }
+        Rule(R.string.intro_focus_title, R.string.intro_focus_body) { FocusIcon(accent) }
         SummonButton(onClick = onSummon)
     }
 }
@@ -259,5 +251,37 @@ private fun LinesIcon() {
             }
         }
         drawPath(path, error, style = Stroke(w * 0.8f, cap = StrokeCap.Round))
+    }
+}
+
+/** Four small seals, the first lit and the second under way: "a finished line lights its seal". */
+@Composable
+private fun SealsIcon(accent: Color) {
+    val dim = MaterialTheme.colorScheme.outlineVariant
+    Canvas(Modifier.size(RuleIcon, RuleIcon * 0.7f)) {
+        val r = size.width / 9f
+        repeat(4) { k ->
+            val c = Offset(r + k * (size.width - 2f * r) / 3f, size.height / 2f)
+            when (k) {
+                0 -> drawCircle(accent, r, c)
+                1 -> drawCircle(accent, r, c, style = Stroke(r * 0.3f))
+                else -> drawCircle(dim, r, c, style = Stroke(r * 0.3f))
+            }
+        }
+    }
+}
+
+/** The focus ring, three quarters left. */
+@Composable
+private fun FocusIcon(accent: Color) {
+    val track = MaterialTheme.colorScheme.surfaceContainerHighest
+    Canvas(Modifier.size(RuleIcon * 0.8f)) {
+        val w = size.minDimension * 0.12f
+        drawCircle(track, size.minDimension / 2f - w / 2f, style = Stroke(w))
+        drawArc(
+            accent, startAngle = -90f, sweepAngle = 270f, useCenter = false,
+            topLeft = Offset(w / 2f, w / 2f), size = Size(size.width - w, size.height - w),
+            style = Stroke(w, cap = StrokeCap.Round),
+        )
     }
 }
