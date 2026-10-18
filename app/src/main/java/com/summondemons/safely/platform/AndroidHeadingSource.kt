@@ -6,9 +6,11 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.hardware.display.DisplayManager
+import android.os.SystemClock
 import android.view.Display
 import com.summondemons.safely.ritual.AzimuthSmoother
 import com.summondemons.safely.ritual.HeadingSource
+import com.summondemons.safely.ritual.RotationGrace
 import com.summondemons.safely.ritual.azimuthFromRotationMatrix
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -46,12 +48,15 @@ class AndroidHeadingSource(context: Context) : HeadingSource {
         val magnetometer = manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
         val smoother = AzimuthSmoother()
+        val grace = RotationGrace()
         val rotationMatrix = FloatArray(9)
         var gravity: FloatArray? = null
         var geomagnetic: FloatArray? = null
 
         fun emitFromMatrix() {
-            trySend(smoother.next(azimuthFromRotationMatrix(rotationMatrix, screenRotation())))
+            val rotation = screenRotation()
+            val azimuth = smoother.next(azimuthFromRotationMatrix(rotationMatrix, rotation))
+            trySend(grace.next(SystemClock.elapsedRealtime(), rotation, azimuth))
         }
 
         val listener = object : SensorEventListener {

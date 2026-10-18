@@ -85,4 +85,14 @@ class HeadingMathTest {
         assertEquals("N", headingLetter(350f))
         assertEquals("SW", headingLetter(-135f))
     }
+
+    @Test
+    fun aRotationChangeHoldsTheLastHeadingForTheGrace() {
+        val grace = RotationGrace(graceMs = 1_000L)
+        assertEquals(90f, grace.next(0L, 0, 90f), 0f)
+        assertEquals(90f, grace.next(100L, 1, 270f), 0f) // rotated: the 180° jump is held back
+        assertEquals(90f, grace.next(1_050L, 1, 268f), 0f)
+        assertEquals(92f, grace.next(1_150L, 1, 92f), 0f) // grace over: live again
+        assertEquals(93f, grace.next(1_200L, 1, 93f), 0f)
+    }
 }

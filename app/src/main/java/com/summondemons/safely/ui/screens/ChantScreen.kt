@@ -113,7 +113,6 @@ private const val BACKDROP_DIM = 0.55f
 private const val WORDS_SCRIM_ALPHA = 0.85f
 private const val METER_TWEEN_MS = 120
 private const val METER_FLOOR = 0.22f
-private const val SYLLABLE_DOT = "·"
 private const val ROUND_BUTTON_ALPHA = 0.8f
 private val METER_HEIGHTS = listOf(0.45f, 0.8f, 1f, 0.7f, 0.4f)
 private val NameSize = 24.sp
@@ -424,7 +423,6 @@ private fun Phrase(words: List<ChantWord>, accent: Color, modifier: Modifier) {
             val start = length
             val sized = if (word.look == WordLook.Current) pushStyle(SpanStyle(fontSize = CURRENT_WORD_SCALE.em)) else null
             word.syllables.forEachIndexed { si, syllable ->
-                if (si > 0) withStyle(SpanStyle(color = colors.outlineVariant)) { append(SYLLABLE_DOT) }
                 val color = when {
                     word.look == WordLook.Rejected -> colors.error
                     word.look == WordLook.Heard || word.look == WordLook.Doubtful -> accent

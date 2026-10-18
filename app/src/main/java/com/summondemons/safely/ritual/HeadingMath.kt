@@ -63,6 +63,26 @@ fun azimuthFromRotationMatrix(r: FloatArray, screenRotation: Int = 0): Float {
     return normalizeDegrees(Math.toDegrees(atan2(east.toDouble(), north.toDouble())).toFloat())
 }
 
+/**
+ * Holds the last heading for [graceMs] after the display rotation changes (ADR-0025). While the
+ * phone is being turned to landscape the rotation reading lags the sensors, and the screen-top
+ * axis can point the wrong way for a moment, which used to flip the turn arrow after the lock.
+ */
+class RotationGrace(private val graceMs: Long = RitualConfig.ROTATION_GRACE_MS) {
+    private var rotation: Int? = null
+    private var changedAt = Long.MIN_VALUE / 2
+    private var last: Float? = null
+
+    fun next(nowMs: Long, rotation: Int, azimuth: Float): Float {
+        if (this.rotation != null && rotation != this.rotation) changedAt = nowMs
+        this.rotation = rotation
+        val held = last
+        if (held != null && nowMs - changedAt < graceMs) return held
+        last = azimuth
+        return azimuth
+    }
+}
+
 /** Exponential low-pass on the unit vector so 359° → 0° doesn't swing through 180°. */
 class AzimuthSmoother(private val alpha: Float = 0.15f) {
     private var sinAcc = 0f

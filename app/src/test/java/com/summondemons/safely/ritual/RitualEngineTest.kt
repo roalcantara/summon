@@ -3,7 +3,6 @@ package com.summondemons.safely.ritual
 import com.summondemons.safely.ritual.RitualConfig.CLIMAX_MS
 import com.summondemons.safely.ritual.RitualConfig.COURT_BONUS
 import com.summondemons.safely.ritual.RitualConfig.FOCUS_DRIFT_MULTIPLIER
-import com.summondemons.safely.ritual.RitualConfig.FOCUS_IDLE_GRACE_MS
 import com.summondemons.safely.ritual.RitualConfig.FRAME_MS
 import com.summondemons.safely.ritual.RitualConfig.LOCK_HOLD_MS
 import com.summondemons.safely.ritual.RitualConfig.ONSET_REFRACTORY_MS
@@ -240,20 +239,13 @@ class RitualEngineTest {
     }
 
     @Test
-    fun silenceDrainsOnlyAfterTheIdleGraceAndOffHeadingDrainsThreeTimes() {
+    fun drainsOnceOnHeadingAndThreeTimesOffHeading() {
         val sealed = firstSealed()
-        val grace = (FOCUS_IDLE_GRACE_MS / FRAME_MS).toInt()
-        assertEquals(sealed.focusMs, run(sealed, grace).state.focusMs)
-        assertEquals(10 * FRAME_MS, sealed.focusMs - run(sealed, grace + 10).state.focusMs)
+        assertEquals(10 * FRAME_MS, sealed.focusMs - run(sealed, 10).state.focusMs)
         val offHeading = run(sealed, 10, azimuth = off).state
         assertEquals(10 * FRAME_MS * FOCUS_DRIFT_MULTIPLIER, sealed.focusMs - offHeading.focusMs)
     }
 
-    @Test
-    fun voicingNeverDrains() {
-        val sealed = firstSealed()
-        assertEquals(sealed.focusMs, run(sealed, 15, voice = voiced).state.focusMs)
-    }
 
     @Test
     fun syllablesDoNotCountOffHeadingAndResumingNeedsNoReLock() {
@@ -286,7 +278,7 @@ class RitualEngineTest {
     fun runningOutCracksTheLastSealClearsThePhraseAndEndsFlawless() {
         val s = chant(firstSealed(), 2).state
         assertEquals(2, s.lit)
-        val step = run(s, (FOCUS_IDLE_GRACE_MS / FRAME_MS).toInt() + ceil(s.focusMs.toDouble() / FRAME_MS).toInt() + 1)
+        val step = run(s, ceil(s.focusMs.toDouble() / FRAME_MS).toInt() + 1)
         assertTrue(Cracked(0) in step.effects)
         assertEquals(0, step.state.phrase)
         assertEquals(0, step.state.lit)
@@ -323,9 +315,9 @@ class RitualEngineTest {
     }
 
     @Test
-    fun budgetsAreAFlatEightSecondsScaledInCourt() {
-        assertEquals(8_000L, focusBudget(1))
-        assertEquals(10_000L, focusBudget(1, 1.25f))
+    fun budgetsAreAFlatMinuteScaledInCourt() {
+        assertEquals(60_000L, focusBudget(1))
+        assertEquals(75_000L, focusBudget(1, 1.25f))
         assertEquals(0L, focusBudget(0))
     }
 

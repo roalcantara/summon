@@ -3,9 +3,6 @@ package com.summondemons.safely.ritual
 import com.summondemons.safely.ritual.RitualConfig.CLIMAX_MS
 import com.summondemons.safely.ritual.RitualConfig.COURT_BONUS
 import com.summondemons.safely.ritual.RitualConfig.FOCUS_DRIFT_MULTIPLIER
-import com.summondemons.safely.ritual.RitualConfig.FOCUS_IDLE_GRACE_MS
-import com.summondemons.safely.ritual.RitualConfig.FOCUS_REJECT_COST
-import kotlin.math.roundToLong
 import com.summondemons.safely.ritual.RitualConfig.FRAME_MS
 import com.summondemons.safely.ritual.RitualConfig.LOCK_HOLD_MS
 import com.summondemons.safely.ritual.RitualConfig.ONSET_REFRACTORY_MS
@@ -75,11 +72,10 @@ object RitualEngine {
         if (s.phase == RitualPhase.Wavering) effects += RitualEffect.Resumed
         val since = s.sinceSyllableMs + FRAME_MS
         val run = if (voice.voiced) s.voicedRunMs + FRAME_MS else 0L
-        val quiet = if (voice.voiced) 0L else s.quietMs + FRAME_MS
-        val chanting = s.copy(phase = RitualPhase.Chanting, sinceSyllableMs = since, voicedRunMs = run, quietMs = quiet)
+        val chanting = s.copy(phase = RitualPhase.Chanting, sinceSyllableMs = since, voicedRunMs = run)
         if (s.take.closing) return close(chanting, voice, effects)
         val lights = voice.voiced && ((voice.onset && since >= ONSET_REFRACTORY_MS) || run >= SUSTAIN_SYLLABLE_MS)
-        if (!lights) return drain(chanting.hearing { hear(voice, begun = s.lit > s.chunkStart()) }, idle(chanting), effects)
+        if (!lights) return drain(chanting.hearing { hear(voice, begun = s.lit > s.chunkStart()) }, 1, effects)
 
         effects += RitualEffect.SyllableLit
         val lit = s.lit + 1
@@ -88,14 +84,14 @@ object RitualEngine {
         val reset = chanting.copy(sinceSyllableMs = 0L, voicedRunMs = 0L, lit = lit, verdict = null)
             .hearing { light(voice, first = s.lit == s.chunkStart(), last = last) }
         // With the chant check on, the last syllable's vowel is heard before the verdict (ADR-0018).
-        if (!last || reset.take.closing) return drain(reset, idle(reset), effects)
+        if (!last || reset.take.closing) return drain(reset, 1, effects)
         return seal(reset, effects)
     }
 
     /** Hears the end of the chunk's last syllable, then judges it (ADR-0022). */
     private fun close(s: RitualState, voice: VoiceFrame, effects: MutableList<RitualEffect>): Step {
         val take = s.take.hear(voice, begun = true)
-        if (voice.voiced && take.closingMs < SEAL_LISTEN_MS) return drain(s.copy(take = take), idle(s), effects)
+        if (voice.voiced && take.closingMs < SEAL_LISTEN_MS) return drain(s.copy(take = take), 1, effects)
         val chunk = s.currentChunk()!!
         val verdict = ChantAligner.judge(chunk.slots, take.frames, chunk.text)
         effects += RitualEffect.Judged(s.phrase, s.chunk, verdict)
@@ -103,15 +99,15 @@ object RitualEngine {
         if (verdict.passed) {
             if (s.chunk < s.chunks!![s.phrase].lastIndex) {
                 effects += RitualEffect.ChunkPassed(s.phrase, s.chunk)
-                return drain(s.copy(chunk = s.chunk + 1, take = ChantTake()), idle(s), effects)
+                // Getting a part right refills the timer (ADR-0025).
+                return Step(s.copy(chunk = s.chunk + 1, take = ChantTake(), focusMs = s.focusBudgetMs), effects)
             }
             return seal(s.copy(take = ChantTake(), verdict = ChantVerdict(ChantVerdict.Kind.Sealed, s.phrase, marks)), effects)
         }
         effects += RitualEffect.Rejected(s.phrase, s.chunk)
         val rejected = s.copy(lit = chunk.syllables.first, take = ChantTake(), verdict = ChantVerdict(ChantVerdict.Kind.Rejected, s.phrase, marks))
-        if (s.phrase < 1) return Step(rejected, effects)
-        val focus = rejected.focusMs - (rejected.focusBudgetMs * FOCUS_REJECT_COST).roundToLong()
-        return if (focus > 0L) Step(rejected.copy(focusMs = focus), effects) else crack(rejected, effects)
+        // A rejection costs nothing but the time it took (ADR-0025).
+        return Step(rejected, effects)
     }
 
     /** Words before the chunk were heard; the chunk's own come from the verdict; later ones are pending. */
@@ -129,9 +125,6 @@ object RitualEngine {
     private fun RitualState.chunkStart(): Int = currentChunk()?.syllables?.first ?: 0
 
     private fun RitualState.chunkEnd(): Int = currentChunk()?.let { it.syllables.last + 1 } ?: syllables[phrase]
-
-    /** Focus drains 1× only after FOCUS_IDLE_GRACE_MS of silence; chanting and short pauses cost nothing (ADR-0023). */
-    private fun idle(s: RitualState): Int = if (s.quietMs > FOCUS_IDLE_GRACE_MS) 1 else 0
 
     /** Seals the current phrase: the next one starts with a full clock, or the 4th starts the climax. */
     private fun seal(s: RitualState, effects: MutableList<RitualEffect>): Step {
@@ -151,7 +144,7 @@ object RitualEngine {
         if (chunks == null) this else copy(take = take.update())
     /**
      * Drains the focus meter by [multiplier] frames (phrases II–IV only); at 0 the last seal cracks. While a fresh
-     * verdict is on screen the meter waits instead (ADR-0019, ADR-0023).
+     * verdict is on screen the meter waits instead (ADR-0019, ADR-0025).
      */
     private fun drain(s: RitualState, multiplier: Int, effects: MutableList<RitualEffect>): Step {
         if (s.phrase < 1) return Step(s, effects)
@@ -171,7 +164,7 @@ object RitualEngine {
         return Step(
             s.copy(
                 phrase = phrase, lit = 0, chunk = 0, focusMs = budget, focusBudgetMs = budget,
-                flawless = false, take = ChantTake(), verdict = cracked, quietMs = 0L,
+                flawless = false, take = ChantTake(), verdict = cracked,
             ),
             effects,
         )
