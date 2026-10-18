@@ -19,8 +19,8 @@ enum class WordLook { Pending, Current, Heard, Doubtful, Rejected }
 /** One word: its syllables (trailing punctuation on the last), how many are lit, and its look. */
 data class ChantWord(val syllables: List<String>, val lit: Int, val look: WordLook)
 
-/** The one line under the words (ADR-0019); before the lock it guides to the direction (ADR-0020). */
-enum class VerdictLine { FindDirection, HoldSteady, ChantAloud, Paused, Sealed, ChantAgain, SealCracked }
+/** The one line under the words (ADR-0019). Before the lock it is only the count; the sigil guides (ADR-0021). */
+enum class VerdictLine { Count, ChantAloud, Paused, Sealed, ChantAgain, SealCracked }
 
 /** What the sigil's outer ring shows (ADR-0020): the track while seeking, the hold while locking, then the focus clock. */
 enum class RingMode { Seeking, Locking, Clock }
@@ -78,8 +78,7 @@ fun chantScreenState(ritual: RitualState, phrases: List<String>, azimuth: Float?
         verdict?.kind == ChantVerdict.Kind.Rejected -> VerdictLine.ChantAgain
         verdict?.kind == ChantVerdict.Kind.Cracked -> VerdictLine.SealCracked
         verdict?.kind == ChantVerdict.Kind.Sealed -> VerdictLine.Sealed
-        ritual.phase == RitualPhase.Seeking -> VerdictLine.FindDirection
-        ritual.phase == RitualPhase.Locking -> VerdictLine.HoldSteady
+        ritual.phase == RitualPhase.Seeking || ritual.phase == RitualPhase.Locking -> VerdictLine.Count
         ritual.phase == RitualPhase.Wavering -> VerdictLine.Paused
         else -> VerdictLine.ChantAloud
     }

@@ -478,27 +478,24 @@ private fun DrawScope.drawWave(from: Float, to: Float, y: Float, amplitude: Floa
     drawPath(path, color, style = Stroke(width, cap = StrokeCap.Round))
 }
 
-/** "CHANT ALOUD · I of IV" and its siblings, with the voice meter while listening. */
+/** "CHANT ALOUD · I of IV" and its siblings, with the voice meter while listening; only "I of IV" before the lock. */
 @Composable
 private fun VerdictLine(screen: ChantScreenState, accent: Color, micLevel: Float) {
     val colors = MaterialTheme.colorScheme
     val safe = MaterialTheme.demonColors.ritualSafe
     val color = when (screen.verdict) {
-        VerdictLine.Sealed, VerdictLine.HoldSteady -> safe
+        VerdictLine.Sealed -> safe
         VerdictLine.ChantAgain, VerdictLine.SealCracked -> colors.error
-        VerdictLine.ChantAloud, VerdictLine.Paused, VerdictLine.FindDirection -> colors.outline
+        VerdictLine.ChantAloud, VerdictLine.Paused, VerdictLine.Count -> colors.outline
     }
-    val label = stringResource(
-        when (screen.verdict) {
-            VerdictLine.FindDirection -> R.string.verdict_find_direction
-            VerdictLine.HoldSteady -> R.string.verdict_hold_steady
-            VerdictLine.ChantAloud -> R.string.verdict_chant_aloud
-            VerdictLine.Paused -> R.string.verdict_paused
-            VerdictLine.Sealed -> R.string.verdict_sealed
-            VerdictLine.ChantAgain -> R.string.verdict_chant_again
-            VerdictLine.SealCracked -> R.string.verdict_seal_cracked
-        },
-    ).upper()
+    val label = when (screen.verdict) {
+        VerdictLine.Count -> null
+        VerdictLine.ChantAloud -> R.string.verdict_chant_aloud
+        VerdictLine.Paused -> R.string.verdict_paused
+        VerdictLine.Sealed -> R.string.verdict_sealed
+        VerdictLine.ChantAgain -> R.string.verdict_chant_again
+        VerdictLine.SealCracked -> R.string.verdict_seal_cracked
+    }?.let { stringResource(it).upper() }
     val of = stringResource(R.string.verdict_of).upper()
     val style = MaterialTheme.textRoles.ritualCue.copy(fontSize = VerdictSize)
     val nameFamily = MaterialTheme.textRoles.name.fontFamily
@@ -516,7 +513,7 @@ private fun VerdictLine(screen: ChantScreenState, accent: Color, micLevel: Float
             val listening = screen.verdict == VerdictLine.ChantAloud
             VoiceMeter(if (listening) micLevel else 0f, if (listening) accent else colors.outline, Modifier.size(MeterWidth, MeterHeight))
         }
-        Text(label, style = style, color = color, maxLines = 1)
+        if (label != null) Text(label, style = style, color = color, maxLines = 1)
         when (screen.verdict) {
             VerdictLine.Sealed -> Text("✓", style = style, color = color)
             VerdictLine.ChantAgain, VerdictLine.SealCracked -> Text("✕", style = style, color = color)

@@ -101,9 +101,10 @@ class ChantScreenStateTest {
     private val seeking = RitualState.start(90f, phrases, judged = true)
 
     @Test
-    fun beforeTheLockTheLineGuidesToTheDirection() {
+    fun beforeTheLockTheLineIsOnlyTheCount() {
         val s = state(seeking.copy(azimuth = 0f), azimuth = 0f)
-        assertEquals(VerdictLine.FindDirection, s.verdict)
+        assertEquals(VerdictLine.Count, s.verdict)
+        assertEquals(0, s.numeral)
         assertEquals(RingMode.Seeking, s.ring)
         assertFalse(s.facing)
         assertFalse("not an error before the lock", s.drifting)
@@ -119,11 +120,11 @@ class ChantScreenStateTest {
     }
 
     @Test
-    fun lockingFillsTheRingAndAsksToHoldSteady() {
+    fun lockingFillsTheRingAndShowsOnlyTheCount() {
         val s = state(seeking.copy(phase = RitualPhase.Locking, azimuth = 90f, lockMs = 300L))
         assertEquals(RingMode.Locking, s.ring)
         assertEquals(0.5f, s.lockFraction, 0.001f)
-        assertEquals(VerdictLine.HoldSteady, s.verdict)
+        assertEquals(VerdictLine.Count, s.verdict)
     }
 
     @Test
