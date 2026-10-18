@@ -1,13 +1,13 @@
 package com.summondemons.safely.ui.components
 
-import androidx.compose.material3.AssistChip
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -29,9 +29,13 @@ import com.summondemons.safely.ritual.ClipLabel
 import com.summondemons.safely.ui.theme.PillShape
 import com.summondemons.safely.ui.theme.spacing
 
-private val MinTouchHeight = 48.dp
+/** As tall as a chip, so "Hold to Chant" lines up with its neighbours. */
+private val ChipHeight = 32.dp
 
-/** Debug builds only (caller checks BuildConfig.DEBUG). */
+/**
+ * The chant screen's debug panel, as small chips (ADR-0021). Debug builds only (caller
+ * checks BuildConfig.DEBUG); shown in the floating panel under "D", never in the layout.
+ */
 @Composable
 fun DebugControls(
     simulateHeading: Boolean,
@@ -44,96 +48,84 @@ fun DebugControls(
     onCycleClipLabel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs)) {
-        ChantControls(simulateHeading, onSimulateHeadingChange, onHoldToChantChange)
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+    val colors = MaterialTheme.colorScheme
+    val small = MaterialTheme.typography.labelSmall
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs)) {
+        Text(stringResource(R.string.debug_controls), style = small, color = colors.outline)
+        Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs), verticalAlignment = Alignment.CenterVertically) {
             FilterChip(
-                selected = clipLabel != null,
-                onClick = onCycleClipLabel,
-                label = {
-                    Text(
-                        stringResource(
-                            when (clipLabel) {
-                                null -> R.string.debug_clip_off
-                                ClipLabel.Chant -> R.string.debug_clip_chant
-                                ClipLabel.Nonsense -> R.string.debug_clip_nonsense
-                            },
-                        ),
-                    )
-                },
+                selected = simulateHeading,
+                onClick = { onSimulateHeadingChange(!simulateHeading) },
+                label = { Text(stringResource(R.string.debug_simulate_heading), style = small) },
             )
-            Text(
-                if (lastScore == null) {
-                    stringResource(R.string.debug_chant_score_none)
-                } else {
-                    stringResource(
-                        R.string.debug_chant_score,
-                        lastScore.total,
-                        if (lastScore.passed) "✓" else "✗",
-                        lastScore.vowels,
-                        lastScore.rhythm,
-                    )
-                },
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f),
-            )
+            HoldToChantChip(onHoldToChantChange)
         }
+        FilterChip(
+            selected = clipLabel != null,
+            onClick = onCycleClipLabel,
+            label = {
+                Text(
+                    stringResource(
+                        when (clipLabel) {
+                            null -> R.string.debug_clip_off
+                            ClipLabel.Chant -> R.string.debug_clip_chant
+                            ClipLabel.Nonsense -> R.string.debug_clip_nonsense
+                        },
+                    ),
+                    style = small,
+                )
+            },
+        )
+        Text(
+            if (lastScore == null) {
+                stringResource(R.string.debug_chant_score_none)
+            } else {
+                stringResource(
+                    R.string.debug_chant_score,
+                    lastScore.total,
+                    if (lastScore.passed) "✓" else "✗",
+                    lastScore.vowels,
+                    lastScore.rhythm,
+                )
+            },
+            style = small,
+            color = colors.onSurfaceVariant,
+        )
     }
 }
 
+/** Sounds the expected vowels while pressed (ADR-0018). */
 @Composable
-private fun ChantControls(
-    simulateHeading: Boolean,
-    onSimulateHeadingChange: (Boolean) -> Unit,
-    onHoldToChantChange: (Boolean) -> Unit,
-) {
+private fun HoldToChantChip(onHoldToChantChange: (Boolean) -> Unit) {
     val colors = MaterialTheme.colorScheme
     val onHold by rememberUpdatedState(onHoldToChantChange)
     var holding by remember { mutableStateOf(false) }
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        FilterChip(
-            selected = simulateHeading,
-            onClick = { onSimulateHeadingChange(!simulateHeading) },
-            label = { Text(stringResource(R.string.debug_simulate_heading)) },
-            modifier = Modifier.weight(1f),
-        )
-        Surface(
-            shape = PillShape,
-            color = if (holding) colors.secondaryContainer else colors.surfaceContainerHigh,
-            contentColor = if (holding) colors.onSecondaryContainer else colors.onSurfaceVariant,
-            modifier = Modifier
-                .weight(1f)
-                .heightIn(min = MinTouchHeight)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onPress = {
-                            holding = true
-                            onHold(true)
-                            try {
-                                awaitRelease()
-                            } finally {
-                                holding = false
-                                onHold(false)
-                            }
-                        },
-                    )
-                },
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Text(
-                    stringResource(if (holding) R.string.debug_chanting else R.string.debug_hold_to_chant),
-                    style = MaterialTheme.typography.labelMedium,
+    Surface(
+        shape = PillShape,
+        color = if (holding) colors.secondaryContainer else colors.surfaceContainerHigh,
+        contentColor = if (holding) colors.onSecondaryContainer else colors.onSurfaceVariant,
+        modifier = Modifier
+            .heightIn(min = ChipHeight)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        holding = true
+                        onHold(true)
+                        try {
+                            awaitRelease()
+                        } finally {
+                            holding = false
+                            onHold(false)
+                        }
+                    },
                 )
-            }
+            },
+    ) {
+        Box(Modifier.padding(horizontal = MaterialTheme.spacing.md), contentAlignment = Alignment.Center) {
+            Text(
+                stringResource(if (holding) R.string.debug_chanting else R.string.debug_hold_to_chant),
+                style = MaterialTheme.typography.labelSmall,
+            )
         }
     }
 }

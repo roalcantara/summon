@@ -16,6 +16,7 @@
     <string name="debug_clip_nonsense">Recording · nonsense</string>
     <string name="debug_chant_score">Chant check %1$.2f %2$s · vowels %3$.2f · rhythm %4$.2f</string>
     <string name="debug_chant_score_none">Chant check · no verdict yet</string>
+    <string name="debug_controls">Debug controls</string>
 
     <string name="heading_unavailable">This device can\'t sense direction, so the ritual can\'t begin.</string>
 

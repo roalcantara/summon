@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
@@ -33,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,11 +46,13 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -59,9 +64,16 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupPositionProvider
+import androidx.compose.ui.window.PopupProperties
 import com.summondemons.safely.R
 import com.summondemons.safely.ritual.RitualUiState
 import com.summondemons.safely.ritual.TurnDirection
@@ -102,6 +114,7 @@ private const val WORDS_SCRIM_ALPHA = 0.85f
 private const val METER_TWEEN_MS = 120
 private const val METER_FLOOR = 0.22f
 private const val SYLLABLE_DOT = "·"
+private const val ROUND_BUTTON_ALPHA = 0.8f
 private val METER_HEIGHTS = listOf(0.45f, 0.8f, 1f, 0.7f, 0.4f)
 private val NameSize = 24.sp
 private val DirectionSize = 18.sp
@@ -112,6 +125,13 @@ private val MeterHeight = 22.dp
 private val MinPhraseSize = 18.sp
 private val MaxPhraseSize = 96.sp
 private val PhraseStep = 2.sp
+private val RoundButtonSize = 36.dp
+private val RoundButtonBorder = 1.5.dp
+private val RoundButtonText = 16.sp
+private val Dash = 4.dp
+private val DashGap = 3.dp
+private val DebugPanelWidth = 300.dp
+private val DebugPanelBorder = 1.dp
 
 /**
  * The chant screen (ADR-0019, ADR-0020): for the whole Ritual, the demon's name, sigil
@@ -125,10 +145,10 @@ fun ChantScreen(
     flash: SigilFlash?,
     showClose: Boolean,
     onClose: () -> Unit,
-    /** Debug controls, shown under the verdict (debug builds only). */
+    /** Debug controls, in a floating panel the "D" button opens (debug builds only; ADR-0021). */
     debug: (@Composable () -> Unit)?,
     modifier: Modifier = Modifier,
-    /** Reopens the intro card ("?"); null hides the button. */
+    /** Reopens the intro card ("?" above the demon's name); null hides the button. */
     onHelp: (() -> Unit)? = null,
     /** Shown instead of the phrase when the ritual can't hear or can't sense direction (ADR-0020). */
     blocker: (@Composable () -> Unit)? = null,
@@ -145,34 +165,22 @@ fun ChantScreen(
         ChantBackdrop(demon.house.stage(), landscape, Modifier.fillMaxSize())
         if (landscape) {
             Row(Modifier.fillMaxSize().safeDrawingPadding().padding(spacing.lg), horizontalArrangement = Arrangement.spacedBy(spacing.lg)) {
-                Slab(state, screen, accent, flash, vertical = true, Modifier.fillMaxHeight().weight(SLAB_WEIGHT))
-                Words(state, screen, accent, debug, blocker, Modifier.fillMaxHeight().weight(1f - SLAB_WEIGHT))
+                Slab(state, screen, accent, flash, onHelp, debug, vertical = true, Modifier.fillMaxHeight().weight(SLAB_WEIGHT))
+                Words(state, screen, accent, blocker, Modifier.fillMaxHeight().weight(1f - SLAB_WEIGHT))
             }
         } else {
             Column(Modifier.fillMaxSize().safeDrawingPadding().padding(spacing.lg), verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
-                Slab(state, screen, accent, flash, vertical = false, Modifier.fillMaxWidth())
-                Words(state, screen, accent, debug, blocker, Modifier.fillMaxWidth().weight(1f))
+                Slab(state, screen, accent, flash, onHelp, debug, vertical = false, Modifier.fillMaxWidth())
+                Words(state, screen, accent, blocker, Modifier.fillMaxWidth().weight(1f))
             }
         }
-        Row(Modifier.align(Alignment.TopEnd).safeDrawingPadding(), verticalAlignment = Alignment.CenterVertically) {
-            if (onHelp != null) {
-                val helpLabel = stringResource(R.string.chant_help)
-                IconButton(onClick = onHelp, modifier = Modifier.semantics { contentDescription = helpLabel }) {
-                    Text(
-                        "?",
-                        style = MaterialTheme.textRoles.ritualCue.copy(fontSize = DirectionSize),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-            if (showClose) {
-                IconButton(onClick = onClose) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_close),
-                        contentDescription = stringResource(R.string.action_abort),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+        if (showClose) {
+            IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).safeDrawingPadding()) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_close),
+                    contentDescription = stringResource(R.string.action_abort),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
     }
@@ -201,6 +209,8 @@ private fun Slab(
     screen: ChantScreenState,
     accent: Color,
     flash: SigilFlash?,
+    onHelp: (() -> Unit)?,
+    debug: (@Composable () -> Unit)?,
     vertical: Boolean,
     modifier: Modifier,
 ) {
@@ -225,6 +235,7 @@ private fun Slab(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(spacing.sm, Alignment.CenterVertically),
             ) {
+                SlabButtons(onHelp, debug)
                 Text(state.demon.name, style = MaterialTheme.textRoles.name.copy(fontSize = NameSize), color = accent, maxLines = 1)
                 ChantSigil(
                     state, screen, accent, ringColor, flash,
@@ -238,11 +249,89 @@ private fun Slab(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(spacing.md),
             ) {
+                SlabButtons(onHelp, debug)
                 ChantSigil(state, screen, accent, ringColor, flash, Modifier.size(BandSigil))
                 DirectionCue(screen, state.demon.ritualHeading, lineColor)
             }
         }
     }
+}
+
+/**
+ * "?" (the intro card) and, in debug builds, "D" (the debug panel), centred above the
+ * demon's name (ADR-0021). The panel floats under them, so opening it moves nothing; a tap
+ * outside or back closes it.
+ */
+@Composable
+private fun SlabButtons(onHelp: (() -> Unit)?, debug: (@Composable () -> Unit)?) {
+    if (onHelp == null && debug == null) return
+    var debugOpen by rememberSaveable { mutableStateOf(false) }
+    val colors = MaterialTheme.colorScheme
+    val spacing = MaterialTheme.spacing
+    val gap = with(LocalDensity.current) { spacing.xs.roundToPx() }
+    Box {
+        Row(horizontalArrangement = Arrangement.spacedBy(spacing.xs)) {
+            if (onHelp != null) RoundButton("?", stringResource(R.string.chant_help), onHelp)
+            if (debug != null) {
+                RoundButton("D", stringResource(R.string.debug_controls), { debugOpen = !debugOpen }, dashed = true, selected = debugOpen)
+            }
+        }
+        if (debug != null && debugOpen) {
+            Popup(
+                popupPositionProvider = remember(gap) { BelowAnchor(gap) },
+                onDismissRequest = { debugOpen = false },
+                properties = PopupProperties(focusable = true),
+            ) {
+                Surface(
+                    shape = MaterialTheme.shapes.medium,
+                    color = colors.surfaceContainerLowest,
+                    border = BorderStroke(DebugPanelBorder, colors.outlineVariant),
+                    modifier = Modifier.width(DebugPanelWidth),
+                ) {
+                    Box(Modifier.padding(spacing.sm)) { debug() }
+                }
+            }
+        }
+    }
+}
+
+/** A small round button on the slab: solid outline, or dashed for debug only; filled while [selected]. */
+@Composable
+private fun RoundButton(label: String, description: String, onClick: () -> Unit, dashed: Boolean = false, selected: Boolean = false) {
+    val colors = MaterialTheme.colorScheme
+    val fill = if (selected) colors.primary else colors.surfaceContainerHighest.copy(alpha = ROUND_BUTTON_ALPHA)
+    val edge = if (selected) colors.primary else colors.outline
+    val ink = when {
+        selected -> colors.onPrimary
+        dashed -> colors.outline
+        else -> colors.onSurface
+    }
+    IconButton(onClick = onClick, modifier = Modifier.semantics { contentDescription = description }) {
+        Box(
+            Modifier.size(RoundButtonSize).drawBehind {
+                val width = RoundButtonBorder.toPx()
+                val dashes = if (dashed) PathEffect.dashPathEffect(floatArrayOf(Dash.toPx(), DashGap.toPx())) else null
+                drawCircle(fill)
+                drawCircle(edge, radius = (size.minDimension - width) / 2f, style = Stroke(width, pathEffect = dashes))
+            },
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(label, style = MaterialTheme.textRoles.ritualCue.copy(fontSize = RoundButtonText), color = ink)
+        }
+    }
+}
+
+/** Puts the debug panel under the buttons, left edges aligned, kept inside the window. */
+private class BelowAnchor(private val gap: Int) : PopupPositionProvider {
+    override fun calculatePosition(
+        anchorBounds: IntRect,
+        windowSize: IntSize,
+        layoutDirection: LayoutDirection,
+        popupContentSize: IntSize,
+    ): IntOffset = IntOffset(
+        anchorBounds.left.coerceIn(0, maxOf(0, windowSize.width - popupContentSize.width)),
+        (anchorBounds.bottom + gap).coerceIn(0, maxOf(0, windowSize.height - popupContentSize.height)),
+    )
 }
 
 /**
@@ -348,7 +437,6 @@ private fun Words(
     state: RitualUiState,
     screen: ChantScreenState,
     accent: Color,
-    debug: (@Composable () -> Unit)?,
     blocker: (@Composable () -> Unit)?,
     modifier: Modifier,
 ) {
@@ -363,7 +451,6 @@ private fun Words(
             Phrase(screen.words, accent, Modifier.fillMaxWidth().weight(1f))
             VerdictLine(screen, accent, state.micLevel)
         }
-        debug?.invoke()
     }
 }
 
