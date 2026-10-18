@@ -97,6 +97,8 @@ private fun ChantControls(
     var holding by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         FilterChip(
             selected = simulateHeading,
