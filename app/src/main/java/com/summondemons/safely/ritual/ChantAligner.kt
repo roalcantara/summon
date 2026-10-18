@@ -1,13 +1,23 @@
 package com.summondemons.safely.ritual
 
 import com.summondemons.safely.ritual.RitualConfig.ALIGN_FRAME_SKIP_COST
+import com.summondemons.safely.ritual.RitualConfig.ALIGN_MAX_COST
 import com.summondemons.safely.ritual.RitualConfig.ALIGN_MIN_SLOT_FRAMES
 import com.summondemons.safely.ritual.RitualConfig.ALIGN_OPTIONAL_SKIP_COST
 import com.summondemons.safely.ritual.RitualConfig.ALIGN_SKIPPED_WEIGHT
+import com.summondemons.safely.ritual.RitualConfig.BASELINE_MIN_DIFFERENT
+import com.summondemons.safely.ritual.RitualConfig.BASELINE_MIN_SHUFFLES
+import com.summondemons.safely.ritual.RitualConfig.BASELINE_PASS_RANK
+import com.summondemons.safely.ritual.RitualConfig.BASELINE_SHUFFLES
 import com.summondemons.safely.ritual.RitualConfig.CHANT_GAP_COST
 import com.summondemons.safely.ritual.RitualConfig.CHANT_UNMEASURED_COST
+import com.summondemons.safely.ritual.RitualConfig.FRAME_MS
 import com.summondemons.safely.ritual.RitualConfig.NEUTRAL_VOWEL
+import com.summondemons.safely.ritual.RitualConfig.TALK_MAX_SLOT_MS
 import com.summondemons.safely.ritual.RitualConfig.VOWEL_SCALES
+import com.summondemons.safely.ritual.RitualConfig.WORD_DOUBT_DISTANCE
+import kotlin.math.abs
+import kotlin.random.Random
 
 /** How a chunk's frames line up with its slots at the best vocal-tract scale (ADR-0022). */
 data class Alignment(
@@ -19,6 +29,23 @@ data class Alignment(
     val skippedFrames: Int,
     /** Mean slot cost (a skipped slot costs its gap) plus [ALIGN_SKIPPED_WEIGHT] × share of skipped frames. */
     val cost: Double,
+)
+
+/** The chant check's verdict on one chunk (ADR-0022). */
+data class ChunkVerdict(
+    val passed: Boolean,
+    /** Alignment cost against the real vowel order (0 = perfect). */
+    val cost: Double,
+    /** Share of valid shuffles the real order beat (ties count half), or null in the low-diversity fallback. */
+    val rank: Double?,
+    /** Valid shuffles compared. */
+    val shuffles: Int,
+    /** Vetoed as conversational speed. */
+    val talk: Boolean,
+    /** One hint per word of the chunk. */
+    val marks: List<WordMark>,
+    /** The real alignment, for diagnostics. */
+    val alignment: Alignment,
 )
 
 /**
@@ -41,6 +68,53 @@ object ChantAligner {
     }
 
     fun gapCost(slot: VowelSlot): Double = if (slot.optional) ALIGN_OPTIONAL_SKIP_COST else CHANT_GAP_COST
+
+    /**
+     * Passes when the real order costs no more than [ALIGN_MAX_COST], beats at least
+     * [BASELINE_PASS_RANK] of the shuffles (unless fewer than [BASELINE_MIN_SHUFFLES] survive), and
+     * the median heard slot is not shorter than [TALK_MAX_SLOT_MS]. [seed] is the chunk's text.
+     */
+    fun judge(slots: List<VowelSlot>, frames: List<Formants?>, seed: String): ChunkVerdict {
+        val real = align(slots, frames)
+        val shuffled = shuffles(slots, seed).map { align(it, frames).cost }
+        val rank = if (shuffled.size >= BASELINE_MIN_SHUFFLES) {
+            shuffled.sumOf { c ->
+                when {
+                    abs(c - real.cost) <= TIE -> 0.5
+                    c > real.cost -> 1.0
+                    else -> 0.0
+                }
+            } / shuffled.size
+        } else {
+            null
+        }
+        val heard = real.slotFrames.filter { it > 0 }.sorted()
+        val talk = heard.isNotEmpty() && heard[heard.size / 2] * FRAME_MS < TALK_MAX_SLOT_MS
+        val passed = !talk && real.cost <= ALIGN_MAX_COST && (rank == null || rank >= BASELINE_PASS_RANK)
+        return ChunkVerdict(passed, real.cost, rank, shuffled.size, talk, marks(slots, real), real)
+    }
+
+    /**
+     * [BASELINE_SHUFFLES] reorderings of whole slots (each vowel keeps its glide and neutral flags;
+     * word positions stay put), seeded by [seed]; those differing from the real vowel order in
+     * fewer than [BASELINE_MIN_DIFFERENT] of the slots are dropped.
+     */
+    fun shuffles(slots: List<VowelSlot>, seed: String): List<List<VowelSlot>> {
+        val random = Random(seed.hashCode())
+        val vowels = slots.map { it.vowel }
+        return List(BASELINE_SHUFFLES) { slots.shuffled(random) }
+            .filter { order -> order.indices.count { order[it].vowel != vowels[it] } >= BASELINE_MIN_DIFFERENT * slots.size }
+            .map { order -> order.mapIndexed { i, slot -> slot.copy(word = slots[i].word) } }
+    }
+
+    /** Per word of the chunk: doubtful when its slots' mean cost reaches [WORD_DOUBT_DISTANCE]. */
+    fun marks(slots: List<VowelSlot>, alignment: Alignment): List<WordMark> =
+        slots.indices.groupBy { slots[it].word }.toSortedMap().values.map { indices ->
+            val mean = indices.map { alignment.slotCosts[it] ?: gapCost(slots[it]) }.average()
+            if (mean >= WORD_DOUBT_DISTANCE) WordMark.Doubtful else WordMark.Heard
+        }
+
+    private const val TIE = 1e-9
 
     /**
      * Viterbi over states (slot j, frames c in it; c = [ALIGN_MIN_SLOT_FRAMES] means "that many or

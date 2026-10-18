@@ -73,4 +73,66 @@ class ChantAlignerTest {
         assertTrue(a.slotCosts.all { it == null })
         assertTrue(a.cost > 0.6)
     }
+
+    // --- Verdict: shuffle baseline, talk veto, word marks ---
+
+    private val seed = "OSTENDE MIHI FACIEM"
+
+    @Test
+    fun theRightOrderBeatsEveryShuffleAndPasses() {
+        val v = ChantAligner.judge(ostende, frames(vowels(ostende)), seed)
+        assertTrue(v.passed)
+        assertEquals(1.0, v.rank!!, 1e-9)
+        assertTrue(v.shuffles >= 8)
+        assertTrue(!v.talk)
+    }
+
+    @Test
+    fun aHeldVowelTiesWithEveryShuffleAndFails() {
+        listOf(Vowel.A, Vowel.E, Vowel.I).forEach { held ->
+            val v = ChantAligner.judge(ostende, frames(List(8) { held }), seed)
+            assertTrue("$held passed", !v.passed)
+            assertEquals("$held rank", 0.5, v.rank!!, 1e-9)
+        }
+    }
+
+    @Test
+    fun babbleFails() {
+        val babble = listOf(Vowel.O, Vowel.A, Vowel.E, Vowel.U, Vowel.A, Vowel.I, Vowel.O, Vowel.O)
+        assertTrue(!ChantAligner.judge(dae, frames(babble, k = 10), "DAEMONIUM RESIDENTE").passed)
+    }
+
+    @Test
+    fun conversationalSpeedIsVetoed() {
+        val fast = ChantAligner.judge(ostende, frames(vowels(ostende), k = 3), seed)
+        assertTrue(fast.talk)
+        assertTrue(!fast.passed)
+        assertTrue(!ChantAligner.judge(ostende, frames(vowels(ostende), k = 5), seed).talk)
+    }
+
+    @Test
+    fun aOneVowelChunkFallsBackToTheCeiling() {
+        val estMe = ChantTemplate.slots("EST ME")
+        val right = ChantAligner.judge(estMe, frames(listOf(Vowel.E, Vowel.E)), "EST ME")
+        assertNull(right.rank)
+        assertEquals(0, right.shuffles)
+        assertTrue(right.passed)
+        assertTrue(!ChantAligner.judge(estMe, frames(listOf(Vowel.A, Vowel.A)), "EST ME").passed)
+    }
+
+    @Test
+    fun shufflesAreDeterministicAndMoveWholeSlots() {
+        val a = ChantAligner.shuffles(dae, "DAEMONIUM RESIDENTE")
+        assertEquals(a, ChantAligner.shuffles(dae, "DAEMONIUM RESIDENTE"))
+        a.forEach { order -> assertEquals(dae.map { it.copy(word = 0) }.sortedBy { it.toString() }, order.map { it.copy(word = 0) }.sortedBy { it.toString() }) }
+        a.forEach { order -> assertEquals(dae.map { it.word }, order.map { it.word }) }
+    }
+
+    @Test
+    fun aWrongWordIsMarkedDoubtful() {
+        val v = vowels(ostende)
+        val spoken = v.take(3) + listOf(Vowel.U, Vowel.U) + v.drop(5) // MIHI sung as "MU-HU"
+        val verdict = ChantAligner.judge(ostende, frames(spoken), seed)
+        assertEquals(listOf(WordMark.Heard, WordMark.Doubtful, WordMark.Heard), verdict.marks)
+    }
 }
