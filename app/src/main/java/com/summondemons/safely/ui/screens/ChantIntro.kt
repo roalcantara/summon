@@ -66,10 +66,10 @@ private val RuleIcon = 40.dp
 private val BandHeight = 112.dp
 
 /**
- * The intro card (ADR-0019): shown at the lock on the first ritual, and from the chant
- * screen's "?". Mirrors the chant screen: art where the sigil goes, the rules where the
+ * The intro card (ADR-0019): shown before every ritual, and from the chant screen's "?"
+ * (ADR-0021). Mirrors the chant screen: art where the sigil goes, the rules where the
  * words go. Generic: nothing in it names a demon or a direction. The microphone is ignored
- * while it is up (RitualViewModel); **Summon** starts the chant.
+ * while it is up (RitualViewModel); **Summon** and ✕ start the chant.
  *
  * Art: `chant_intro_singer.webp` on the slab, `chant_intro_banner.webp` for the header,
  * and `chant_summon_button.webp` / `_pressed.webp` for the action (DESIGN.md, ADR-0019).
@@ -102,7 +102,7 @@ fun ChantIntro(
             IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).safeDrawingPadding()) {
                 Icon(
                     painter = painterResource(R.drawable.ic_close),
-                    contentDescription = stringResource(R.string.action_abort),
+                    contentDescription = stringResource(R.string.intro_close),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }

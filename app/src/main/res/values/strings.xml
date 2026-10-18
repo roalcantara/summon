@@ -72,8 +72,6 @@
     <string name="verdict_chant_again">Chant again</string>
     <string name="verdict_seal_cracked">Seal cracked</string>
     <string name="verdict_of">of</string>
-    <string name="chant_turn_sideways">Turn your phone sideways</string>
-    <string name="chant_keep_mic_clear">Hold it in front of your mouth, and keep the bottom edge clear so the microphone can hear you.</string>
     <string name="chant_help">How to chant</string>
     <string name="intro_title">How to chant</string>
     <string name="intro_direction_title">Direction</string>
@@ -85,6 +83,7 @@
     <string name="intro_seal_title">Seal</string>
     <string name="intro_seal_body">Seal all four lines to summon the demon.</string>
     <string name="intro_summon">Summon</string>
+    <string name="intro_close">Close and start the chant</string>
     <string name="abandon_title">Abandon the ritual?</string>
     <string name="abandon_body">Your seals will fade.</string>
     <string name="action_abandon">Abandon</string>

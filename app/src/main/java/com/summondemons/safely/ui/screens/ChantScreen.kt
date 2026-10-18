@@ -9,7 +9,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -22,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
@@ -32,11 +30,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,7 +77,6 @@ import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.stage
 import com.summondemons.safely.ui.theme.textRoles
 import com.summondemons.safely.ui.theme.upper
-import kotlinx.coroutines.delay
 
 private const val SLAB_WEIGHT = 0.25f
 private const val SLAB_ALPHA = 0.7f
@@ -102,8 +97,6 @@ private const val WAVE_AMPLITUDE = 0.08f
 private const val BADGE_FRACTION = 0.22f
 private const val BLINK_HALF_MS = 300
 private const val BLINK_MIN = 0.55f
-private const val HINT_MS = 2_500L
-private const val HINT_SCRIM_ALPHA = 0.88f
 private const val BACKDROP_DIM = 0.55f
 private const val WORDS_SCRIM_ALPHA = 0.85f
 private const val METER_TWEEN_MS = 120
@@ -121,8 +114,8 @@ private val MaxPhraseSize = 96.sp
 private val PhraseStep = 2.sp
 
 /**
- * The chant screen (ADR-0019): from the lock, the demon's name, sigil (progress, direction,
- * focus clock) and direction line on a slab at the left; the phrase, as large as fits, and
+ * The chant screen (ADR-0019, ADR-0020): for the whole Ritual, the demon's name, sigil
+ * (progress, direction, focus clock) and direction line on a slab at the left; the phrase, as large as fits, and
  * one verdict line at the right. Portrait screens get the slab as a top band. The House
  * stage fills the screen edge to edge; the content keeps clear of the system bars.
  */
@@ -137,8 +130,6 @@ fun ChantScreen(
     modifier: Modifier = Modifier,
     /** Reopens the intro card ("?"); null hides the button. */
     onHelp: (() -> Unit)? = null,
-    /** False right after the intro card, which already asked to turn sideways. */
-    showTurnHint: Boolean = true,
     /** Shown instead of the phrase when the ritual can't hear or can't sense direction (ADR-0020). */
     blocker: (@Composable () -> Unit)? = null,
 ) {
@@ -147,12 +138,6 @@ fun ChantScreen(
     val screen = remember(state.ritual, state.azimuth) {
         chantScreenState(state.ritual, demon.chantPhrases, state.azimuth, demon.ritualHeading)
     }
-    var hint by rememberSaveable { mutableStateOf(showTurnHint) }
-    LaunchedEffect(Unit) {
-        delay(HINT_MS)
-        hint = false
-    }
-    LaunchedEffect(state.ritual.lit) { if (state.ritual.lit > 0) hint = false }
 
     BoxWithConstraints(modifier) {
         val landscape = maxWidth > maxHeight
@@ -190,7 +175,6 @@ fun ChantScreen(
                 }
             }
         }
-        if (hint) TurnSidewaysHint(accent, Modifier.fillMaxSize())
     }
 }
 
@@ -541,25 +525,3 @@ fun VoiceMeter(level: Float, color: Color, modifier: Modifier = Modifier) {
     }
 }
 
-/** Shown for a moment after the lock: turn sideways, keep the microphone clear. */
-@Composable
-private fun TurnSidewaysHint(accent: Color, modifier: Modifier) {
-    val colors = MaterialTheme.colorScheme
-    Column(
-        modifier.background(colors.surfaceContainerLowest.copy(alpha = HINT_SCRIM_ALPHA)).padding(MaterialTheme.spacing.xl),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md, Alignment.CenterVertically),
-    ) {
-        Text(
-            stringResource(R.string.chant_turn_sideways),
-            style = MaterialTheme.textRoles.name.copy(fontSize = NameSize, textAlign = TextAlign.Center),
-            color = accent,
-        )
-        Text(
-            stringResource(R.string.chant_keep_mic_clear),
-            style = MaterialTheme.textRoles.body.copy(textAlign = TextAlign.Center),
-            color = colors.onSurfaceVariant,
-            modifier = Modifier.widthIn(max = 420.dp),
-        )
-    }
-}

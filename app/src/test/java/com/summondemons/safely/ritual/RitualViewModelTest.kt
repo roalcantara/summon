@@ -124,10 +124,9 @@ class RitualViewModelTest {
 
     @Test
     fun theIntroCardMutesTheMicUntilSummon() = runTest(dispatcher) {
-        var seen = 0
         val vm = RitualViewModel(
             demon = demon, headingSource = FakeHeading(), pcmSource = chantingPcm(),
-            showIntro = true, onIntroSeen = { seen++ }, analysisDispatcher = dispatcher,
+            showIntro = true, analysisDispatcher = dispatcher,
         )
         observe(vm)
         vm.onMicPermission(true)
@@ -136,7 +135,6 @@ class RitualViewModelTest {
         assertEquals(RitualPhase.Chanting, vm.uiState.value.ritual.phase) // the lock still happens
         assertEquals(0, vm.uiState.value.ritual.lit)
         assertTrue(vm.uiState.value.introVisible)
-        assertTrue(vm.uiState.value.introOffered)
         vm.dismissIntro()
         advanceTimeBy(2_000); runCurrent()
         assertTrue("lit=${vm.uiState.value.ritual.lit}", vm.uiState.value.ritual.lit >= 4)
@@ -145,7 +143,7 @@ class RitualViewModelTest {
         assertTrue(vm.uiState.value.introVisible)
         vm.dismissIntro()
         runCurrent()
-        assertEquals(1, seen) // reported once
+        assertFalse(vm.uiState.value.introVisible)
     }
 
     private class FakeRecorder : ClipRecorder {

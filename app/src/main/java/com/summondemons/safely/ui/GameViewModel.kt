@@ -126,9 +126,6 @@ class GameViewModel(
         update { it.copy(homeHintSeen = true) }
     }
 
-    /** The chant screen's intro card was dismissed: show it automatically only once (ADR-0019). */
-    fun markChantIntroSeen() = update { it.copy(chantIntroSeen = true) }
-
     fun select(id: String) {
         savedState[KEY_SELECTED] = id
     }

@@ -21,7 +21,6 @@ class ProgressJsonTest {
         ),
         lastSummonDay = 20_001L,
         homeHintSeen = true,
-        chantIntroSeen = true,
         lastViewed = "astaroth",
     )
 
@@ -44,8 +43,9 @@ class ProgressJsonTest {
     }
 
     @Test
-    fun olderSavesHaveNotSeenTheChantIntro() {
-        assertEquals(false, ProgressJson.decode("""{"homeHintSeen":true}""").chantIntroSeen)
+    fun savesWithTheOldIntroFlagStillLoad() {
+        // chantIntroSeen left Progress (ADR-0021): the card now shows before every ritual.
+        assertTrue(ProgressJson.decode("""{"homeHintSeen":true,"chantIntroSeen":true}""").homeHintSeen)
     }
 
     @Test

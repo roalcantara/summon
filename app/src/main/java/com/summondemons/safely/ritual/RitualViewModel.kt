@@ -61,8 +61,6 @@ data class RitualUiState(
     val clipLabel: ClipLabel? = null,
     /** The intro card is on screen; the microphone is ignored meanwhile (ADR-0019). */
     val introVisible: Boolean = false,
-    /** The card was shown automatically this ritual, so the chant screen skips its turn-sideways hint. */
-    val introOffered: Boolean = false,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -76,10 +74,8 @@ class RitualViewModel(
     private val commitSummon: (flawless: Boolean) -> Unit = {},
     /** Debug builds record tester clips here; release builds pass [ClipRecorder.None] (ADR-0018). */
     private val clipRecorder: ClipRecorder = ClipRecorder.None,
-    /** Show the intro card from the lock: the player's first ritual (ADR-0019). */
+    /** Show the intro card when the ritual opens: the app does on every ritual (ADR-0021). */
     private val showIntro: Boolean = false,
-    /** Called once, the first time the player dismisses the intro card. */
-    private val onIntroSeen: () -> Unit = {},
     private val analysisDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ViewModel() {
 
@@ -89,7 +85,6 @@ class RitualViewModel(
             ritual = RitualState.start(demon.ritualHeading, demon.chantPhrases, judged = true),
             headingUnavailable = !headingSource.available,
             introVisible = showIntro,
-            introOffered = showIntro,
         ),
     )
     private val _effects = MutableSharedFlow<RitualEffect>(extraBufferCapacity = EFFECT_BUFFER)
@@ -133,17 +128,8 @@ class RitualViewModel(
         state.update { it.copy(holdToChant = on) }
     }
 
-    private var introSeenReported = false
-
-    /** **Summon** on the intro card: the chant starts listening (ADR-0019). */
-    fun dismissIntro() {
-        if (!state.value.introVisible) return
-        state.update { it.copy(introVisible = false) }
-        if (!introSeenReported) {
-            introSeenReported = true
-            onIntroSeen()
-        }
-    }
+    /** **Summon**, ✕ or back on the intro card: the chant starts listening (ADR-0019, ADR-0021). */
+    fun dismissIntro() = state.update { it.copy(introVisible = false) }
 
     /** "?" on the chant screen: show the intro card again. */
     fun openIntro() = state.update { it.copy(introVisible = true) }
@@ -251,9 +237,8 @@ class RitualViewModel(
             commitSummon: (flawless: Boolean) -> Unit = {},
             clipRecorder: ClipRecorder = ClipRecorder.None,
             showIntro: Boolean = false,
-            onIntroSeen: () -> Unit = {},
         ): ViewModelProvider.Factory = viewModelFactory {
-            initializer { RitualViewModel(demon, headingSource, pcmSource, inCourt, commitSummon, clipRecorder, showIntro, onIntroSeen) }
+            initializer { RitualViewModel(demon, headingSource, pcmSource, inCourt, commitSummon, clipRecorder, showIntro) }
         }
     }
 }

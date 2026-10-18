@@ -207,6 +207,8 @@ private fun RitualContent(
     val requestClose = { if (ritual.phrase >= 1 && !inClimax) confirmAbort = true else onAbort() }
     BackHandler(enabled = inClimax) {}
     BackHandler(enabled = !inClimax) { requestClose() }
+    // Registered last, so it wins while the intro card is up: back puts the card away (ADR-0021).
+    BackHandler(enabled = state.introVisible && !inClimax) { onDismissIntro() }
     val chromeAlpha = 1f - segment(ritual.climaxFraction, 0f, 0.3f)
     RequestLandscape(true)
     // The altar's error panels, now in place of the phrase (ADR-0020).
@@ -238,8 +240,7 @@ private fun RitualContent(
             flash = flash,
             showClose = !inClimax,
             onClose = requestClose,
-            onHelp = onShowIntro,
-            showTurnHint = !state.introOffered,
+            onHelp = if (inClimax) null else onShowIntro,
             blocker = blocker,
             debug = if (BuildConfig.DEBUG && !inClimax) {
                 {
@@ -257,13 +258,14 @@ private fun RitualContent(
             },
             modifier = Modifier.fillMaxSize().graphicsLayer { alpha = chromeAlpha },
         )
-        // The intro card comes down over the chant screen and goes back up to reveal it (ADR-0019).
+        // The intro card comes down over the chant screen and goes back up to reveal it (ADR-0019);
+        // Summon and ✕ both start the chant (ADR-0021).
         AnimatedVisibility(
             visible = state.introVisible && !inClimax,
             enter = if (reduceMotion) fadeIn(tween(INTRO_MS)) else slideInVertically(tween(INTRO_MS)) { -it } + fadeIn(tween(INTRO_MS)),
             exit = if (reduceMotion) fadeOut(tween(INTRO_MS)) else slideOutVertically(tween(INTRO_MS)) { -it } + fadeOut(tween(INTRO_MS)),
         ) {
-            ChantIntro(demon = demon, onSummon = onDismissIntro, showClose = true, onClose = requestClose, modifier = Modifier.fillMaxSize())
+            ChantIntro(demon = demon, onSummon = onDismissIntro, showClose = true, onClose = onDismissIntro, modifier = Modifier.fillMaxSize())
         }
         if (inClimax) ClimaxOverlay(demon, accent, ritual.climaxFraction, reduceMotion)
     }
