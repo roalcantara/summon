@@ -93,4 +93,14 @@ class ChantJudgeTest {
         assertEquals(1f, ChantJudge.score(expected, take(expected, pauses = 2)).rhythm, 1e-4f)
         assertEquals(0.5f, ChantJudge.score(expected, take(expected, pauses = 4)).rhythm, 1e-4f)
     }
+
+    @Test
+    fun wordMarksJudgeEachWordOnceItsSyllablesAreHeard() {
+        val sizes = LatinSyllables.wordSizes(phrase) // [4, 4]
+        val good = expected.map { it?.formants(1.2) }
+        assertEquals(listOf(WordMark.Pending, WordMark.Pending), ChantJudge.wordMarks(expected, good.take(3), sizes))
+        assertEquals(listOf(WordMark.Heard, WordMark.Pending), ChantJudge.wordMarks(expected, good.take(5), sizes))
+        val secondWrong = good.take(4) + List(4) { Vowel.A.formants(1.2) }
+        assertEquals(listOf(WordMark.Heard, WordMark.Doubtful), ChantJudge.wordMarks(expected, secondWrong, sizes))
+    }
 }

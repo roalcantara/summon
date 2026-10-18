@@ -16,6 +16,9 @@ object LatinSyllables {
 
     fun count(text: String): Int = spans(text).size
 
+    /** Syllables of each word of [text], in order; they sum to [count] (ADR-0019 word hints). */
+    fun wordSizes(text: String): List<Int> = WORD.findAll(text).map { wordSpans(it.value.uppercase(), 0).size }.toList()
+
     fun spans(text: String): List<SyllableSpan> =
         WORD.findAll(text).flatMap { wordSpans(it.value.uppercase(), it.range.first) }.toList()
 

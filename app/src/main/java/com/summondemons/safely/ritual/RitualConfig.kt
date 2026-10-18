@@ -61,6 +61,12 @@ object RitualConfig {
     /** An unvoiced run at least this long inside a phrase counts as a pause (breath). */
     const val CHANT_PAUSE_MS = 250L
 
+    // Chant screen (ADR-0019)
+    /** After a verdict (sealed, rejected, cracked) the focus clock waits this long, or until the next syllable. */
+    const val VERDICT_HOLD_MS = 3_000L
+    /** A word whose syllables average at least this vowel distance is marked doubtful (a hint only). */
+    const val WORD_DOUBT_DISTANCE = 0.6
+
     // Mic level for glow only (never progress)
     const val MIC_LEVEL_CEILING = 8_000.0
     const val MIC_LEVEL_ATTACK_MS = 40f

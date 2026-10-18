@@ -52,4 +52,13 @@ class LatinSyllablesTest {
             DemonCatalog.byId("astaroth")!!.chantPhrases.map(LatinSyllables::count),
         )
     }
+
+    @Test
+    fun wordSizesCountEachWordsSyllables() {
+        assertEquals(listOf(4, 4), LatinSyllables.wordSizes("DAEMONIUM RESIDENTE,"))
+        assertEquals(listOf(3, 1, 2), LatinSyllables.wordSizes("GRATIA SIT CURA."))
+        DemonCatalog.all.flatMap { it.chantPhrases }.forEach { phrase ->
+            assertEquals(phrase, LatinSyllables.count(phrase), LatinSyllables.wordSizes(phrase).sum())
+        }
+    }
 }

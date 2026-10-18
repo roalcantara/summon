@@ -11,6 +11,7 @@ import com.summondemons.safely.ritual.RitualConfig.CHANT_UNMEASURED_COST
 import com.summondemons.safely.ritual.RitualConfig.FRAME_MS
 import com.summondemons.safely.ritual.RitualConfig.VOWEL_MAX_DISTANCE
 import com.summondemons.safely.ritual.RitualConfig.VOWEL_SCALES
+import com.summondemons.safely.ritual.RitualConfig.WORD_DOUBT_DISTANCE
 import kotlin.math.ln
 import kotlin.math.sqrt
 
@@ -25,6 +26,9 @@ enum class Vowel(val f1: Double, val f2: Double) {
     /** This vowel's formants for a vocal tract [scale] times shorter than the reference. */
     fun formants(scale: Double = 1.0) = Formants(f1 * scale, f2 * scale)
 }
+
+/** A hint under each word of the phrase being chanted (ADR-0019); it never decides the verdict. */
+enum class WordMark { Pending, Heard, Doubtful }
 
 /** How one chanted phrase sounded: vowel match and rhythm in [0, 1], and their weighted total. */
 data class ChantScore(val vowels: Float, val rhythm: Float) {
@@ -131,6 +135,28 @@ object ChantJudge {
         val d1 = ln(heard.f1 / reference.f1)
         val d2 = ln(heard.f2 / reference.f2)
         return (sqrt(d1 * d1 + d2 * d2) / VOWEL_MAX_DISTANCE).coerceAtMost(1.0)
+    }
+
+    /**
+     * One mark per word: [WordMark.Pending] until all its syllables are heard, then
+     * [WordMark.Heard] or [WordMark.Doubtful] (average vowel distance ≥ [WORD_DOUBT_DISTANCE]).
+     * Heard nuclei match expected vowels by position, at the vocal-tract scale that best fits
+     * everything heard so far. A word is too short to judge alone, so this is only a hint.
+     */
+    fun wordMarks(expected: List<Vowel?>, heard: List<Formants?>, wordSizes: List<Int>): List<WordMark> {
+        val n = minOf(expected.size, heard.size)
+        val scale = VOWEL_SCALES.minBy { sc -> (0 until n).sumOf { distance(heard[it], expected[it], sc) } }
+        var start = 0
+        return wordSizes.map { size ->
+            val end = start + size
+            val mark = when {
+                end > n -> WordMark.Pending
+                (start until end).sumOf { distance(heard[it], expected[it], scale) } / size >= WORD_DOUBT_DISTANCE -> WordMark.Doubtful
+                else -> WordMark.Heard
+            }
+            start = end
+            mark
+        }
     }
 
     private fun alignmentCost(expected: List<Vowel?>, heard: List<Formants?>, scale: Double): Double {
