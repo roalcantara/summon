@@ -6,7 +6,7 @@ set -euo pipefail
 app=com.summondemons.safely
 root="$(cd "$(dirname "$0")/.." && pwd)"
 sdk_adb() { # adb from PATH, $ANDROID_HOME, local.properties' sdk.dir, or the default macOS SDK
-  command -v adb && return
+  type -P adb && return
   for d in "${ANDROID_HOME:-}" "$(sed -n 's/^sdk.dir=//p' "$root/local.properties" 2>/dev/null)" "$HOME/Library/Android/sdk"; do
     [ -n "$d" ] && [ -x "$d/platform-tools/adb" ] && { echo "$d/platform-tools/adb"; return; }
   done
