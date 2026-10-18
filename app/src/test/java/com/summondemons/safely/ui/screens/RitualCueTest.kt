@@ -20,7 +20,7 @@ class RitualCueTest {
         micGranted: Boolean? = true,
     ) = base.copy(ritual = base.ritual.copy(phase = phase, phrase = phrase), azimuth = azimuth, micGranted = micGranted)
 
-    private fun kind(s: RitualUiState, cracked: Int? = null) = ritualCue(s, cracked).kind
+    private fun kind(s: RitualUiState, cracked: Int? = null, rejected: Boolean = false) = ritualCue(s, cracked, rejected).kind
 
     @Test
     fun errorsComeFirstInSpecOrder() {
@@ -38,6 +38,19 @@ class RitualCueTest {
         assertEquals(CueKind.Cracked, cue.kind)
         assertEquals(1, cue.crackedPhrase)
         assertEquals(CueTone.Error, cue.kind.tone)
+    }
+
+    @Test
+    fun aRejectionShowsAfterErrorsAndCracksButBeforeThePhaseRows() {
+        val chanting = state(RitualPhase.Chanting).copy(rejections = 2)
+        val cue = ritualCue(chanting, crackedPhrase = null, rejected = true)
+        assertEquals(CueKind.Rejected, cue.kind)
+        assertEquals(2, cue.rejections)
+        assertEquals(CueTone.Error, cue.kind.tone)
+        assertEquals(CueKind.Cracked, kind(chanting, cracked = 0, rejected = true))
+        assertEquals(CueKind.MicDenied, kind(chanting.copy(micGranted = false), rejected = true))
+        assertEquals(CueKind.Chant, kind(chanting))
+        assertEquals(0, ritualCue(chanting, crackedPhrase = null).rejections)
     }
 
     @Test

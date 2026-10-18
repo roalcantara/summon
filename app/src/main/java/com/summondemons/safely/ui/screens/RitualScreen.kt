@@ -55,6 +55,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -107,6 +108,7 @@ private const val HEARTBEAT_HALF_MS = 150 // 300 ms heartbeat while wavering
 private const val WAVER_MIN_ALPHA = 0.45f
 private const val SEAL_FLARE_MS = 700
 private const val CRACK_MS = 1_500
+private const val REJECT_MS = 1_500
 private const val SEAL_FLASH_MIX = 0.5f
 private const val EMBER_ALPHA = 0.5f
 private const val CLIMAX_SCRIM_ALPHA = 0.85f
@@ -171,6 +173,7 @@ fun RitualScreen(
     // Seal flares and the crack cue come from the lossy effects flow: UI only, nothing durable.
     var flare by remember { mutableStateOf<Mark?>(null) }
     var cracked by remember { mutableStateOf<Mark?>(null) }
+    var rejected by remember { mutableStateOf<Mark?>(null) }
     var flash by remember { mutableStateOf<SigilFlash?>(null) }
     val accent = MaterialTheme.demonColors.accent(state.demon.accent)
     val sealColor = lerp(accent, MaterialTheme.demonColors.inkHighlight, SEAL_FLASH_MIX)
@@ -197,6 +200,15 @@ fun RitualScreen(
                         if (cracked == mark) cracked = null
                     }
                 }
+                is RitualEffect.Rejected -> {
+                    val mark = Mark(effect.phrase, ++serial)
+                    rejected = mark
+                    flash = SigilFlash(effect.phrase + 1, crackColor, REJECT_MS, mark.id)
+                    launch {
+                        delay(REJECT_MS.toLong())
+                        if (rejected == mark) rejected = null
+                    }
+                }
                 else -> Unit
             }
         }
@@ -206,6 +218,7 @@ fun RitualScreen(
         state = state,
         flare = flare?.phrase,
         cracked = cracked?.phrase,
+        rejected = rejected != null,
         flash = flash,
         permanentlyDenied = permanentlyDenied,
         onRetryPermission = { launcher.launch(Manifest.permission.RECORD_AUDIO) },
@@ -226,6 +239,7 @@ private fun RitualContent(
     state: RitualUiState,
     flare: Int?,
     cracked: Int?,
+    rejected: Boolean,
     flash: SigilFlash?,
     permanentlyDenied: Boolean,
     onRetryPermission: () -> Unit,
@@ -286,7 +300,7 @@ private fun RitualContent(
                 }
             }
 
-            val cue = ritualCue(state, cracked)
+            val cue = ritualCue(state, cracked, rejected)
             CueChip(cueText(cue, demon), cue.kind.tone)
 
             Box(Modifier.size(sigilSide), contentAlignment = Alignment.Center) {
@@ -395,6 +409,7 @@ private fun cueText(cue: RitualCue, demon: Demon): String {
         CueKind.MicUnavailable -> stringResource(R.string.cue_mic_unavailable)
         CueKind.NoHeading -> stringResource(R.string.cue_no_heading)
         CueKind.Cracked -> stringResource(R.string.cue_cracked, ROMAN_NUMERALS[cue.crackedPhrase ?: 0])
+        CueKind.Rejected -> stringArrayResource(R.array.cue_rejected).let { it[(cue.rejections - 1).coerceAtLeast(0) % it.size] }
         CueKind.TurnLeft -> stringResource(R.string.hint_turn_left, direction)
         CueKind.TurnRight -> stringResource(R.string.hint_turn_right, direction)
         CueKind.Face -> stringResource(R.string.hint_face, direction)

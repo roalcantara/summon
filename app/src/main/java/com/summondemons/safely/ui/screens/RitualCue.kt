@@ -15,6 +15,7 @@ enum class CueKind(val tone: CueTone) {
     MicUnavailable(CueTone.Error),
     NoHeading(CueTone.Error),
     Cracked(CueTone.Error),
+    Rejected(CueTone.Error),
     TurnLeft(CueTone.Neutral),
     TurnRight(CueTone.Neutral),
     Face(CueTone.Neutral),
@@ -25,16 +26,21 @@ enum class CueKind(val tone: CueTone) {
     Opening(CueTone.Safe),
 }
 
-data class RitualCue(val kind: CueKind, val crackedPhrase: Int? = null)
+/** [rejections] counts the attempt's rejected phrases while [kind] is [CueKind.Rejected] (it picks the scoff line), else 0. */
+data class RitualCue(val kind: CueKind, val crackedPhrase: Int? = null, val rejections: Int = 0)
 
-/** [crackedPhrase] is the phrase that cracked within the last 1.5 s, or null. */
-fun ritualCue(state: RitualUiState, crackedPhrase: Int?): RitualCue {
+/**
+ * [crackedPhrase] is the phrase that cracked within the last 1.5 s, or null; [rejected] is
+ * true within 1.5 s of a phrase the chant check rejected (ADR-0018).
+ */
+fun ritualCue(state: RitualUiState, crackedPhrase: Int?, rejected: Boolean = false): RitualCue {
     val ritual = state.ritual
     val kind = when {
         state.micGranted == false -> CueKind.MicDenied
         state.micGranted == true && state.micUnavailable -> CueKind.MicUnavailable
         state.headingUnavailable && !state.simulateHeading -> CueKind.NoHeading
         crackedPhrase != null -> CueKind.Cracked
+        rejected -> CueKind.Rejected
         else -> when (ritual.phase) {
             RitualPhase.Seeking -> when (turnDirection(state.azimuth, state.demon.ritualHeading)) {
                 TurnDirection.Left -> CueKind.TurnLeft
@@ -47,7 +53,11 @@ fun ritualCue(state: RitualUiState, crackedPhrase: Int?): RitualCue {
             RitualPhase.Climax, RitualPhase.Done -> CueKind.Opening
         }
     }
-    return RitualCue(kind, crackedPhrase.takeIf { kind == CueKind.Cracked })
+    return RitualCue(
+        kind,
+        crackedPhrase.takeIf { kind == CueKind.Cracked },
+        if (kind == CueKind.Rejected) state.rejections else 0,
+    )
 }
 
 /** The chant tablet's right-hand header (§4). */

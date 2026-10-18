@@ -64,6 +64,13 @@
     <string name="cue_mic_unavailable">The microphone wouldn\'t start</string>
     <string name="cue_no_heading">This device can\'t sense direction</string>
     <string name="cue_cracked">The seal cracked · Chant %1$s again</string>
+    <!-- Chant check (ADR-0018): shown in turn, one per rejected phrase. -->
+    <string-array name="cue_rejected">
+        <item>That wasn\'t Latin · Chant it again</item>
+        <item>He\'s heard better from a parrot · Again</item>
+        <item>The demon yawns · Read the tablet</item>
+        <item>Nice try · The real words, please</item>
+    </string-array>
     <string name="cue_chant">Locked · Chant aloud</string>
     <string name="cue_wavering">Face %1$s!</string>
     <string name="cue_wavering_focus">Face %1$s! · Focus slipping</string>
