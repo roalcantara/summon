@@ -1,8 +1,7 @@
 package com.summondemons.safely.ritual
 
 import com.summondemons.safely.ritual.RitualConfig.CLIMAX_MS
-import com.summondemons.safely.ritual.RitualConfig.FOCUS_BASE_MS
-import com.summondemons.safely.ritual.RitualConfig.FOCUS_PER_SYLLABLE_MS
+import com.summondemons.safely.ritual.RitualConfig.FOCUS_BUDGET_MS
 import com.summondemons.safely.ritual.RitualConfig.ONSET_REFRACTORY_MS
 import com.summondemons.safely.ritual.RitualConfig.PHRASE_COUNT
 import com.summondemons.safely.ritual.RitualConfig.VERDICT_HOLD_MS
@@ -66,6 +65,8 @@ data class RitualState(
     val climaxMs: Long = 0L,
     val sinceSyllableMs: Long = ONSET_REFRACTORY_MS,
     val voicedRunMs: Long = 0L,
+    /** Silence since the last voiced frame while chanting; focus drains only past FOCUS_IDLE_GRACE_MS (ADR-0023). */
+    val quietMs: Long = 0L,
     /** Last 5 degree proximity bucket while seeking; null when out of range or unknown. */
     val proximityBucket: Int? = null,
     /** Each phrase's chunks; null turns the chant check off (ADR-0018, ADR-0022). */
@@ -123,9 +124,9 @@ data class RitualState(
     }
 }
 
-/** Focus budget in ms for phrase index [phrase] with [syllables] syllables (ADR-0010); none for phrase I. */
-fun focusBudget(syllables: Int, phrase: Int, courtMultiplier: Float = 1f): Long =
-    if (phrase <= 0) 0L else ((FOCUS_BASE_MS + FOCUS_PER_SYLLABLE_MS * syllables) * courtMultiplier).roundToLong()
+/** Focus budget in ms for phrase index [phrase] (ADR-0023): flat, scaled in court; none for phrase I. */
+fun focusBudget(phrase: Int, courtMultiplier: Float = 1f): Long =
+    if (phrase <= 0) 0L else (FOCUS_BUDGET_MS * courtMultiplier).roundToLong()
 
 data class Step(val state: RitualState, val effects: List<RitualEffect> = emptyList())
 

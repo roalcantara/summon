@@ -13,9 +13,13 @@ object RitualConfig {
     const val SUSTAIN_SYLLABLE_MS = 350L
     const val PROXIMITY_RANGE_DEG = 60f
 
-    // Focus clock (ADR-0010, longer per ADR-0019) and the Court Hours bonus (ADR-0012)
-    const val FOCUS_BASE_MS = 4_000L
-    const val FOCUS_PER_SYLLABLE_MS = 750L
+    // Focus meter (ADR-0023) and the Court Hours bonus (ADR-0012)
+    /** Lost focus allowed per phrase II–IV (ADR-0023). */
+    const val FOCUS_BUDGET_MS = 8_000L
+    /** Silence shorter than this costs no focus (ADR-0023). */
+    const val FOCUS_IDLE_GRACE_MS = 2_000L
+    /** Share of the budget a rejected chunk costs at once (ADR-0023). */
+    const val FOCUS_REJECT_COST = 0.25f
     const val FOCUS_DRIFT_MULTIPLIER = 3
     const val COURT_BONUS = 0.25f
     /** Below this focus fraction the focus bar beats. */

@@ -4,6 +4,9 @@ import com.summondemons.safely.ritual.RitualConfig.FRAME_MS
 import com.summondemons.safely.ritual.RitualConfig.LOCK_HOLD_MS
 import com.summondemons.safely.ritual.RitualConfig.SEAL_LISTEN_MS
 import com.summondemons.safely.ritual.RitualConfig.VERDICT_HOLD_MS
+import com.summondemons.safely.ritual.RitualConfig.FOCUS_IDLE_GRACE_MS
+import com.summondemons.safely.ritual.RitualConfig.FOCUS_REJECT_COST
+import kotlin.math.roundToLong
 import com.summondemons.safely.ritual.RitualEffect.ClimaxStart
 import com.summondemons.safely.ritual.RitualEffect.Cracked
 import com.summondemons.safely.ritual.RitualEffect.Judged
@@ -113,7 +116,7 @@ class ChantCheckTest {
         // A syllable clears the verdict and the clock runs again.
         val chanting = run(second, listOf(frame(Vowel.A, true)) + List(5) { frame(Vowel.A, false) }).state
         assertNull(chanting.verdict)
-        assertTrue(chanting.focusMs < budget)
+        assertEquals(budget, chanting.focusMs) // chanting never drains
     }
 
     @Test
@@ -124,24 +127,27 @@ class ChantCheckTest {
         val verdict = step.state.verdict!!
         assertEquals(ChantVerdict.Kind.Rejected, verdict.kind)
         assertTrue(WordMark.Doubtful in verdict.marks)
+        assertEquals(second.focusMs - (second.focusBudgetMs * FOCUS_REJECT_COST).roundToLong(), step.state.focusMs)
         val focus = step.state.focusMs
         assertEquals(focus, run(step.state, List(10) { VoiceFrame.SILENT }).state.focusMs)
     }
 
     @Test
     fun aCrackLeavesACrackedVerdict() {
-        val second = run(locked(), sing(expected(0))).state.copy(focusMs = FRAME_MS, verdict = null)
+        val second = run(locked(), sing(expected(0))).state.copy(focusMs = FRAME_MS, verdict = null, quietMs = FOCUS_IDLE_GRACE_MS)
         val step = run(second, listOf(frame(null, false)))
         assertTrue(Cracked(0) in step.effects)
         assertEquals(ChantVerdict(ChantVerdict.Kind.Cracked, 0), step.state.verdict)
     }
 
     @Test
-    fun aCrackWhileListeningClearsTheTake() {
-        val second = run(locked(), sing(expected(0))).state.copy(focusMs = FRAME_MS, verdict = null)
-        val step = run(second, listOf(frame(Vowel.A, true), frame(Vowel.A, false)))
+    fun aRejectionThatEmptiesFocusCracksAndClearsTheTake() {
+        val second = run(locked(), sing(expected(0))).state.copy(focusMs = 1_000L, verdict = null)
+        val step = run(second, sing(List(expected(1).size) { Vowel.U }))
+        assertTrue(Rejected(1, 0) in step.effects)
         assertTrue(Cracked(0) in step.effects)
         assertEquals(ChantTake(), step.state.take)
+        assertEquals(0, step.state.phrase)
     }
 
     @Test
