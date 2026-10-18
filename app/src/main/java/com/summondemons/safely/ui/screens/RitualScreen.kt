@@ -330,6 +330,7 @@ private fun RitualContent(
                 ChantIntro(demon = demon, onSummon = onDismissIntro, showClose = true, onClose = requestClose, modifier = Modifier.fillMaxSize())
             }
         } else {
+            ParticleField(accent.copy(alpha = EMBER_ALPHA), ParticleStyle.Embers, Modifier.fillMaxSize())
             Column(
                 modifier = Modifier
                     .fillMaxSize()
