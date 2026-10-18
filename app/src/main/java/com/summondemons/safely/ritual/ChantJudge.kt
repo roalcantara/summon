@@ -131,7 +131,11 @@ object ChantJudge {
     /** Distance in [0, 1] between a heard nucleus and an expected vowel at [scale]. */
     fun distance(heard: Formants?, expected: Vowel?, scale: Double): Double {
         if (heard == null || expected == null) return CHANT_UNMEASURED_COST
-        val reference = expected.formants(scale)
+        return distance(heard, expected.formants(scale))
+    }
+
+    /** Log-formant distance in [0, 1] between [heard] and a [reference] vowel sound. */
+    fun distance(heard: Formants, reference: Formants): Double {
         val d1 = ln(heard.f1 / reference.f1)
         val d2 = ln(heard.f2 / reference.f2)
         return (sqrt(d1 * d1 + d2 * d2) / VOWEL_MAX_DISTANCE).coerceAtMost(1.0)
