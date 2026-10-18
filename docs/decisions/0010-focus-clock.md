@@ -1,7 +1,7 @@
 # 0010 — Focus clock
 
 - Date: 2026-10-16
-- Status: Accepted (supersedes the drift grace of ADR-0008); budget raised to 4 s + 0.75 s per syllable and a verdict hold added by ADR-0019
+- Status: Accepted (supersedes the drift grace of ADR-0008); budget raised to 4 s + 0.75 s per syllable and a verdict hold added by ADR-0019. Replaced by the focus meter of ADR-0023.
 
 ## Context
 Ritual 2.0 (ADR-0008) had no real failure mode: silence paused for free, and drifting

@@ -7,7 +7,7 @@
   whole Ritual and its sigil carries the direction marker and the lock fill. Amended by
   ADR-0021: the intro card shows before every ritual and replaces the turn-sideways hint,
   its ✕ starts the chant, "?" moves above the name, and the debug controls move to a
-  floating panel.
+  floating panel. Amended by ADR-0023 (no seconds label) and ADR-0024 (status column, reduced verdict line).
 
 ## Context
 Device testing of the chant check (ADR-0018) showed two problems. The scoff appeared in

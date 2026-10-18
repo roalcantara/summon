@@ -2,7 +2,7 @@
 
 - Date: 2026-10-18
 - Status: Accepted. Amends ADR-0019 (intro card, turn-sideways hint, "?", debug controls)
-  and ADR-0020 (verdict line before the lock, intro on the first ritual only).
+  and ADR-0020 (verdict line before the lock, intro on the first ritual only). Amended by ADR-0024 (the card's four rules).
 
 ## Context
 A device test of the chant screen with ADR-0020 in place showed five problems:

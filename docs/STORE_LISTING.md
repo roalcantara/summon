@@ -47,7 +47,7 @@ MEET THE FIRST TWO
 • Astaroth, Mighty Duke of Past, Present & Future. Knows your secrets, your future, and that you didn't read the terms of service.
 
 PRIVACY, SERIOUSLY
-The microphone is used only during the ritual, only on your device, and only to tell whether you are chanting. No audio is recorded, saved or sent anywhere, and no words are recognised: the app only checks that your vowels and rhythm sound like the chant. The app has no internet access, no ads, no accounts and no tracking.
+The microphone is used only during the ritual, only on your device, and only to tell whether you are chanting. No audio is recorded, saved or sent anywhere, and no words are recognised: the app only checks that your vowel sounds and pacing sound like the chant. The app has no internet access, no ads, no accounts and no tracking.
 
 NEEDS
 A microphone, and a compass (magnetometer) to tell which way you're facing. Best played in portrait, somewhere you don't mind chanting Latin out loud.
