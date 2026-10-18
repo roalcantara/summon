@@ -61,6 +61,31 @@ object RitualConfig {
     /** An unvoiced run at least this long inside a phrase counts as a pause (breath). */
     const val CHANT_PAUSE_MS = 250L
 
+    // Chant check v2 (ADR-0022): frame-level alignment and shuffle baseline
+    /** A neutral "uh" (adult male); accepted on the unstressed last syllable of longer words. */
+    val NEUTRAL_VOWEL = Formants(500.0, 1_500.0)
+    /** A slot counts as heard only with at least this many frames (3 × 20 ms). */
+    const val ALIGN_MIN_SLOT_FRAMES = 3
+    /** Cost of leaving one frame out of every slot (a consonant or a transition). */
+    const val ALIGN_FRAME_SKIP_COST = 0.6
+    /** Cost of skipping a glide slot entirely (an ordinary slot costs CHANT_GAP_COST). */
+    const val ALIGN_OPTIONAL_SKIP_COST = 0.15
+    /** Weight of the share of skipped frames in a chunk's cost. */
+    const val ALIGN_SKIPPED_WEIGHT = 0.6
+    /** A chunk never passes above this cost. Calibrated from tester clips. */
+    const val ALIGN_MAX_COST = 0.8
+    const val BASELINE_SHUFFLES = 24
+    /** Below this many valid shuffles only [ALIGN_MAX_COST] decides (low-diversity fallback). */
+    const val BASELINE_MIN_SHUFFLES = 8
+    /** A shuffle must differ from the real vowel order in at least this share of slots. */
+    const val BASELINE_MIN_DIFFERENT = 0.3
+    /** The real order must beat at least this share of the shuffles. Calibrated from tester clips. */
+    const val BASELINE_PASS_RANK = 0.7
+    /** A chunk whose median heard slot is shorter than this is talk, not chanting. */
+    const val TALK_MAX_SLOT_MS = 70L
+    const val CHUNK_MAX_SYLLABLES = 8
+    const val CHUNK_MIN_SYLLABLES = 3
+
     // Chant screen (ADR-0019)
     /** After a verdict (sealed, rejected, cracked) the focus clock waits this long, or until the next syllable. */
     const val VERDICT_HOLD_MS = 3_000L
