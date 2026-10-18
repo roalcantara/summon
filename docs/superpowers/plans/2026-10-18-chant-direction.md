@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Bring the portrait altar's direction-finding into the chant screen's sigil, now that the chant screen covers the whole Ritual: a marker on the sigil's ring points at the demon, the ring fills during the lock hold, the sigil shows faintly before it inks, and the lines under it guide ("FIND THE DIRECTION", "HOLD STEADY"). Also bring back the altar's microphone/heading error panels and delete the altar's dead components (ADR-0020).
+**Goal:** Bring the portrait altar's direction-finding into the chant screen's sigil, now that the chant screen covers the whole Ritual: a marker on the sigil's ring points at the demon, the ring fills during the lock hold, the sigil shows faintly before it inks, and the lines under it guide ("FIND THE DIRECTION", "HOLD STEADY"). Also bring back the altar's microphone/heading error panels, show the intro card on the first ritual only again, and delete the altar's dead components (ADR-0020).
 
 **Architecture:** `chantScreenState(...)` (pure, JVM-tested) gains `drifting`, `markerDegrees` (`signedDelta(azimuth, target)`, the same angle `AltarRing` used), `ring` (`RingMode.Seeking / Locking / Clock`) and `lockFraction`, plus two verdict lines. `ChantSigil` draws the marker and the lock fill from them; `DirectionCue` is red only while drifting. `ChantScreen` takes a `blocker` slot that replaces the phrase with the error panel `RitualScreen` builds. No engine or rule changes.
 
@@ -54,6 +54,7 @@ Expected: `BUILD SUCCESSFUL`. Lint warnings are allowed; lint errors are not.
 | `MAIN/ui/screens/ChantScreenState.kt`, `TEST/ui/screens/ChantScreenStateTest.kt` | Replace | Marker angle, ring mode, lock fill, drifting, two verdict lines |
 | `MAIN/ui/screens/ChantScreen.kt` | Modify | Marker and lock fill on `ChantSigil`, ghost sigil, line colours, verdict lines, `blocker` slot |
 | `MAIN/ui/screens/RitualScreen.kt` | Modify | Error panels as the `blocker`; dead altar code removed |
+| `MAIN/navigation/AppNavHost.kt` | Modify | Intro card on the first ritual only |
 | `app/src/main/res/values/strings.xml` | Modify | Two verdict lines; unused altar strings removed |
 | `MAIN/ui/components/RomanNumerals.kt` | Create | `ROMAN_NUMERALS`, moved out of `ChantTablet.kt` |
 | `MAIN/ui/components/AltarRing.kt`, `ChantTablet.kt`, `KaraokeLine.kt`, `MAIN/ui/screens/RitualCue.kt`, `TEST/ui/screens/RitualCueTest.kt` | Delete | The portrait altar's components |
@@ -923,7 +924,40 @@ git add app/src/main/java/com/summondemons/safely/ui/screens
 git commit -q -m "fix(ui): Microphone and heading error panels on the chant screen (ADR-0020)" -m "$TRAILER"
 ```
 
-### Task 5: Remove the portrait altar's leftovers
+### Task 5: The intro card only on the first ritual
+
+`AppNavHost` passes `showIntro = true`, so the "How to chant" card shows on every ritual.
+ADR-0019 says the first ritual only, then from "?". `Progress.chantIntroSeen` and
+`GameViewModel.markChantIntroSeen` already exist and are already wired as `onIntroSeen`.
+
+**Files:**
+- Modify: `MAIN/navigation/AppNavHost.kt`
+
+- [ ] **Step 1: Edit `app/src/main/java/com/summondemons/safely/navigation/AppNavHost.kt`**
+
+Replace:
+
+```kotlin
+            showIntro = true,
+```
+
+with:
+
+```kotlin
+            // First ritual only; "?" on the chant screen reopens it (ADR-0019).
+            showIntro = !state.progress.chantIntroSeen,
+```
+
+- [ ] **Step 2: Build and commit**
+
+Run: `./gradlew assembleDebug`. Expected: `BUILD SUCCESSFUL`.
+
+```bash
+git add app/src/main/java/com/summondemons/safely/navigation/AppNavHost.kt
+git commit -q -m "fix(ui): Show the intro card on the first ritual only (ADR-0019)" -m "$TRAILER"
+```
+
+### Task 6: Remove the portrait altar's leftovers
 
 Nothing calls these since the chant screen covers the whole Ritual. Delete them; the
 compiler and lint point at anything that still refers to them.
@@ -998,7 +1032,7 @@ git commit -q -m "refactor(ui): Remove the portrait altar's components (ADR-0020
 
 ## Phase 4 — Device check
 
-### Task 6: Device checklist
+### Task 7: Device checklist
 
 Install with `./gradlew installDebug` and check on a phone:
 
@@ -1018,8 +1052,10 @@ Install with `./gradlew installDebug` and check on a phone:
    settings** after a permanent denial) replaces the phrase; granting it brings the phrase
    back. **No heading sensor** (emulator without sensors): its panel shows.
 7. **Reduced motion:** the drifting line doesn't blink; the marker still moves.
-8. Everything from the chant-screen checklist still works (intro card, verdicts, word
-   lines, climax).
+8. **Intro card once:** on a fresh install (or debug sheet → Reset all) the card shows at
+   the first ritual; after **Summon**, the next ritual starts without it, even after
+   restarting the app; "?" still opens it.
+9. Everything from the chant-screen checklist still works (verdicts, word lines, climax).
 
 ---
 
@@ -1033,5 +1069,6 @@ Install with `./gradlew installDebug` and check on a phone:
 | Direction line neutral while seeking, red only while drifting | 2, 3 |
 | "FIND THE DIRECTION" / "HOLD STEADY" | 2, 3 |
 | Error panels on the chant screen | 4 |
-| Remove the altar's components and strings; `ROMAN_NUMERALS` moved | 5 |
+| Remove the altar's components and strings; `ROMAN_NUMERALS` moved | 6 |
+| Intro card on the first ritual only (ADR-0019, regressed in `a7f4c27`) | 5 |
 | Canon updates | 1 |

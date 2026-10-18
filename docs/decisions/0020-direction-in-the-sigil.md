@@ -38,6 +38,9 @@ The chant screen covers the whole Ritual, and the sigil carries the direction:
 - **Error panels on the chant screen:** when the microphone is denied or unavailable, or
   the device has no heading sensor, the panel replaces the phrase and the verdict line
   (same copy and actions as the altar had).
+- **Intro card on the first ritual only:** `a7f4c27` also passed `showIntro = true`, so
+  the card showed on every ritual; it goes back to ADR-0019's rule
+  (`!progress.chantIntroSeen`, then "?").
 - **Cleanup:** the altar's components go: `AltarRing`, `ChantTablet` (with `FocusBar`,
   `Medallion`, `FocusTone`), `KaraokeLine`, `RitualCue` (cue chip rows and the chant
   header) and their tests, and the strings only they used. `CueChip` stays (Home uses
