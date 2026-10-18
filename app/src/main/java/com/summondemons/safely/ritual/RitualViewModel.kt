@@ -77,6 +77,8 @@ class RitualViewModel(
     /** Show the intro card when the ritual opens: the app does on every ritual (ADR-0021). */
     private val showIntro: Boolean = false,
     private val analysisDispatcher: CoroutineDispatcher = Dispatchers.Default,
+    /** Debug builds log every ritual here; release builds pass [SessionLog.None] (ADR-0025). */
+    private val sessionLog: SessionLog = SessionLog.None,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(
@@ -119,8 +121,9 @@ class RitualViewModel(
 
     fun onMicPermission(granted: Boolean) = state.update { it.copy(micGranted = granted) }
 
-    fun setSimulateHeading(on: Boolean) = state.update {
-        if (on) it.copy(simulateHeading = true) else it.copy(simulateHeading = false, azimuth = null)
+    fun setSimulateHeading(on: Boolean) {
+        note("simulateHeading:$on")
+        state.update { if (on) it.copy(simulateHeading = true) else it.copy(simulateHeading = false, azimuth = null) }
     }
 
     fun setHoldToChant(on: Boolean) {
@@ -129,7 +132,10 @@ class RitualViewModel(
     }
 
     /** **Summon**, ✕ or back on the intro card: the chant starts listening (ADR-0019, ADR-0021). */
-    fun dismissIntro() = state.update { it.copy(introVisible = false) }
+    fun dismissIntro() {
+        note("intro:closed")
+        state.update { it.copy(introVisible = false) }
+    }
 
     /** "?" on the chant screen: show the intro card again. */
     fun openIntro() = state.update { it.copy(introVisible = true) }
@@ -143,10 +149,23 @@ class RitualViewModel(
         }
         clipRecorder.stop()
         if (next != null) clipRecorder.start("${demon.id}-${next.tag}")
+        note("clip:${next?.tag ?: "off"}")
         state.update { it.copy(clipLabel = next) }
     }
 
-    override fun onCleared() = clipRecorder.stop()
+    override fun onCleared() {
+        clipRecorder.stop()
+        sessionLog.stop()
+    }
+
+    /** Ticks run so far; the session log's clock (ADR-0025). */
+    private var ticks = 0L
+
+    private fun note(text: String) = sessionLog.write(SessionTick(t = ticks * RitualConfig.FRAME_MS, note = text))
+
+    init {
+        sessionLog.start(SessionHeader(demon.id, demon.ritualHeading, demon.chantPhrases, judged = true, startedMs = System.currentTimeMillis()))
+    }
 
     /** Called from the Ritual screen's ON_START / ON_STOP. */
     fun setActive(active: Boolean) = state.update {
@@ -165,7 +184,9 @@ class RitualViewModel(
         }
 
         val inCourt = if (RitualEngine.canLock(current.ritual, current.azimuth)) inCourt() else false
-        val step = RitualEngine.step(current.ritual, RitualInput(current.azimuth, voice, inCourt))
+        val input = RitualInput(current.azimuth, voice, inCourt)
+        val step = RitualEngine.step(current.ritual, input)
+        sessionLog.write(SessionRecords.tick(ticks++ * RitualConfig.FRAME_MS, input, step, hold = current.holdToChant))
         // The summon is saved here, not through the lossy effects flow, before the climax plays.
         step.effects.filterIsInstance<RitualEffect.ClimaxStart>().firstOrNull()?.let { commitSummon(it.flawless) }
         state.update {
@@ -237,8 +258,11 @@ class RitualViewModel(
             commitSummon: (flawless: Boolean) -> Unit = {},
             clipRecorder: ClipRecorder = ClipRecorder.None,
             showIntro: Boolean = false,
+            sessionLog: SessionLog = SessionLog.None,
         ): ViewModelProvider.Factory = viewModelFactory {
-            initializer { RitualViewModel(demon, headingSource, pcmSource, inCourt, commitSummon, clipRecorder, showIntro) }
+            initializer {
+                RitualViewModel(demon, headingSource, pcmSource, inCourt, commitSummon, clipRecorder, showIntro, sessionLog = sessionLog)
+            }
         }
     }
 }

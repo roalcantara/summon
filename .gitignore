@@ -16,6 +16,7 @@ local.properties
 
 # Tester voice clips for chant-check calibration (ADR-0018): people's voices, never committed
 app/src/test/chant-clips/
+app/src/test/sessions/
 
 # Signing (ADR-0017): never commit keystores
 *.jks

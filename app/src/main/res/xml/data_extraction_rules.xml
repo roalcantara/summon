@@ -4,9 +4,11 @@
     <cloud-backup>
         <exclude domain="file" path="datastore/debug_settings.preferences_pb" />
         <exclude domain="file" path="chant-clips/" />
+        <exclude domain="file" path="sessions/" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="file" path="datastore/debug_settings.preferences_pb" />
         <exclude domain="file" path="chant-clips/" />
+        <exclude domain="file" path="sessions/" />
     </device-transfer>
 </data-extraction-rules>

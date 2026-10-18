@@ -38,6 +38,7 @@ import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.platform.AndroidHeadingSource
 import com.summondemons.safely.platform.AndroidPcmSource
 import com.summondemons.safely.platform.ClipRecorders
+import com.summondemons.safely.platform.SessionLogs
 import com.summondemons.safely.platform.GameSounds
 import com.summondemons.safely.platform.LocalGameSounds
 import com.summondemons.safely.progress.ProgressRules
@@ -178,6 +179,7 @@ private fun RitualDestination(
             inCourt = { game.inCourtNow(demon.house) },
             commitSummon = { flawless -> game.commitSummon(demon.id, startDay, flawless) },
             clipRecorder = ClipRecorders.create(appContext),
+            sessionLog = SessionLogs.create(appContext),
             // Before every ritual; "?" on the chant screen reopens it (ADR-0021).
             showIntro = true,
         )
