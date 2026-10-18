@@ -62,17 +62,13 @@
 
     <!-- Chant screen (ADR-0019) -->
     <string name="chant_face">Face %1$s</string>
+    <string name="chant_step_chant">Chant</string>
+    <string name="chant_a11y_seals">%1$d of 4 lines sealed</string>
     <string name="chant_a11y_facing">Facing %1$s</string>
     <string name="chant_a11y_turn_left">Turn left to face %1$s</string>
     <string name="chant_a11y_turn_right">Turn right to face %1$s</string>
-    <string name="chant_clock_seconds">%1$d s</string>
-    <string name="chant_clock_paused">Paused</string>
-    <string name="verdict_chant_aloud">Chant aloud</string>
-    <string name="verdict_paused">Paused</string>
-    <string name="verdict_sealed">Sealed</string>
     <string name="verdict_chant_again">Chant again</string>
     <string name="verdict_seal_cracked">Seal cracked</string>
-    <string name="verdict_of">of</string>
     <string name="chant_help">How to chant</string>
     <string name="intro_title">How to chant</string>
     <string name="intro_direction_title">Direction</string>

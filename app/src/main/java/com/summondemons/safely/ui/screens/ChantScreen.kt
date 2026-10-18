@@ -117,7 +117,6 @@ private const val SYLLABLE_DOT = "·"
 private const val ROUND_BUTTON_ALPHA = 0.8f
 private val METER_HEIGHTS = listOf(0.45f, 0.8f, 1f, 0.7f, 0.4f)
 private val NameSize = 24.sp
-private val DirectionSize = 18.sp
 private val VerdictSize = 22.sp
 private val BandSigil = 96.dp
 private val MeterWidth = 26.dp
@@ -223,11 +222,6 @@ private fun Slab(
         screen.drifting -> colors.error
         else -> colors.outline
     }
-    val lineColor = when {
-        screen.facing -> safe
-        screen.drifting -> colors.error
-        else -> colors.onSurface
-    }
     Surface(modifier, shape = MaterialTheme.shapes.large, color = colors.surfaceContainerLow.copy(alpha = SLAB_ALPHA)) {
         if (vertical) {
             Column(
@@ -241,7 +235,7 @@ private fun Slab(
                     state, screen, accent, ringColor, flash,
                     Modifier.fillMaxWidth().weight(1f, fill = false).aspectRatio(1f, matchHeightConstraintsFirst = true),
                 )
-                DirectionCue(screen, state.demon.ritualHeading, lineColor, Modifier.padding(top = spacing.sm))
+                RitualStatusBlock(screen.status, state.demon.ritualHeading, accent, Modifier.padding(top = spacing.sm))
             }
         } else {
             Row(
@@ -251,7 +245,7 @@ private fun Slab(
             ) {
                 SlabButtons(onHelp, debug)
                 ChantSigil(state, screen, accent, ringColor, flash, Modifier.size(BandSigil))
-                DirectionCue(screen, state.demon.ritualHeading, lineColor)
+                RitualStatusBlock(screen.status, state.demon.ritualHeading, accent, Modifier.weight(1f))
             }
         }
     }
@@ -392,43 +386,6 @@ private fun ChantSigil(
             ghostAlpha = GHOST_ALPHA,
             flash = flash,
         )
-        screen.clockSeconds?.let { seconds ->
-            Text(
-                if (screen.clockHeld) stringResource(R.string.chant_clock_paused).upper() else stringResource(R.string.chant_clock_seconds, seconds),
-                style = MaterialTheme.textRoles.meta,
-                color = colors.onSurfaceVariant,
-                modifier = Modifier.align(Alignment.BottomCenter),
-            )
-        }
-    }
-}
-
-/** "FACE EAST ✓" in green; "← FACE EAST" neutral while seeking, red and blinking while drifting (ADR-0020). */
-@Composable
-private fun DirectionCue(screen: ChantScreenState, target: Float, color: Color, modifier: Modifier = Modifier) {
-    val reduceMotion = LocalReduceMotion.current
-    val blink = if (screen.drifting && !reduceMotion) {
-        rememberInfiniteTransition(label = "direction").animateFloat(
-            1f, BLINK_MIN, infiniteRepeatable(tween(BLINK_HALF_MS), RepeatMode.Reverse), label = "directionBlink",
-        ).value
-    } else {
-        1f
-    }
-    val direction = headingLabel(target)
-    val description = when {
-        screen.facing -> stringResource(R.string.chant_a11y_facing, direction)
-        screen.turn == TurnDirection.Right -> stringResource(R.string.chant_a11y_turn_right, direction)
-        else -> stringResource(R.string.chant_a11y_turn_left, direction)
-    }
-    val style = MaterialTheme.textRoles.ritualCue.copy(fontSize = DirectionSize)
-    Row(
-        modifier.graphicsLayer { alpha = blink }.semantics(mergeDescendants = true) { contentDescription = description },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs),
-    ) {
-        if (!screen.facing) Text(if (screen.turn == TurnDirection.Right) "→" else "←", style = style, color = color)
-        Text(stringResource(R.string.chant_face, direction).upper(), style = style, color = color, maxLines = 1)
-        if (screen.facing) Text("✓", style = style, color = color)
     }
 }
 
@@ -549,48 +506,29 @@ private fun DrawScope.drawWave(from: Float, to: Float, y: Float, amplitude: Floa
     drawPath(path, color, style = Stroke(width, cap = StrokeCap.Round))
 }
 
-/** "CHANT ALOUD · I of IV" and its siblings, with the voice meter while listening; only "I of IV" before the lock. */
+/** The voice meter while chanting, or the one message that needs action (ADR-0024). */
 @Composable
 private fun VerdictLine(screen: ChantScreenState, accent: Color, micLevel: Float) {
     val colors = MaterialTheme.colorScheme
-    val safe = MaterialTheme.demonColors.ritualSafe
-    val color = when (screen.verdict) {
-        VerdictLine.Sealed -> safe
-        VerdictLine.ChantAgain, VerdictLine.SealCracked -> colors.error
-        VerdictLine.ChantAloud, VerdictLine.Paused, VerdictLine.Count -> colors.outline
-    }
-    val label = when (screen.verdict) {
-        VerdictLine.Count -> null
-        VerdictLine.ChantAloud -> R.string.verdict_chant_aloud
-        VerdictLine.Paused -> R.string.verdict_paused
-        VerdictLine.Sealed -> R.string.verdict_sealed
-        VerdictLine.ChantAgain -> R.string.verdict_chant_again
-        VerdictLine.SealCracked -> R.string.verdict_seal_cracked
-    }?.let { stringResource(it).upper() }
-    val of = stringResource(R.string.verdict_of).upper()
     val style = MaterialTheme.textRoles.ritualCue.copy(fontSize = VerdictSize)
-    val nameFamily = MaterialTheme.textRoles.name.fontFamily
-    val count = buildAnnotatedString {
-        withStyle(SpanStyle(fontFamily = nameFamily, color = accent)) { append(ROMAN_NUMERALS[screen.numeral]) }
-        withStyle(SpanStyle(color = colors.outline, fontSize = 0.7.em)) { append(" $of ") }
-        withStyle(SpanStyle(fontFamily = nameFamily, color = accent)) { append(ROMAN_NUMERALS.last()) }
-    }
     Row(
         Modifier.semantics(mergeDescendants = true) { liveRegion = LiveRegionMode.Polite },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
     ) {
-        if (screen.verdict == VerdictLine.ChantAloud || screen.verdict == VerdictLine.Paused) {
-            val listening = screen.verdict == VerdictLine.ChantAloud
-            VoiceMeter(if (listening) micLevel else 0f, if (listening) accent else colors.outline, Modifier.size(MeterWidth, MeterHeight))
-        }
-        if (label != null) Text(label, style = style, color = color, maxLines = 1)
         when (screen.verdict) {
-            VerdictLine.Sealed -> Text("✓", style = style, color = color)
-            VerdictLine.ChantAgain, VerdictLine.SealCracked -> Text("✕", style = style, color = color)
-            else -> Unit
+            VerdictLine.None -> Unit
+            VerdictLine.Listening -> VoiceMeter(
+                if (screen.drifting) 0f else micLevel,
+                if (screen.drifting) colors.outline else accent,
+                Modifier.size(MeterWidth, MeterHeight),
+            )
+            VerdictLine.ChantAgain, VerdictLine.SealCracked -> {
+                val label = if (screen.verdict == VerdictLine.ChantAgain) R.string.verdict_chant_again else R.string.verdict_seal_cracked
+                Text(stringResource(label).upper(), style = style, color = colors.error, maxLines = 1)
+                Text("✕", style = style, color = colors.error)
+            }
         }
-        Text(count, style = style, maxLines = 1)
     }
 }
 

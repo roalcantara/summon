@@ -10,7 +10,6 @@ import com.summondemons.safely.ritual.TurnDirection
 import com.summondemons.safely.ritual.WordMark
 import com.summondemons.safely.ritual.signedDelta
 import com.summondemons.safely.ritual.turnDirection
-import kotlin.math.ceil
 
 /** How a word is drawn on the chant screen (ADR-0019): its underline and colour. */
 enum class WordLook { Pending, Current, Heard, Doubtful, Rejected }
@@ -18,8 +17,20 @@ enum class WordLook { Pending, Current, Heard, Doubtful, Rejected }
 /** One word: its syllables (trailing punctuation on the last), how many are lit, and its look. */
 data class ChantWord(val syllables: List<String>, val lit: Int, val look: WordLook)
 
-/** The one line under the words (ADR-0019). Before the lock it is only the count; the sigil guides (ADR-0021). */
-enum class VerdictLine { Count, ChantAloud, Paused, Sealed, ChantAgain, SealCracked }
+/** The one line under the words (ADR-0024): nothing before the lock, the voice meter, or a message that needs action. */
+enum class VerdictLine { None, Listening, ChantAgain, SealCracked }
+
+/** Step 1 of the status block (ADR-0024): finding the direction, holding it, lost after the lock, or done. */
+enum class StepState { Seeking, Aligned, Drifting, Done }
+
+/** How one phrase's seal is drawn (ADR-0024). */
+enum class SealLook { Pending, Current, Sealed, Cracked }
+
+/** One seal: its look, the phrase's chunk count, and how many of them have passed. */
+data class SealState(val look: SealLook, val parts: Int, val passed: Int)
+
+/** The two-row status block under the sigil (ADR-0024). [turn] is null when aligned or done. */
+data class StatusBlock(val step: StepState, val turn: TurnDirection?, val seals: List<SealState>)
 
 /** What the sigil's outer ring shows (ADR-0020): the track while seeking, the hold while locking, then the focus clock. */
 enum class RingMode { Seeking, Locking, Clock }
@@ -41,14 +52,10 @@ data class ChantScreenState(
     /** How much of the 0.6 s lock hold is done, 0..1 (only while locking). */
     val lockFraction: Float,
     val verdict: VerdictLine,
-    /** Phrase shown as "{I..IV} of IV", 0-based. */
-    val numeral: Int,
+    /** Step 1 and the four seals (ADR-0024). */
+    val status: StatusBlock,
     /** The sigil ring's arc: focus left, or 1 on phrase I (no clock). */
     val clockFraction: Float,
-    /** Whole seconds left, or null on phrase I. */
-    val clockSeconds: Int?,
-    /** The clock waits while a fresh verdict is on screen. */
-    val clockHeld: Boolean,
 )
 
 /** Splits a chant phrase into words of syllables for display, matching [LatinSyllables]. */
@@ -80,10 +87,8 @@ fun chantScreenState(ritual: RitualState, phrases: List<String>, azimuth: Float?
     val line = when {
         verdict?.kind == ChantVerdict.Kind.Rejected -> VerdictLine.ChantAgain
         verdict?.kind == ChantVerdict.Kind.Cracked -> VerdictLine.SealCracked
-        verdict?.kind == ChantVerdict.Kind.Sealed -> VerdictLine.Sealed
-        ritual.phase == RitualPhase.Seeking || ritual.phase == RitualPhase.Locking -> VerdictLine.Count
-        ritual.phase == RitualPhase.Wavering -> VerdictLine.Paused
-        else -> VerdictLine.ChantAloud
+        ritual.phase == RitualPhase.Chanting || ritual.phase == RitualPhase.Wavering -> VerdictLine.Listening
+        else -> VerdictLine.None
     }
     val clock = ritual.phrase in 1 until PHRASE_COUNT
     return ChantScreenState(
@@ -99,10 +104,8 @@ fun chantScreenState(ritual: RitualState, phrases: List<String>, azimuth: Float?
         },
         lockFraction = if (ritual.phase == RitualPhase.Locking) (ritual.lockMs.toFloat() / LOCK_HOLD_MS).coerceIn(0f, 1f) else 0f,
         verdict = line,
-        numeral = if (verdict?.kind == ChantVerdict.Kind.Sealed) verdict.phrase else phrase,
+        status = statusBlock(ritual, azimuth, target, verdict),
         clockFraction = if (clock) ritual.focusFraction else 1f,
-        clockSeconds = if (clock) ceil(ritual.focusMs / 1_000.0).toInt() else null,
-        clockHeld = clock && verdict?.holdsClock == true,
     )
 }
 
@@ -121,4 +124,25 @@ private fun chantingWords(ritual: RitualState, phrase: Int, text: List<List<Stri
         }
         ChantWord(syllables, lit, look)
     }
+}
+
+private fun statusBlock(ritual: RitualState, azimuth: Float?, target: Float, verdict: ChantVerdict?): StatusBlock {
+    val done = ritual.phrase >= PHRASE_COUNT
+    val step = when {
+        done -> StepState.Done
+        ritual.phase == RitualPhase.Wavering -> StepState.Drifting
+        ritual.aligned -> StepState.Aligned
+        else -> StepState.Seeking
+    }
+    val seals = (0 until PHRASE_COUNT).map { p ->
+        val parts = ritual.chunks?.getOrNull(p)?.size ?: 1
+        when {
+            verdict?.kind == ChantVerdict.Kind.Cracked && p == verdict.phrase -> SealState(SealLook.Cracked, parts, 0)
+            p < ritual.phrase -> SealState(SealLook.Sealed, parts, parts)
+            p == ritual.phrase -> SealState(SealLook.Current, parts, ritual.chunk)
+            else -> SealState(SealLook.Pending, parts, 0)
+        }
+    }
+    val turn = if (step == StepState.Aligned || step == StepState.Done) null else turnDirection(azimuth, target)
+    return StatusBlock(step, turn, seals)
 }
