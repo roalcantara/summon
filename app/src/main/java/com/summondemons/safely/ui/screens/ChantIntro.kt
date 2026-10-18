@@ -2,12 +2,14 @@ package com.summondemons.safely.ui.screens
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,16 +17,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -33,15 +35,16 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
-import com.summondemons.safely.ui.components.PrimaryActionButton
 import com.summondemons.safely.ui.components.ROMAN_NUMERALS
-import com.summondemons.safely.ui.components.RibbonBanner
 import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.stage
@@ -51,6 +54,11 @@ import com.summondemons.safely.ui.theme.upper
 private const val INTRO_SLAB_WEIGHT = 0.25f
 private const val INTRO_SLAB_ALPHA = 0.7f
 private const val ART_FRACTION = 0.8f
+private val BannerTitleColor = Color(0xFF3A2400)
+private val BannerHeight = 56.dp
+private val BannerTitleSize = 24.sp
+private val SummonButtonHeight = 56.dp
+private val SummonLabelSize = 20.sp
 private val RuleTitleSize = 18.sp
 private val RuleBodySize = 16.sp
 private val NumeralSize = 11.sp
@@ -63,8 +71,8 @@ private val BandHeight = 112.dp
  * words go. Generic: nothing in it names a demon or a direction. The microphone is ignored
  * while it is up (RitualViewModel); **Summon** starts the chant.
  *
- * Placeholders until the Stitch art lands (DESIGN.md "Gaps"): the demon's avatar for the
- * singer, `RibbonBanner` for the banner, `PrimaryActionButton` for the button.
+ * Art: `chant_intro_singer.webp` on the slab, `chant_intro_banner.webp` for the header,
+ * and `chant_summon_button.webp` / `_pressed.webp` for the action (DESIGN.md, ADR-0019).
  */
 @Composable
 fun ChantIntro(
@@ -81,12 +89,12 @@ fun ChantIntro(
         ChantBackdrop(demon.house.stage(), landscape, Modifier.fillMaxSize())
         if (landscape) {
             Row(Modifier.fillMaxSize().safeDrawingPadding().padding(spacing.lg), horizontalArrangement = Arrangement.spacedBy(spacing.lg)) {
-                ArtSlab(demon, Modifier.fillMaxHeight().weight(INTRO_SLAB_WEIGHT))
+                ArtSlab(Modifier.fillMaxHeight().weight(INTRO_SLAB_WEIGHT))
                 Rules(accent, onSummon, Modifier.fillMaxHeight().weight(1f - INTRO_SLAB_WEIGHT))
             }
         } else {
             Column(Modifier.fillMaxSize().safeDrawingPadding().padding(spacing.lg), verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
-                ArtSlab(demon, Modifier.fillMaxWidth().height(BandHeight))
+                ArtSlab(Modifier.fillMaxWidth().height(BandHeight))
                 Rules(accent, onSummon, Modifier.fillMaxWidth().weight(1f))
             }
         }
@@ -103,17 +111,15 @@ fun ChantIntro(
 }
 
 @Composable
-private fun ArtSlab(demon: Demon, modifier: Modifier) {
+private fun ArtSlab(modifier: Modifier) {
     val colors = MaterialTheme.colorScheme
     Surface(modifier, shape = MaterialTheme.shapes.large, color = colors.surfaceContainerLow.copy(alpha = INTRO_SLAB_ALPHA)) {
         Box(contentAlignment = Alignment.Center) {
-            // Placeholder: the demon's avatar, circle-clipped. Swap for R.drawable.chant_intro_singer
-            // (no clip, ContentScale.Fit) when the Stitch art lands.
             Image(
-                painter = painterResource(demon.avatarArt),
+                painter = painterResource(R.drawable.chant_intro_singer),
                 contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(ART_FRACTION).aspectRatio(1f).clip(CircleShape),
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize(ART_FRACTION),
             )
         }
     }
@@ -123,7 +129,26 @@ private fun ArtSlab(demon: Demon, modifier: Modifier) {
 private fun Rules(accent: Color, onSummon: () -> Unit, modifier: Modifier) {
     val spacing = MaterialTheme.spacing
     Column(modifier.padding(horizontal = spacing.sm), verticalArrangement = Arrangement.spacedBy(spacing.md, Alignment.CenterVertically)) {
-        RibbonBanner(stringResource(R.string.intro_title).upper(), Modifier.semantics { heading() })
+        Box(
+            modifier = Modifier
+                .height(BannerHeight)
+                .semantics { heading() },
+            contentAlignment = Alignment.Center,
+        ) {
+            Image(
+                painter = painterResource(R.drawable.chant_intro_banner),
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier.matchParentSize(),
+            )
+            Text(
+                text = stringResource(R.string.intro_title).upper(),
+                style = MaterialTheme.textRoles.name.copy(fontSize = BannerTitleSize),
+                color = BannerTitleColor,
+                modifier = Modifier.padding(horizontal = spacing.xl),
+                maxLines = 1,
+            )
+        }
         Rule(R.string.intro_direction_title, R.string.intro_direction_body) { CheckIcon() }
         Rule(R.string.intro_chant_title, R.string.intro_chant_body) { VoiceMeter(0.8f, accent, Modifier.size(RuleIcon, RuleIcon * 0.7f)) }
         Rule(R.string.intro_lines_title, R.string.intro_lines_body) { LinesIcon() }
@@ -135,7 +160,45 @@ private fun Rules(accent: Color, onSummon: () -> Unit, modifier: Modifier) {
                 maxLines = 1,
             )
         }
-        PrimaryActionButton(stringResource(R.string.intro_summon).upper(), onClick = onSummon)
+        SummonButton(onClick = onSummon)
+    }
+}
+
+@Composable
+private fun SummonButton(onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val label = stringResource(R.string.intro_summon).upper()
+    val buttonDrawable = if (isPressed) R.drawable.chant_summon_button_pressed else R.drawable.chant_summon_button
+    val inkHighlight = MaterialTheme.demonColors.inkHighlight
+    Box(
+        modifier = Modifier
+            .height(SummonButtonHeight)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                role = Role.Button,
+                onClick = onClick,
+            )
+            .semantics {
+                contentDescription = label
+                role = Role.Button
+            },
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            painter = painterResource(buttonDrawable),
+            contentDescription = null,
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.matchParentSize(),
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.textRoles.name.copy(fontSize = SummonLabelSize),
+            color = inkHighlight,
+            modifier = Modifier.padding(horizontal = MaterialTheme.spacing.xl),
+            maxLines = 1,
+        )
     }
 }
 

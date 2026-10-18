@@ -195,6 +195,10 @@ large sources are not density-scaled and the APK stays small.
 | `stage_home` | `art/etc/stage_home.png` | 768×1376 scene, Home stage background |
 | `stage_sol` | `art/etc/stage_sol.png` | 768×1376 scene, Sol House stage background |
 | `stage_venus` | `art/etc/stage_venus.png` | 768×1376 scene, Venus House stage background |
+| `chant_intro_singer` | `art/splash/chant_intro_singer_full.png` | 1024×1024, alpha; generic chibi demon singing into karaoke mic |
+| `chant_intro_banner` | `art/splash/chant_intro_banner.png` | 1200×531, alpha; parchment ribbon banner |
+| `chant_summon_button` | `art/splash/chant_summon_button_unpressed.png` | 800×359, alpha; plum-enamel stone plaque button |
+| `chant_summon_button_pressed` | `art/splash/chant_summon_button_pressed.png` | 800×359, alpha; pressed state |
 | `ic_home_grimoire` | `art/etc/RestlessGrimoire.png` | 1024×1024 opaque square asset, Home grimoire book |
 | `ic_launcher_foreground` | `tools/gen_icons.py` | Generated mipmaps (`mipmap-{m,h,xh,xxh,xxxh}dpi`), adaptive icon foreground |
 | `ic_launcher_monochrome` | Hand-crafted vector | 108×108 dp vector drawable (`res/drawable/`), themed icon layer |
@@ -235,12 +239,4 @@ breach screen).
 
 ## Gaps
 
-Stage backgrounds (`stage_home`, `stage_sol`, `stage_venus`), Home grimoire (`ic_home_grimoire`), and Asmodeus scene art (`demon_asmodeus_full`) have been processed and integrated into `app/src/main/res/drawable-nodpi/`.
-
-Open gaps (the intro card of the chant screen, ADR-0019). Full specs and prompts: `docs/superpowers/plans/2026-10-18-chant-screen.md`, Task 10.
-
-| Gap                                               | Placeholder                        | Stitch prompt (short)                                                                                 |
-| ------------------------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Intro singer (`chant_intro_singer`)               | The demon's avatar, circle-clipped | A generic cute chibi demon belting into a vintage karaoke microphone, transparent background, no text |
-| Intro banner (`chant_intro_banner`)               | `RibbonBanner`                     | An empty parchment ribbon banner with folded tails, transparent background, no text                   |
-| Summon button (`chant_summon_button`, `_pressed`) | `PrimaryActionButton`              | A glowing plum-enamel stone plaque with a gold rim, transparent background, no text                   |
+All gaps closed. Stage backgrounds (`stage_home`, `stage_sol`, `stage_venus`), Home grimoire (`ic_home_grimoire`), Asmodeus scene art (`demon_asmodeus_full`), and the chant intro card art (`chant_intro_singer`, `chant_intro_banner`, `chant_summon_button`, `chant_summon_button_pressed`) have been processed and integrated into `app/src/main/res/drawable-nodpi/`.
