@@ -174,6 +174,8 @@ private fun RitualDestination(
             inCourt = { game.inCourtNow(demon.house) },
             commitSummon = { flawless -> game.commitSummon(demon.id, startDay, flawless) },
             clipRecorder = ClipRecorders.create(appContext),
+            showIntro = !state.progress.chantIntroSeen,
+            onIntroSeen = game::markChantIntroSeen,
         )
     }
     val ritual: RitualViewModel = viewModel(factory = ritualFactory)

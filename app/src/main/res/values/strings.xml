@@ -99,6 +99,16 @@
     <string name="chant_turn_sideways">Turn your phone sideways</string>
     <string name="chant_keep_mic_clear">Hold it in front of your mouth, and keep the bottom edge clear so the microphone can hear you.</string>
     <string name="chant_help">How to chant</string>
+    <string name="intro_title">How to chant</string>
+    <string name="intro_direction_title">Direction</string>
+    <string name="intro_direction_body">Turn until the symbol turns green.</string>
+    <string name="intro_chant_title">Chant</string>
+    <string name="intro_chant_body">Read each line aloud, following the glowing syllables.</string>
+    <string name="intro_lines_title">Lines</string>
+    <string name="intro_lines_body">Green: heard. Red: say it again.</string>
+    <string name="intro_seal_title">Seal</string>
+    <string name="intro_seal_body">Seal all four lines to summon the demon.</string>
+    <string name="intro_summon">Summon</string>
     <string name="focus_label">Focus</string>
     <string name="abandon_title">Abandon the ritual?</string>
     <string name="abandon_body">Your seals will fade.</string>

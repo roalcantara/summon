@@ -59,6 +59,10 @@ data class RitualUiState(
     val rejections: Int = 0,
     /** Debug clip recorder label; null = not recording (ADR-0018). */
     val clipLabel: ClipLabel? = null,
+    /** The intro card is on screen; the microphone is ignored meanwhile (ADR-0019). */
+    val introVisible: Boolean = false,
+    /** The card was shown automatically this ritual, so the chant screen skips its turn-sideways hint. */
+    val introOffered: Boolean = false,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -72,6 +76,10 @@ class RitualViewModel(
     private val commitSummon: (flawless: Boolean) -> Unit = {},
     /** Debug builds record tester clips here; release builds pass [ClipRecorder.None] (ADR-0018). */
     private val clipRecorder: ClipRecorder = ClipRecorder.None,
+    /** Show the intro card from the lock: the player's first ritual (ADR-0019). */
+    private val showIntro: Boolean = false,
+    /** Called once, the first time the player dismisses the intro card. */
+    private val onIntroSeen: () -> Unit = {},
     private val analysisDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ViewModel() {
 
@@ -80,6 +88,8 @@ class RitualViewModel(
             demon = demon,
             ritual = RitualState.start(demon.ritualHeading, demon.chantPhrases, judged = true),
             headingUnavailable = !headingSource.available,
+            introVisible = showIntro,
+            introOffered = showIntro,
         ),
     )
     private val _effects = MutableSharedFlow<RitualEffect>(extraBufferCapacity = EFFECT_BUFFER)
@@ -123,6 +133,21 @@ class RitualViewModel(
         state.update { it.copy(holdToChant = on) }
     }
 
+    private var introSeenReported = false
+
+    /** **Summon** on the intro card: the chant starts listening (ADR-0019). */
+    fun dismissIntro() {
+        if (!state.value.introVisible) return
+        state.update { it.copy(introVisible = false) }
+        if (!introSeenReported) {
+            introSeenReported = true
+            onIntroSeen()
+        }
+    }
+
+    /** "?" on the chant screen: show the intro card again. */
+    fun openIntro() = state.update { it.copy(introVisible = true) }
+
     /** Debug: Off → Chant → Nonsense → Off. Each label starts a new clip (ADR-0018). */
     fun cycleClipLabel() {
         val next = when (state.value.clipLabel) {
@@ -147,7 +172,12 @@ class RitualViewModel(
     private fun tick(micFrame: VoiceFrame) {
         val current = state.value
         if (!current.active || awaitingHeading(current)) return
-        val voice = if (current.holdToChant) syntheticVoice(current.ritual) else micFrame
+        val voice = when {
+            current.introVisible -> VoiceFrame.SILENT // nothing counts while the rules are up
+            current.holdToChant -> syntheticVoice(current.ritual)
+            else -> micFrame
+        }
+
         val inCourt = if (RitualEngine.canLock(current.ritual, current.azimuth)) inCourt() else false
         val step = RitualEngine.step(current.ritual, RitualInput(current.azimuth, voice, inCourt))
         // The summon is saved here, not through the lossy effects flow, before the climax plays.
@@ -220,8 +250,10 @@ class RitualViewModel(
             inCourt: () -> Boolean = { false },
             commitSummon: (flawless: Boolean) -> Unit = {},
             clipRecorder: ClipRecorder = ClipRecorder.None,
+            showIntro: Boolean = false,
+            onIntroSeen: () -> Unit = {},
         ): ViewModelProvider.Factory = viewModelFactory {
-            initializer { RitualViewModel(demon, headingSource, pcmSource, inCourt, commitSummon, clipRecorder) }
+            initializer { RitualViewModel(demon, headingSource, pcmSource, inCourt, commitSummon, clipRecorder, showIntro, onIntroSeen) }
         }
     }
 }

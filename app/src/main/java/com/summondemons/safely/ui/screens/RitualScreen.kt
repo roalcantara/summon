@@ -10,6 +10,11 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -113,6 +118,7 @@ private const val WAVER_MIN_ALPHA = 0.45f
 private const val SEAL_FLARE_MS = 700
 private const val CRACK_MS = 1_500
 private const val REJECT_MS = 1_500
+private const val INTRO_MS = 500
 private const val SEAL_FLASH_MIX = 0.5f
 private const val EMBER_ALPHA = 0.5f
 private const val CLIMAX_SCRIM_ALPHA = 0.85f
@@ -237,6 +243,8 @@ fun RitualScreen(
         onSimulateHeadingChange = viewModel::setSimulateHeading,
         onHoldToChantChange = viewModel::setHoldToChant,
         onCycleClipLabel = viewModel::cycleClipLabel,
+        onDismissIntro = viewModel::dismissIntro,
+        onShowIntro = viewModel::openIntro,
         onAbort = onAbort,
         modifier = modifier,
     )
@@ -255,6 +263,8 @@ private fun RitualContent(
     onSimulateHeadingChange: (Boolean) -> Unit,
     onHoldToChantChange: (Boolean) -> Unit,
     onCycleClipLabel: () -> Unit,
+    onDismissIntro: () -> Unit,
+    onShowIntro: () -> Unit,
     onAbort: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -293,6 +303,8 @@ private fun RitualContent(
                 flash = flash,
                 showClose = !inClimax,
                 onClose = requestClose,
+                onHelp = onShowIntro,
+                showTurnHint = !state.introOffered,
                 debug = if (BuildConfig.DEBUG && !inClimax) {
                     {
                         DebugControls(
@@ -309,8 +321,15 @@ private fun RitualContent(
                 },
                 modifier = Modifier.fillMaxSize().graphicsLayer { alpha = chromeAlpha },
             )
+            // The intro card comes down over the chant screen and goes back up to reveal it (ADR-0019).
+            AnimatedVisibility(
+                visible = state.introVisible && !inClimax,
+                enter = if (reduceMotion) fadeIn(tween(INTRO_MS)) else slideInVertically(tween(INTRO_MS)) { -it } + fadeIn(tween(INTRO_MS)),
+                exit = if (reduceMotion) fadeOut(tween(INTRO_MS)) else slideOutVertically(tween(INTRO_MS)) { -it } + fadeOut(tween(INTRO_MS)),
+            ) {
+                ChantIntro(demon = demon, onSummon = onDismissIntro, showClose = true, onClose = requestClose, modifier = Modifier.fillMaxSize())
+            }
         } else {
-            ParticleField(accent.copy(alpha = EMBER_ALPHA), ParticleStyle.Embers, Modifier.fillMaxSize())
             Column(
                 modifier = Modifier
                     .fillMaxSize()

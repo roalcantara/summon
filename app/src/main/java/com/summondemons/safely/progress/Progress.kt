@@ -40,6 +40,8 @@ data class Progress(
     val demons: Map<String, DemonRecord> = emptyMap(),
     val lastSummonDay: Long? = null,
     val homeHintSeen: Boolean = false,
+    /** The chant screen's "How to chant" card was dismissed once (ADR-0019). */
+    val chantIntroSeen: Boolean = false,
     val lastViewed: String? = null,
 ) {
     fun record(id: String): DemonRecord = demons[id] ?: DemonRecord()

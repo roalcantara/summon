@@ -21,6 +21,7 @@ class ProgressJsonTest {
         ),
         lastSummonDay = 20_001L,
         homeHintSeen = true,
+        chantIntroSeen = true,
         lastViewed = "astaroth",
     )
 
@@ -40,6 +41,11 @@ class ProgressJsonTest {
         val progress = ProgressJson.decode(json)
         assertTrue(progress.record("asmodeus").bound)
         assertEquals(5L, progress.lastSummonDay)
+    }
+
+    @Test
+    fun olderSavesHaveNotSeenTheChantIntro() {
+        assertEquals(false, ProgressJson.decode("""{"homeHintSeen":true}""").chantIntroSeen)
     }
 
     @Test
