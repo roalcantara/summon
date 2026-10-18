@@ -2,6 +2,8 @@ package com.summondemons.safely.ritual
 
 import com.summondemons.safely.ritual.RitualConfig.CLIMAX_MS
 import com.summondemons.safely.ritual.RitualConfig.COURT_BONUS
+import com.summondemons.safely.ritual.RitualConfig.DRIFT_ENTER_DEG
+import com.summondemons.safely.ritual.RitualConfig.DRIFT_EXIT_DEG
 import com.summondemons.safely.ritual.RitualConfig.FOCUS_DRIFT_MULTIPLIER
 import com.summondemons.safely.ritual.RitualConfig.FRAME_MS
 import com.summondemons.safely.ritual.RitualConfig.LOCK_HOLD_MS
@@ -9,10 +11,12 @@ import com.summondemons.safely.ritual.RitualConfig.ONSET_REFRACTORY_MS
 import com.summondemons.safely.ritual.RitualConfig.PHRASE_COUNT
 import com.summondemons.safely.ritual.RitualConfig.PROXIMITY_RANGE_DEG
 import com.summondemons.safely.ritual.RitualConfig.PROXIMITY_STEP_DEG
-import com.summondemons.safely.ritual.RitualConfig.SEAL_LISTEN_MS
 import com.summondemons.safely.ritual.RitualConfig.SUSTAIN_SYLLABLE_MS
 
-/** Pure ritual rules (ADR-0008, the focus clock of ADR-0010, the chant check of ADR-0018/ADR-0022, verdicts of ADR-0019): one call per 20 ms tick. */
+/**
+ * Pure ritual rules (ADR-0008, the timer of ADR-0010/ADR-0025, verdicts of ADR-0019, the
+ * on-device chant check of ADR-0027): one call per 20 ms tick.
+ */
 object RitualEngine {
 
     fun step(state: RitualState, input: RitualInput): Step {
@@ -20,11 +24,12 @@ object RitualEngine {
         val s = state.copy(azimuth = input.azimuth)
         return when (s.phase) {
             RitualPhase.Seeking, RitualPhase.Locking -> seek(s, input.inCourt)
-            RitualPhase.Chanting, RitualPhase.Wavering -> chant(s, input.voice)
+            RitualPhase.Chanting, RitualPhase.Wavering -> chant(s, input.voice, input.heard)
             RitualPhase.Climax -> climax(s)
             RitualPhase.Done -> Step(s)
         }
     }
+
     /**
      * Whether a step with [state] and [azimuth] can lock on this tick.
      * Keeps RitualEngine pure: inputs and state only.
@@ -36,7 +41,6 @@ object RitualEngine {
         val held = (if (s.phase == RitualPhase.Locking) s.lockMs else 0L) + FRAME_MS
         return held >= LOCK_HOLD_MS
     }
-
 
     private fun seek(s: RitualState, inCourt: Boolean): Step {
         val effects = mutableListOf<RitualEffect>()
@@ -62,9 +66,9 @@ object RitualEngine {
         return Step(chanting, effects)
     }
 
-    private fun chant(s: RitualState, voice: VoiceFrame): Step {
+    private fun chant(s: RitualState, voice: VoiceFrame, heard: LineHeard?): Step {
         val effects = mutableListOf<RitualEffect>()
-        if (!s.aligned) {
+        if (!onCourse(s)) {
             // Off heading: nothing counts; once locked, never back to Seeking (ADR-0010).
             if (s.phase == RitualPhase.Chanting) effects += RitualEffect.Drift
             return drain(s.copy(phase = RitualPhase.Wavering, voicedRunMs = 0L), FOCUS_DRIFT_MULTIPLIER, effects)
@@ -72,79 +76,52 @@ object RitualEngine {
         if (s.phase == RitualPhase.Wavering) effects += RitualEffect.Resumed
         val since = s.sinceSyllableMs + FRAME_MS
         val run = if (voice.voiced) s.voicedRunMs + FRAME_MS else 0L
-        val chanting = s.copy(phase = RitualPhase.Chanting, sinceSyllableMs = since, voicedRunMs = run)
-        if (s.take.closing) return close(chanting, voice, effects)
-        val lights = voice.voiced && ((voice.onset && since >= ONSET_REFRACTORY_MS) || run >= SUSTAIN_SYLLABLE_MS)
-        if (!lights) return drain(chanting.hearing { hear(voice, begun = s.lit > s.chunkStart()) }, 1, effects)
+        var chanting = s.copy(phase = RitualPhase.Chanting, sinceSyllableMs = since, voicedRunMs = run)
+
+        if (s.mode == CheckMode.Whisper && heard != null && heard.phrase == s.phrase) {
+            effects += RitualEffect.LineChecked(heard.phrase, heard.found, heard.distance)
+            chanting = chanting.copy(covered = chanting.covered + heard.covered)
+            if (heard.found) return seal(chanting.copy(verdict = ChantVerdict(ChantVerdict.Kind.Sealed, s.phrase)), effects)
+        }
+
+        val total = s.syllables[s.phrase]
+        val lights = voice.voiced && s.lit < total &&
+            ((voice.onset && since >= ONSET_REFRACTORY_MS) || run >= SUSTAIN_SYLLABLE_MS)
+        if (!lights) return drain(chanting, 1, effects)
 
         effects += RitualEffect.SyllableLit
-        val lit = s.lit + 1
-        val last = lit == s.chunkEnd()
         // Chanting again clears the last verdict (ADR-0019).
-        val reset = chanting.copy(sinceSyllableMs = 0L, voicedRunMs = 0L, lit = lit, verdict = null)
-            .hearing { light(voice, first = s.lit == s.chunkStart(), last = last) }
-        // With the chant check on, the last syllable's vowel is heard before the verdict (ADR-0018).
-        if (!last || reset.take.closing) return drain(reset, 1, effects)
-        return seal(reset, effects)
+        val lit = chanting.copy(sinceSyllableMs = 0L, voicedRunMs = 0L, lit = s.lit + 1, verdict = null)
+        if (s.mode == CheckMode.Lenient && lit.lit == total) return seal(lit, effects)
+        return drain(lit, 1, effects)
     }
 
-    /** Hears the end of the chunk's last syllable, then judges it (ADR-0022). */
-    private fun close(s: RitualState, voice: VoiceFrame, effects: MutableList<RitualEffect>): Step {
-        val take = s.take.hear(voice, begun = true)
-        if (voice.voiced && take.closingMs < SEAL_LISTEN_MS) return drain(s.copy(take = take), 1, effects)
-        val chunk = s.currentChunk()!!
-        val verdict = ChantAligner.judge(chunk.slots, take.frames, chunk.text)
-        effects += RitualEffect.Judged(s.phrase, s.chunk, verdict)
-        val marks = phraseMarks(s, chunk, verdict.marks)
-        if (verdict.passed) {
-            if (s.chunk < s.chunks!![s.phrase].lastIndex) {
-                effects += RitualEffect.ChunkPassed(s.phrase, s.chunk)
-                // Getting a part right refills the timer (ADR-0025).
-                return Step(s.copy(chunk = s.chunk + 1, take = ChantTake(), focusMs = s.focusBudgetMs), effects)
-            }
-            return seal(s.copy(take = ChantTake(), verdict = ChantVerdict(ChantVerdict.Kind.Sealed, s.phrase, marks)), effects)
-        }
-        effects += RitualEffect.Rejected(s.phrase, s.chunk)
-        val rejected = s.copy(lit = chunk.syllables.first, take = ChantTake(), verdict = ChantVerdict(ChantVerdict.Kind.Rejected, s.phrase, marks))
-        // A rejection costs nothing but the time it took (ADR-0025).
-        return Step(rejected, effects)
+    /** Locking needs ±20°; once locked the ritual wavers beyond 25° and resumes within 20° (ADR-0027). */
+    private fun onCourse(s: RitualState): Boolean {
+        val azimuth = s.azimuth ?: return false
+        val limit = if (s.phase == RitualPhase.Chanting) DRIFT_ENTER_DEG else DRIFT_EXIT_DEG
+        return angularDistance(azimuth, s.target) <= limit
     }
 
-    /** Words before the chunk were heard; the chunk's own come from the verdict; later ones are pending. */
-    private fun phraseMarks(s: RitualState, chunk: ChantChunk, marks: List<WordMark>): List<WordMark> =
-        List(s.wordSizes!![s.phrase].size) { w ->
-            when {
-                w < chunk.words.first -> WordMark.Heard
-                w in chunk.words -> marks[w - chunk.words.first]
-                else -> WordMark.Pending
-            }
-        }
-
-    private fun RitualState.currentChunk(): ChantChunk? = chunks?.getOrNull(phrase)?.getOrNull(chunk)
-
-    private fun RitualState.chunkStart(): Int = currentChunk()?.syllables?.first ?: 0
-
-    private fun RitualState.chunkEnd(): Int = currentChunk()?.let { it.syllables.last + 1 } ?: syllables[phrase]
-
-    /** Seals the current phrase: the next one starts with a full clock, or the 4th starts the climax. */
+    /** Seals the current phrase: the next one starts with a full timer, or the 4th starts the climax. */
     private fun seal(s: RitualState, effects: MutableList<RitualEffect>): Step {
         effects += RitualEffect.Sealed(s.phrase)
         val phrase = s.phrase + 1
         if (phrase < PHRASE_COUNT) {
             val budget = focusBudget(phrase, s.courtMultiplier)
-            return Step(s.copy(phrase = phrase, lit = 0, chunk = 0, focusMs = budget, focusBudgetMs = budget), effects)
+            return Step(s.copy(phrase = phrase, lit = 0, covered = emptySet(), focusMs = budget, focusBudgetMs = budget), effects)
         }
         effects += RitualEffect.ClimaxStart(s.flawless)
-        val climax = s.copy(phase = RitualPhase.Climax, phrase = phrase, lit = 0, focusMs = 0L, focusBudgetMs = 0L, climaxMs = 0L)
+        val climax = s.copy(
+            phase = RitualPhase.Climax, phrase = phrase, lit = 0, covered = emptySet(),
+            focusMs = 0L, focusBudgetMs = 0L, climaxMs = 0L,
+        )
         return Step(climax, effects)
     }
 
-    /** Advances the chant take only while the chant check is on. */
-    private inline fun RitualState.hearing(update: ChantTake.() -> ChantTake): RitualState =
-        if (chunks == null) this else copy(take = take.update())
     /**
-     * Drains the focus meter by [multiplier] frames (phrases II–IV only); at 0 the last seal cracks. While a fresh
-     * verdict is on screen the meter waits instead (ADR-0019, ADR-0025).
+     * Drains the timer by [multiplier] frames (phrases II–IV only); at 0 the last seal cracks.
+     * While a fresh verdict is on screen the timer waits instead (ADR-0019, ADR-0025).
      */
     private fun drain(s: RitualState, multiplier: Int, effects: MutableList<RitualEffect>): Step {
         if (s.phrase < 1) return Step(s, effects)
@@ -155,16 +132,16 @@ object RitualEngine {
         return crack(s, effects)
     }
 
-    /** Focus ran out: the last seal cracks and its phrase reopens with a full meter (ADR-0010, ADR-0023). */
+    /** The timer ran out: the last seal cracks and its phrase reopens with a full timer (ADR-0010, ADR-0025). */
     private fun crack(s: RitualState, effects: MutableList<RitualEffect>): Step {
         val phrase = s.phrase - 1
         effects += RitualEffect.Cracked(phrase)
         val budget = focusBudget(phrase, s.courtMultiplier)
-        val cracked = if (s.chunks != null) ChantVerdict(ChantVerdict.Kind.Cracked, phrase) else null
+        val cracked = if (s.mode == CheckMode.Whisper) ChantVerdict(ChantVerdict.Kind.Cracked, phrase) else null
         return Step(
             s.copy(
-                phrase = phrase, lit = 0, chunk = 0, focusMs = budget, focusBudgetMs = budget,
-                flawless = false, take = ChantTake(), verdict = cracked,
+                phrase = phrase, lit = 0, covered = emptySet(), focusMs = budget, focusBudgetMs = budget,
+                flawless = false, verdict = cracked,
             ),
             effects,
         )

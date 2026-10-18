@@ -9,12 +9,20 @@ import kotlin.math.roundToLong
 
 enum class RitualPhase { Seeking, Locking, Chanting, Wavering, Climax, Done }
 
+/** How lines seal (ADR-0027): Whisper hears them, or (fallback) every syllable lit. Fixed per ritual. */
+enum class CheckMode { Whisper, Lenient }
+
 /**
  * One 20 ms tick: the latest heading (null = unknown, which counts as off heading once
- * locked), the analysed mic frame, and whether the demon's House is in court (read only
- * at the moment of lock, ADR-0012).
+ * locked), the analysed mic frame, whether the demon's House is in court (read only at the
+ * moment of lock, ADR-0012), and the latest finished line check, if any (ADR-0027).
  */
-data class RitualInput(val azimuth: Float?, val voice: VoiceFrame, val inCourt: Boolean = false)
+data class RitualInput(
+    val azimuth: Float?,
+    val voice: VoiceFrame,
+    val inCourt: Boolean = false,
+    val heard: LineHeard? = null,
+)
 
 /** What happened during a step; the UI turns these into haptics, sounds and flashes. */
 sealed interface RitualEffect {
@@ -22,22 +30,17 @@ sealed interface RitualEffect {
     data object Locked : RitualEffect
     data object SyllableLit : RitualEffect
 
-    /** Every syllable of [phrase] lit (ADR-0010). */
+    /** [phrase] sealed: heard (Whisper) or every syllable lit (lenient; ADR-0027). */
     data class Sealed(val phrase: Int) : RitualEffect
+
+    /** A finished check of [phrase] (ADR-0027); [found] seals it. */
+    data class LineChecked(val phrase: Int, val found: Boolean, val distance: Double) : RitualEffect
 
     /** Focus ran out: [phrase], the last sealed one, reopened. */
     data class Cracked(val phrase: Int) : RitualEffect
     data object Drift : RitualEffect
     data object Resumed : RitualEffect
 
-    /** The chant check judged [chunk] of [phrase] (ADR-0022); followed by [ChunkPassed], [Sealed] or [Rejected]. */
-    data class Judged(val phrase: Int, val chunk: Int, val verdict: ChunkVerdict) : RitualEffect
-
-    /** [chunk] of [phrase] passed and was not its last: the next chunk opens (ADR-0022). */
-    data class ChunkPassed(val phrase: Int, val chunk: Int) : RitualEffect
-
-    /** [chunk] of [phrase] didn't sound like its text: it reopens at its first syllable (ADR-0022). */
-    data class Rejected(val phrase: Int, val chunk: Int) : RitualEffect
     data class ClimaxStart(val flawless: Boolean) : RitualEffect
     data object Summoned : RitualEffect
 }
@@ -67,21 +70,16 @@ data class RitualState(
     val voicedRunMs: Long = 0L,
     /** Last 5 degree proximity bucket while seeking; null when out of range or unknown. */
     val proximityBucket: Int? = null,
-    /** Each phrase's chunks; null turns the chant check off (ADR-0018, ADR-0022). */
-    val chunks: List<List<ChantChunk>>? = null,
-    /** Index of the open chunk in the current phrase. */
-    val chunk: Int = 0,
-    /** What has been heard of the current chunk; only advanced while the chant check is on. */
-    val take: ChantTake = ChantTake(),
-    /** Syllables of each word, per phrase; set with [chunks] (ADR-0019 word hints). */
-    val wordSizes: List<List<Int>>? = null,
-    /** The last verdict, until the next syllable lights; only while the chant check is on (ADR-0019). */
+    /** How lines seal; fixed per ritual (ADR-0027). */
+    val mode: CheckMode = CheckMode.Lenient,
+    /** Words of the current line covered by checks so far (Whisper mode; ADR-0027). */
+    val covered: Set<Int> = emptySet(),
+    /** The last verdict, until the next syllable lights (ADR-0019). */
     val verdict: ChantVerdict? = null,
 ) {
     init {
         require(syllables.size == PHRASE_COUNT) { "need exactly $PHRASE_COUNT phrases" }
         require(syllables.all { it >= 1 }) { "every phrase needs at least one syllable" }
-        require(chunks == null || chunks.size == PHRASE_COUNT) { "need chunks for exactly $PHRASE_COUNT phrases" }
     }
 
     val aligned: Boolean get() = azimuth != null && isAligned(azimuth, target)
@@ -106,18 +104,17 @@ data class RitualState(
         }
 
     companion object {
-        /** [judged] turns the chant check on (ADR-0018); the app always does, most engine tests don't. */
+        /** The app passes the device's mode (ADR-0027); most engine tests use the lenient default. */
         fun start(
             target: Float,
             phrases: List<String>,
-            judged: Boolean = false,
+            mode: CheckMode = CheckMode.Lenient,
             phase: RitualPhase = RitualPhase.Seeking,
         ): RitualState = RitualState(
             target = target,
             syllables = phrases.map { LatinSyllables.count(it).coerceAtLeast(1) },
             phase = phase,
-            chunks = if (judged) phrases.map(ChantChunks::of) else null,
-            wordSizes = if (judged) phrases.map(LatinSyllables::wordSizes) else null,
+            mode = mode,
         )
     }
 }
@@ -129,17 +126,11 @@ fun focusBudget(phrase: Int, courtMultiplier: Float = 1f): Long =
 data class Step(val state: RitualState, val effects: List<RitualEffect> = emptyList())
 
 /**
- * The last phrase verdict while the chant check is on (ADR-0019): shown on the chant screen
- * until the next syllable lights. While it is fresh ([holdsClock]) the focus clock waits.
+ * The last verdict (ADR-0019, ADR-0027): shown until the next syllable lights. While it is
+ * fresh ([holdsClock]) the timer waits.
  */
-data class ChantVerdict(
-    val kind: Kind,
-    val phrase: Int,
-    /** Word hints of the judged attempt; doubtful words of a rejection are the ones to fix. */
-    val marks: List<WordMark> = emptyList(),
-    val heldMs: Long = 0L,
-) {
-    enum class Kind { Sealed, Rejected, Cracked }
+data class ChantVerdict(val kind: Kind, val phrase: Int, val heldMs: Long = 0L) {
+    enum class Kind { Sealed, Cracked }
 
     val holdsClock: Boolean get() = heldMs < VERDICT_HOLD_MS
 }
