@@ -33,7 +33,9 @@ object RitualConfig {
     const val CHECK_PAUSE_MS = 600L
     const val CHECK_MIN_VOICED_MS = 800L
     const val CHECK_CONTINUOUS_MS = 6_000L
-    const val CHECK_WINDOW_MS = 25_000L
+    const val CHECK_WINDOW_MS = 12_000L
+    /** Words turn green only from checks at most this far from the line (no green from babble; ADR-0028). */
+    const val COVER_MAX_DISTANCE = 0.75
     /** Lenient mode when a 5 s device check takes longer than this. */
     const val DEVICE_MAX_CHECK_MS = 4_000L
     /** Once locked, the ritual wavers beyond this and resumes within [DRIFT_EXIT_DEG]. */

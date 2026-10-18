@@ -221,6 +221,7 @@ class RitualViewModel(
         sessionLog.write(SessionRecords.tick(ticks++ * RitualConfig.FRAME_MS, input, step, hold = current.holdToChant, check = report))
         // The summon is saved here, not through the lossy effects flow, before the climax plays.
         step.effects.filterIsInstance<RitualEffect.ClimaxStart>().firstOrNull()?.let { commitSummon(it.flawless) }
+        if (step.effects.any { it is RitualEffect.Retry }) listener?.restart()
         state.update {
             it.copy(
                 ritual = step.state,

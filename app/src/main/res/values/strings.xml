@@ -12,6 +12,9 @@
     <string name="debug_hold_to_chant">Hold to Chant</string>
     <string name="debug_chanting">Chanting…</string>
     <string name="debug_clip_off">Record clip</string>
+    <string name="debug_check_auto">Check: auto</string>
+    <string name="debug_check_whisper">Check: Whisper (next ritual)</string>
+    <string name="debug_check_lenient">Check: lenient (next ritual)</string>
     <string name="debug_clip_chant">Recording · chant</string>
     <string name="debug_clip_nonsense">Recording · nonsense</string>
     <string name="debug_chant_score">Check %1$s %2$.2f %3$s · %4$d ms · “%5$s”</string>

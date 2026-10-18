@@ -20,6 +20,18 @@ object DeviceCheck {
 
     data class Result(val mode: CheckMode, val reason: String)
 
+    private const val KEY_FORCED = "debug_forced"
+
+    /** Debug builds: a check mode forced from the debug panel, or null for automatic (ADR-0028). */
+    fun forced(context: Context): CheckMode? =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_FORCED, null)?.let(CheckMode::valueOf)
+
+    fun setForced(context: Context, mode: CheckMode?) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().apply {
+            if (mode == null) remove(KEY_FORCED) else putString(KEY_FORCED, mode.name)
+        }.apply()
+    }
+
     fun cached(context: Context): Result? {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val mode = prefs.getString(KEY_MODE, null) ?: return null

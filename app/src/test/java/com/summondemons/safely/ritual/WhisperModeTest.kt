@@ -43,9 +43,44 @@ class WhisperModeTest {
 
     @Test
     fun lightingEverySyllableDoesNotSealInWhisperMode() {
-        val s = syllables(locked(CheckMode.Whisper), 12)
+        val s = syllables(locked(CheckMode.Whisper), 8)
         assertEquals(0, s.phrase)
-        assertEquals(8, s.lit) // capped at the line's syllables
+        assertEquals(8, s.lit)
+    }
+
+    @Test
+    fun chantingPastTheEndStartsTheLineOver() {
+        val full = syllables(locked(CheckMode.Whisper), 8).copy(covered = setOf(0))
+        val again = run(full, 1, voice = onset)
+        assertTrue(RitualEffect.Retry(0) in again.effects)
+        assertEquals(1, again.state.lit)
+        assertEquals(emptySet<Int>(), again.state.covered)
+        val rested = run(again.state, (ONSET_REFRACTORY_MS / FRAME_MS).toInt()).state
+        assertEquals(4, syllables(rested, 3).lit)
+    }
+
+    @Test
+    fun aMissAfterTheWholeLineClearsItForAnotherTry() {
+        val full = syllables(locked(CheckMode.Whisper), 8)
+        val step = run(full, 1, heard = LineHeard(0, found = false, distance = 0.65, covered = setOf(1)))
+        assertTrue(RitualEffect.Retry(0) in step.effects)
+        assertEquals(0, step.state.lit)
+        assertEquals(emptySet<Int>(), step.state.covered)
+        assertEquals(0, step.state.phrase)
+    }
+
+    @Test
+    fun aMissMidLineKeepsTheLitSyllables() {
+        val partial = syllables(locked(CheckMode.Whisper), 3)
+        val step = run(partial, 1, heard = LineHeard(0, found = false, distance = 0.65, covered = emptySet()))
+        assertTrue(step.effects.none { it is RitualEffect.Retry })
+        assertEquals(3, step.state.lit)
+    }
+
+    @Test
+    fun babbleTurnsNoWordGreen() {
+        val step = run(locked(CheckMode.Whisper), 1, heard = LineHeard(0, found = false, distance = 0.86, covered = setOf(0)))
+        assertEquals(emptySet<Int>(), step.state.covered)
     }
 
     @Test

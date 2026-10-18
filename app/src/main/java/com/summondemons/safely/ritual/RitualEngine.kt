@@ -1,6 +1,7 @@
 package com.summondemons.safely.ritual
 
 import com.summondemons.safely.ritual.RitualConfig.CLIMAX_MS
+import com.summondemons.safely.ritual.RitualConfig.COVER_MAX_DISTANCE
 import com.summondemons.safely.ritual.RitualConfig.COURT_BONUS
 import com.summondemons.safely.ritual.RitualConfig.DRIFT_ENTER_DEG
 import com.summondemons.safely.ritual.RitualConfig.DRIFT_EXIT_DEG
@@ -78,20 +79,37 @@ object RitualEngine {
         val run = if (voice.voiced) s.voicedRunMs + FRAME_MS else 0L
         var chanting = s.copy(phase = RitualPhase.Chanting, sinceSyllableMs = since, voicedRunMs = run)
 
+        val total = s.syllables[s.phrase]
         if (s.mode == CheckMode.Whisper && heard != null && heard.phrase == s.phrase) {
             effects += RitualEffect.LineChecked(heard.phrase, heard.found, heard.distance)
-            chanting = chanting.copy(covered = chanting.covered + heard.covered)
-            if (heard.found) return seal(chanting.copy(verdict = ChantVerdict(ChantVerdict.Kind.Sealed, s.phrase)), effects)
+            if (heard.found) {
+                return seal(chanting.copy(covered = chanting.covered + heard.covered, verdict = ChantVerdict(ChantVerdict.Kind.Sealed, s.phrase)), effects)
+            }
+            // Only checks close to the line turn words green: babble never does (ADR-0028).
+            if (heard.distance <= COVER_MAX_DISTANCE) chanting = chanting.copy(covered = chanting.covered + heard.covered)
+            // A miss after the whole line was recited: the words clear for another try (ADR-0028).
+            if (chanting.lit >= total) {
+                effects += RitualEffect.Retry(s.phrase)
+                chanting = chanting.copy(lit = 0, covered = emptySet())
+            }
         }
 
-        val total = s.syllables[s.phrase]
-        val lights = voice.voiced && s.lit < total &&
+        // In Whisper mode the line can always be recited again; lenient seals at its last syllable.
+        val lights = voice.voiced && (chanting.lit < total || s.mode == CheckMode.Whisper) &&
             ((voice.onset && since >= ONSET_REFRACTORY_MS) || run >= SUSTAIN_SYLLABLE_MS)
         if (!lights) return drain(chanting, 1, effects)
 
         effects += RitualEffect.SyllableLit
-        // Chanting again clears the last verdict (ADR-0019).
-        val lit = chanting.copy(sinceSyllableMs = 0L, voicedRunMs = 0L, lit = s.lit + 1, verdict = null)
+        val again = chanting.lit >= total
+        if (again) effects += RitualEffect.Retry(s.phrase)
+        // Chanting again clears the last verdict (ADR-0019); past the end, the line starts over (ADR-0028).
+        val lit = chanting.copy(
+            sinceSyllableMs = 0L,
+            voicedRunMs = 0L,
+            lit = if (again) 1 else chanting.lit + 1,
+            covered = if (again) emptySet() else chanting.covered,
+            verdict = null,
+        )
         if (s.mode == CheckMode.Lenient && lit.lit == total) return seal(lit, effects)
         return drain(lit, 1, effects)
     }

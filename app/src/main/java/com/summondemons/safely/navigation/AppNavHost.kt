@@ -186,7 +186,11 @@ private fun RitualDestination(
             transcriber = WhisperTranscriber.get(appContext),
             checkMode = {
                 val result = DeviceCheck.cached(appContext)
+                // Debug builds can force a mode from the chant screen's debug panel (ADR-0028).
+                val forced = if (BuildConfig.DEBUG) DeviceCheck.forced(appContext) else null
                 when {
+                    forced == CheckMode.Lenient -> CheckMode.Lenient to "forced in debug"
+                    forced == CheckMode.Whisper -> CheckMode.Whisper to ""
                     result == null -> CheckMode.Lenient to "device check still running"
                     result.mode == CheckMode.Lenient -> CheckMode.Lenient to result.reason
                     else -> CheckMode.Whisper to ""

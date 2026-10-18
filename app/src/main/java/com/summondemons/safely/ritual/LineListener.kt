@@ -77,6 +77,21 @@ class LineListener(
         results.clear()
     }
 
+    /**
+     * The line starts over (ADR-0028): the audio heard so far is dropped so the next attempt is
+     * judged on its own. A check already running still reports, so a late hit still seals.
+     */
+    @Synchronized
+    fun restart() {
+        audioStart = 0
+        audioSize = 0
+        voicedFrames.clear()
+        newVoicedMs = 0L
+        quietMs = 0L
+        continuousMs = 0L
+        again = false
+    }
+
     /** One 20 ms frame of 16 kHz audio and whether it was voiced. */
     @Synchronized
     fun onFrame(samples: FloatArray, voiced: Boolean) {

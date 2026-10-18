@@ -36,6 +36,9 @@ sealed interface RitualEffect {
     /** A finished check of [phrase] (ADR-0027); [found] seals it. */
     data class LineChecked(val phrase: Int, val found: Boolean, val distance: Double) : RitualEffect
 
+    /** [phrase] starts over for another try: its words clear and light again (ADR-0028). */
+    data class Retry(val phrase: Int) : RitualEffect
+
     /** Focus ran out: [phrase], the last sealed one, reopened. */
     data class Cracked(val phrase: Int) : RitualEffect
     data object Drift : RitualEffect

@@ -119,7 +119,10 @@ object SessionRecords {
 
     fun effectName(effect: RitualEffect): String = effect.toString()
 
-    fun encode(header: SessionHeader): String = json.encodeToString(SessionHeader.serializer(), header)
+    /** The header keeps its defaults (the mode must always be visible in the log). */
+    private val headerJson = Json(json) { encodeDefaults = true }
+
+    fun encode(header: SessionHeader): String = headerJson.encodeToString(SessionHeader.serializer(), header)
 
     fun encode(tick: SessionTick): String = json.encodeToString(SessionTick.serializer(), tick)
 

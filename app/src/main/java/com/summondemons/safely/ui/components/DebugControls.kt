@@ -28,6 +28,10 @@ import com.summondemons.safely.ritual.ClipLabel
 import com.summondemons.safely.ritual.CheckReport
 import com.summondemons.safely.ui.theme.PillShape
 import com.summondemons.safely.ui.theme.spacing
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import com.summondemons.safely.platform.DeviceCheck
+import com.summondemons.safely.ritual.CheckMode
 
 /** As tall as a chip, so "Hold to Chant" lines up with its neighbours. */
 private val ChipHeight = 32.dp
@@ -62,6 +66,7 @@ fun DebugControls(
             )
             HoldToChantChip(onHoldToChantChange)
         }
+        CheckModeChip(small)
         FilterChip(
             selected = clipLabel != null,
             onClick = onCycleClipLabel,
@@ -138,3 +143,35 @@ private fun HoldToChantChip(onHoldToChantChange: (Boolean) -> Unit) {
 fun DebugChip(onClick: () -> Unit, modifier: Modifier = Modifier) {
     AssistChip(onClick = onClick, label = { Text(stringResource(R.string.debug_chip)) }, modifier = modifier)
 }
+
+/** Debug: force the next ritual's check mode, auto → Whisper → lenient → auto (ADR-0028). */
+@Composable
+private fun CheckModeChip(style: TextStyle) {
+    val context = LocalContext.current
+    var forced by remember { mutableStateOf(DeviceCheck.forced(context)) }
+    FilterChip(
+        selected = forced != null,
+        onClick = {
+            val next = when (forced) {
+                null -> CheckMode.Whisper
+                CheckMode.Whisper -> CheckMode.Lenient
+                CheckMode.Lenient -> null
+            }
+            DeviceCheck.setForced(context, next)
+            forced = next
+        },
+        label = {
+            Text(
+                stringResource(
+                    when (forced) {
+                        null -> R.string.debug_check_auto
+                        CheckMode.Whisper -> R.string.debug_check_whisper
+                        CheckMode.Lenient -> R.string.debug_check_lenient
+                    },
+                ),
+                style = style,
+            )
+        },
+    )
+}
+

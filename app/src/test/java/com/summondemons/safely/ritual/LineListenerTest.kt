@@ -80,6 +80,20 @@ class LineListenerTest {
     }
 
     @Test
+    fun aRestartDropsTheHeardAudioButKeepsALateHit() = runTest {
+        val t = FakeTranscriber().apply { gate = CompletableDeferred() }
+        val l = listener(t)
+        l.voiced(1_000); l.quiet(600)
+        advanceUntilIdle()
+        l.restart()
+        l.quiet(600) // no new voice since the restart: nothing to check
+        t.gate!!.complete(Unit)
+        advanceUntilIdle()
+        assertEquals(1, t.calls)
+        assertTrue(l.poll()!!.heard.found) // the check that was running still counts
+    }
+
+    @Test
     fun aResultForAnOldLineIsDiscarded() = runTest {
         val t = FakeTranscriber().apply { gate = CompletableDeferred() }
         val l = listener(t)
