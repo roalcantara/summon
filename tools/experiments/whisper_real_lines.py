@@ -2,11 +2,11 @@ import sys
 from pathlib import Path
 import soundfile as sf
 sys.argv=[sys.argv[0], sys.argv[1], sys.argv[2], "base", "/dev/null"]
-exec(open("whisper_experiment.py").read().split("expected = ")[0])
+exec(open(Path(__file__).parent / "whisper_latin.py").read().split("expected = ")[0])
 from faster_whisper import WhisperModel
 model=WhisperModel("base", device="cpu", compute_type="int8"); lines=demons()
 def tr(a):
-    parts,_=model.transcribe(a, language="la", beam_size=5, temperature=0.0, condition_on_previous_text=False, vad_filter=False)
+    parts,_=model.transcribe(a, language="la", beam_size=int(__import__("os").environ.get("BEAM", "5")), temperature=0.0, condition_on_previous_text=False, vad_filter=False)
     return " ".join(p.text for p in parts).strip()
 def local(exp, heard):
     """Edit distance of [exp] against the best-matching stretch of [heard] (free start and end), / len(exp)."""

@@ -54,7 +54,7 @@ for n, path in enumerate(files):
     if y.ndim > 1: y = y.mean(1)
     if rate != RATE: raise SystemExit(f"{path}: expected 16 kHz")
     for si, seg in enumerate(segments(y)):
-        parts, _ = model.transcribe(seg, language="la", beam_size=5, temperature=0.0, condition_on_previous_text=False, vad_filter=False)
+        parts, _ = model.transcribe(seg, language="la", beam_size=int(__import__("os").environ.get("BEAM", "5")), temperature=0.0, condition_on_previous_text=False, vad_filter=False)
         text = " ".join(p.text for p in parts).strip()
         heard = letters(text)
         scores = {k: lev(heard, e) / max(1, len(e)) for k, e in expected.items()}
