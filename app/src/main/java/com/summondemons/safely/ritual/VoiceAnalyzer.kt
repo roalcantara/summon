@@ -10,8 +10,8 @@ import com.summondemons.safely.ritual.RitualConfig.VOICE_RMS_FLOOR
 import com.summondemons.safely.ritual.RitualConfig.VOICING_MIN_CORRELATION
 import kotlin.math.sqrt
 
-/** One analysed 20 ms mic frame (ADR-0008). */
-data class VoiceFrame(val rms: Double, val voiced: Boolean, val onset: Boolean) {
+/** One analysed 20 ms mic frame (ADR-0008); [formants] only on voiced frames (ADR-0018). */
+data class VoiceFrame(val rms: Double, val voiced: Boolean, val onset: Boolean, val formants: Formants? = null) {
     companion object {
         val SILENT = VoiceFrame(0.0, voiced = false, onset = false)
     }
@@ -23,6 +23,7 @@ data class VoiceFrame(val rms: Double, val voiced: Boolean, val onset: Boolean) 
  * A new instance is needed when the sample rate changes.
  * - voiced: loud enough and periodic at a voice pitch (70–400 Hz) over the last 40 ms.
  * - onset: a voiced energy rise while armed; re-arms after a dip or an unvoiced frame.
+ * - formants: F1/F2 of voiced frames over the same 40 ms window (ADR-0018).
  */
 class VoiceAnalyzer(val sampleRate: Int) {
     private val stride = maxOf(1, sampleRate / ANALYSIS_RATE)
@@ -32,6 +33,7 @@ class VoiceAnalyzer(val sampleRate: Int) {
     private val recent = ArrayDeque<Double>()
     private var armed = true
     private var peak = 0.0
+    private val formantEstimator = FormantEstimator(sampleRate)
 
     fun analyze(samples: ShortArray, count: Int): VoiceFrame {
         if (count <= 0) return VoiceFrame.SILENT
@@ -54,7 +56,7 @@ class VoiceAnalyzer(val sampleRate: Int) {
         }
         recent.addLast(level)
         if (recent.size > ONSET_WINDOW_FRAMES) recent.removeFirst()
-        return VoiceFrame(level, voiced, onset)
+        return VoiceFrame(level, voiced, onset, if (voiced) formantEstimator.estimate(window) else null)
     }
 
     /** Highest normalized autocorrelation over the voice-pitch lags, in [0, 1]. */

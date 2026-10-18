@@ -117,4 +117,14 @@ class VoiceAnalyzerTest {
         assertEquals(prefix.rms, full.rms, 1e-9)
         assertEquals(rms(padded.copyOf(160), 160), full.rms, 1e-9)
     }
+
+    @Test
+    fun voicedFramesCarryFormantsAndSilenceDoesNot() {
+        val pcm = SyntheticVoice(f0 = 120.0).vowel(null, 100) + SyntheticVoice(f0 = 120.0).vowel(Vowel.A, 300)
+        val result = analyze(16_000, pcm.frames(16_000))
+        assertTrue(result.take(5).all { it.formants == null })
+        val voiced = result.drop(7).dropLast(2).filter { it.voiced }
+        assertTrue(voiced.isNotEmpty())
+        voiced.forEach { assertEquals(Vowel.A.f1, it.formants!!.f1, Vowel.A.f1 * 0.15) }
+    }
 }
