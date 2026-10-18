@@ -42,8 +42,19 @@ At about 0.55, 11 of 12 honest lines pass and 0 of 16 wrong lines; the margin is
 sample is one voice. Script: `tools/experiments/whisper_real_lines.py`. The first real "chant" clip
 (2026-10-18 05:41) was the Portuguese test phrase and is now labelled nonsense.
 
+## Second voice (2026-10-18, 2 honest Asmodeus rituals)
+| Clip | I | II | III | IV | Same audio vs Astaroth's lines |
+|---|---|---|---|---|---|
+| Asmodeus 16:18 (room talk and laughter in the take) | 0.28 | 0.56 | 0.64 | 0.56 | 0.54–0.67 |
+| Asmodeus 16:19 | 0.22 | 0.21 | 0.49 | 0.33 | 0.43–0.67 |
+
+Both voices together at 0.60: 19 of 20 honest lines pass; ordinary nonsense ("Olá meu amigo")
+passes no line (0.67–0.76); Latin from the other demon, a deliberately hard stand-in, passes about
+15 % of lines. Whisper works as a lenient but real check; keep best-stretch scoring, free retries
+and the 60 s timer. Clips are tagged locally as `v1` (first tester) and `v2` (second).
+
 ## Open points before any Android work
-- **Real voices:** confirmed on one voice (above); add at least a second voice before release tuning.
+- **Real voices:** two voices measured (above); the threshold (≈ 0.60) should be re-checked on logged sessions once the judge runs on device.
 - **Size and speed:** Whisper base adds roughly 60–80 MB (quantised) and needs whisper.cpp or
   sherpa-onnx; judging a 5 s line takes about 1–3 s on a mid-range phone (to be measured).
 - **Privacy:** the app would then recognise speech on device. The privacy policy, store listing
