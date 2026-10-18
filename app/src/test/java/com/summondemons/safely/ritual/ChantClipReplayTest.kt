@@ -27,7 +27,11 @@ class ChantClipReplayTest {
 
     @Test
     fun testerClipsMeetTheGate() {
-        val files = dir.listFiles { f -> f.extension.equals("wav", ignoreCase = true) }.orEmpty().sortedBy { it.name }
+        // Real clips at the top level; tools/gen_chant_corpus.py writes TTS and LibriSpeech clips to generated/ (ADR-0025).
+        val only = System.getProperty("chantSource") // "real", "generated" or null for both
+        val files = dir.walkTopDown().filter { it.isFile && it.extension.equals("wav", ignoreCase = true) }
+            .filter { only == null || (it.parentFile.name == "generated") == (only == "generated") }
+            .sortedBy { it.name }.toList()
         assumeTrue("no clips in ${dir.absolutePath}", files.isNotEmpty())
         val results = files.flatMap { file ->
             val clip = parse(file)
@@ -80,6 +84,11 @@ class ChantClipReplayTest {
     }
 
     private fun summary(results: List<Result>): List<String> = buildList {
+        add("source     label     chunks  passed")
+        results.groupBy { source(it.clip) to it.clip.label }.toSortedMap(compareBy({ it.first }, { it.second })).forEach { (key, list) ->
+            add("%-10s %-9s %6d  %5.1f %%".format(key.first, key.second, list.size, list.count { it.judged.verdict.passed } * 100.0 / list.size))
+        }
+        add("")
         add("voice     label     chunks  passed")
         results.groupBy { it.clip.voice to it.clip.label }.toSortedMap(compareBy({ it.first }, { it.second })).forEach { (key, list) ->
             add("%-9s %-9s %6d  %5.1f %%".format(key.first, key.second, list.size, list.count { it.judged.verdict.passed } * 100.0 / list.size))
@@ -106,6 +115,9 @@ class ChantClipReplayTest {
         }
         return if (missing.isEmpty()) null else "insufficient: " + missing.joinToString()
     }
+
+    /** TTS voices are tagged "tts…", LibriSpeech speakers "ls…"; everything else is a real tester. */
+    private fun source(clip: Clip) = if (clip.voice.startsWith("tts") || clip.voice.startsWith("ls")) "generated" else "real"
 
     private companion object {
         val ROMAN = listOf("I", "II", "III", "IV")

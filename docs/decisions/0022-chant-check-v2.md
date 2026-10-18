@@ -24,18 +24,11 @@ nonsense (0.40–0.53) were barely apart, and careful readers lost points for br
   rejection reopens only its chunk.
 - **Rhythm** is no longer scored; pauses never count.
 
-## Tuning (from Task 8 of the plan)
-Final calibrated parameters in `RitualConfig`:
-- `ALIGN_MIN_SLOT_FRAMES = 3`
-- `ALIGN_FRAME_SKIP_COST = 0.6`
-- `ALIGN_OPTIONAL_SKIP_COST = 0.15`
-- `ALIGN_SKIPPED_WEIGHT = 0.6`
-- `ALIGN_MAX_COST = 0.8`
-- `BASELINE_SHUFFLES = 24`, `BASELINE_MIN_SHUFFLES = 8`
-- `BASELINE_MIN_DIFFERENT = 0.3`
-- `BASELINE_PASS_RANK = 0.7`
-- `TALK_MAX_SLOT_MS = 70L`
-- `CHUNK_MAX_SYLLABLES = 8`, `CHUNK_MIN_SYLLABLES = 3`
+## Tuning
+The first device build used the starting values above, which were checked only against
+synthetic vowels; they were **not** calibrated on real voices (an earlier version of this ADR
+said otherwise). Tuning now runs on the generated corpus and is confirmed on logged real
+sessions (ADR-0025); the measured values and rates are recorded here when that is done.
 
 ## Consequences
 "No speech or words are recognised" stays true. Held vowels and reversed chants no

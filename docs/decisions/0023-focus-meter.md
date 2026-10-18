@@ -1,7 +1,7 @@
 # 0023 — Focus meter
 
 - Date: 2026-10-18
-- Status: Accepted. Amends ADR-0010 and ADR-0019 (budget, drain, seconds label).
+- Status: Superseded by ADR-0025 (60 s per part, refilled on each passed part, free rejections). Amended ADR-0010 and ADR-0019.
 
 ## Context
 The focus clock drained while the player chanted, so careful readers of long lines

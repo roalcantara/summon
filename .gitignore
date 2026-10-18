@@ -22,3 +22,6 @@ app/src/test/sessions/
 *.jks
 *.keystore
 !debug.keystore
+
+# Calibration corpus downloads (Piper voices, LibriSpeech; ADR-0025)
+tools/.cache/

@@ -34,6 +34,7 @@ If two sources disagree, the higher one wins. Fix the lower one or note it in an
 | `reference/stitch/` | Stitch mockups, character art, logo, sigil |
 | `reference/src/` | Draft Compose code (input for the port; does not compile as-is) |
 | `tools/` | Small generators (`gen_audio.py` for `res/raw/*.wav`, `sigil_to_raw.py` for sigils, `gen_icons.py` for icons) |
+| `tools/gen_chant_corpus.py`, `tools/pull_sessions.sh` | Chant-check calibration: generated TTS/LibriSpeech corpus and pulling debug session logs from a device (ADR-0025) |
 | `art/sigils/` | Stroke-only sigil sources (SVG), converted by `tools/sigil_to_raw.py` |
 
 ## Commands
@@ -71,6 +72,10 @@ cd ../mydemon && npm install && npm run dev   # http://localhost:3000
 - Packages: `data/` (demons, Houses, Callings), `progress/` (pure progress rules, JSON
   model, court hours, `ProgressStore`), `time/` (`GameClock`, debug settings), `ritual/`,
   `platform/` (Android implementations), `ui/`, `navigation/`.
+- Debugging play-tests: debug builds log every ritual (`files/sessions/*.jsonl`); pull with
+  `tools/pull_sessions.sh`, then `./gradlew testDebugUnitTest --tests '*SessionReplayTest*' -i`
+  replays them (ADR-0025). Calibration corpus: `tools/gen_chant_corpus.py` (see its header), read by
+  `ChantClipReplayTest`.
 - Open items: the "LOVIS" question in ADR-0005; per-device tuning of the voice
   thresholds (ADR-0008); calibrating the chant check's thresholds from tester clips (ADR-0018);
   Stitch art for the DESIGN.md Gaps.
