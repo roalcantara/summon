@@ -83,6 +83,22 @@
     <string name="chant_sealed_count">%1$s / IV</string>
     <string name="chant_seconds">⏱ %1$d s</string>
     <string name="chant_drift">⏱ 3×</string>
+    <!-- Chant screen (ADR-0019) -->
+    <string name="chant_face">Face %1$s</string>
+    <string name="chant_a11y_facing">Facing %1$s</string>
+    <string name="chant_a11y_turn_left">Turn left to face %1$s</string>
+    <string name="chant_a11y_turn_right">Turn right to face %1$s</string>
+    <string name="chant_clock_seconds">%1$d s</string>
+    <string name="chant_clock_paused">Paused</string>
+    <string name="verdict_chant_aloud">Chant aloud</string>
+    <string name="verdict_paused">Paused</string>
+    <string name="verdict_sealed">Sealed</string>
+    <string name="verdict_chant_again">Chant again</string>
+    <string name="verdict_seal_cracked">Seal cracked</string>
+    <string name="verdict_of">of</string>
+    <string name="chant_turn_sideways">Turn your phone sideways</string>
+    <string name="chant_keep_mic_clear">Hold it in front of your mouth, and keep the bottom edge clear so the microphone can hear you.</string>
+    <string name="chant_help">How to chant</string>
     <string name="focus_label">Focus</string>
     <string name="abandon_title">Abandon the ritual?</string>
     <string name="abandon_body">Your seals will fade.</string>

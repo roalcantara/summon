@@ -20,6 +20,10 @@ data class TextRoles(
     /** Cinzel Bold; the font size is set per use. */
     val name: TextStyle,
     val body: TextStyle,
+    /** Chant screen lines (ADR-0019): Inter Bold, upper case; 18 sp direction, 22 sp verdict, set per use. */
+    val ritualCue: TextStyle,
+    /** Chant screen phrase (ADR-0019): Cinzel Bold, auto-sized at the call site. */
+    val incantationLarge: TextStyle,
 )
 
 internal val AppTextRoles = TextRoles(
@@ -34,6 +38,13 @@ internal val AppTextRoles = TextRoles(
     meta = AppTypography.labelSmall.copy(letterSpacing = 0.14.em, color = Palette.outline),
     name = TextStyle(fontFamily = Display, fontWeight = FontWeight.Bold),
     body = AppTypography.bodyMedium,
+    ritualCue = AppTypography.labelMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = 0.05.em),
+    incantationLarge = TextStyle(
+        fontFamily = Display,
+        fontWeight = FontWeight.Bold,
+        lineHeight = 1.3.em,
+        letterSpacing = 0.02.em,
+    ),
 )
 
 val LocalTextRoles = staticCompositionLocalOf { AppTextRoles }
@@ -41,5 +52,5 @@ val LocalTextRoles = staticCompositionLocalOf { AppTextRoles }
 val MaterialTheme.textRoles: TextRoles
     @Composable @ReadOnlyComposable get() = LocalTextRoles.current
 
-/** Compose has no text-transform: the `cue` and `meta` roles upper-case at the call site. */
+/** Compose has no text-transform: the `cue`, `meta` and `ritualCue` roles upper-case at the call site. */
 fun String.upper(): String = uppercase(Locale.ROOT)
