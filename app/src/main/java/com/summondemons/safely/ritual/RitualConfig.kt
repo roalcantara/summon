@@ -1,6 +1,6 @@
 package com.summondemons.safely.ritual
 
-/** Ritual-wide tuning (ADR-0008, ADR-0010). Per-demon parameters live in `Demon` (ADR-0006). */
+/** Ritual-wide tuning (ADR-0008, ADR-0010, ADR-0018). Per-demon parameters live in `Demon` (ADR-0006). */
 object RitualConfig {
     const val PHRASE_COUNT = 4
     const val HEADING_TOLERANCE_DEG = 20f
@@ -32,6 +32,34 @@ object RitualConfig {
     const val ONSET_RATIO = 1.8
     const val ONSET_REARM_RATIO = 0.6
     const val ONSET_WINDOW_FRAMES = 5
+
+    // Formants by linear prediction (ADR-0018)
+    /** Formant analysis decimates the mic to about this rate (F1/F2 live below 3 kHz). */
+    const val FORMANT_RATE = 8_000
+    const val LPC_ORDER = 10
+    const val PRE_EMPHASIS = 0.94
+    const val FORMANT_MAX_BANDWIDTH_HZ = 500.0
+    const val FORMANT_F1_MIN_HZ = 200.0
+    const val FORMANT_F1_MAX_HZ = 1_200.0
+    const val FORMANT_F2_MAX_HZ = 3_400.0
+
+    // Chant plausibility check (ADR-0018)
+    /** Vocal-tract scales tried per phrase: adult male (1.0) to child (~1.45). */
+    val VOWEL_SCALES = listOf(0.9, 1.0, 1.1, 1.2, 1.3, 1.45)
+    /** Log-formant distance (natural log units) at which two vowels count as fully different. */
+    const val VOWEL_MAX_DISTANCE = 0.8
+    const val CHANT_GAP_COST = 0.7
+    const val CHANT_UNMEASURED_COST = 0.5
+    const val CHANT_SYLLABLES_PER_PAUSE = 6
+    const val CHANT_PAUSE_PENALTY = 0.25f
+    const val CHANT_FAST_INTERVAL_MS = 170L
+    const val CHANT_RHYTHM_WEIGHT = 0.2f
+    /** A phrase seals only when its [ChantScore.total] reaches this. Calibrated from tester clips. */
+    const val CHANT_PASS_SCORE = 0.6f
+    /** After the last syllable lights, its vowel is heard until voicing stops or this elapses. */
+    const val SEAL_LISTEN_MS = 300L
+    /** An unvoiced run at least this long inside a phrase counts as a pause (breath). */
+    const val CHANT_PAUSE_MS = 250L
 
     // Mic level for glow only (never progress)
     const val MIC_LEVEL_CEILING = 8_000.0
