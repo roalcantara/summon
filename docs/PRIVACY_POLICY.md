@@ -17,14 +17,9 @@ detection**:
 
 - The microphone is only used while the Ritual screen is open, and only after you grant
   the permission. When you leave the Ritual screen, the microphone stops.
-- Audio is processed in memory, about 20 milliseconds at a time, to measure loudness,
-  voice-like pitch, syllable timing and vowel sounds. Each piece of audio is thrown away as
-  soon as it has been measured.
-- The vowel sounds are compared with the vowels the incantation's spelling predicts, to
-  tell chanting apart from unrelated talk. This happens on your device and its result is
-  never stored.
-- **No audio is ever recorded, saved to storage, or transmitted.** No speech or words are
-  recognised: the app cannot tell what you said, only whether it sounded like the chant.
+- Audio is processed in memory to measure loudness, voice-like pitch and syllable timing.
+- Speech is recognised on your device, only to check that you chant the line. Nothing you say is stored or sent anywhere.
+- **No audio is ever recorded, saved to storage, or transmitted.**
 - If you deny the permission, the ritual cannot hear you, and the rest of the app still
   works.
 

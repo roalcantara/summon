@@ -1,7 +1,7 @@
 # 0025 — Play-test fixes, session log and calibration corpus
 
 - Date: 2026-10-18
-- Status: Accepted. Replaces the focus meter of ADR-0023; amends ADR-0022 (tuning) and ADR-0024 (intro card copy).
+- Status: Accepted. Replaces the focus meter of ADR-0023; amends ADR-0022 (tuning) and ADR-0024 (intro card copy). Amended by ADR-0027 (judge, copy).
 
 ## Context
 The first device build of chant check v2 (ADR-0022–0024) was hard to play: the intro card's

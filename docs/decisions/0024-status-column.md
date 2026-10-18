@@ -1,7 +1,7 @@
 # 0024 — Status column and rules on the intro card
 
 - Date: 2026-10-18
-- Status: Accepted. Amends ADR-0019 (direction line, verdict line, "I of IV") and ADR-0021 (intro card rules).
+- Status: Accepted. Amends ADR-0019 (direction line, verdict line, "I of IV") and ADR-0021 (intro card rules). Amended by ADR-0027 (whole-line seals, no rejection state).
 
 ## Context
 Progress was split between the sigil's ink and an "I of IV" count in the verdict line;

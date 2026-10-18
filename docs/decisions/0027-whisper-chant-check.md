@@ -1,7 +1,20 @@
 # 0027 — On-device Whisper chant check
 
 - Date: 2026-10-18
-- Status: Proposed
+- Status: Accepted. Replaces the vowel judge and chunks of ADR-0022; amends ADR-0018 (no words recognised → on-device recognition), ADR-0024 (no part arcs, no rejection state) and ADR-0025 (copy, timer refill on seal only).
+
+## Decision
+- Whisper base (q5_1, MIT) runs on the phone through whisper.cpp v1.9.4 (MIT), language Latin, no prompt, greedy decoding, encoder context sized to the audio.
+- **Listen until found:** after each pause (≥ 0.6 s after ≥ 0.8 s of new voice) or 6 s of continuous voice, the audio since the line began (≤ 25 s) is transcribed; the line seals when its letters are within 0.60 of the best-matching stretch of the transcript (J→I, V→U; repeats collapsed; likely-silence segments dropped). No rejection state.
+- Words turn green as checks cover them; the current seal pulses faster while a check runs.
+- Drift hysteresis: lock at ±20°, waver beyond 25°, resume within 20°.
+- Devices that fail to load the model or need more than 4 s for a 5 s check use the lenient rule (a line seals when every syllable lit), decided once per install.
+- The model ships in the app (≈ 57 MB); `tools/fetch_whisper_model.sh` downloads it for builds.
+
+## Consequences
+Speech is recognised on the device; transcripts are discarded at once in release builds and kept
+only in debug session logs. Half a long line can pass (plan note 4); `TranscriptRescoreTest`
+re-checks the threshold on logged sessions.
 
 ## Spike
 

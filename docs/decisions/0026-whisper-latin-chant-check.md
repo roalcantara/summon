@@ -1,7 +1,7 @@
 # 0026 — Chant check by Whisper in Latin (proposed)
 
 - Date: 2026-10-18
-- Status: Proposed. Would replace the vowel judge of ADR-0018/ADR-0022; needs real-voice confirmation first.
+- Status: Accepted; implemented by ADR-0027.
 
 ## Context
 On the generated corpus (ADR-0025: 64 honest TTS rituals in 8 voices with augmentation, 13 TTS

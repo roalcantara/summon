@@ -40,6 +40,8 @@ If two sources disagree, the higher one wins. Fix the lower one or note it in an
 ## Commands
 
 ```bash
+tools/fetch_whisper_model.sh   # once: downloads the Whisper model the build needs (ADR-0027)
+git submodule update --init    # once: whisper.cpp sources
 ./gradlew assembleDebug        # build
 ./gradlew testDebugUnitTest    # unit tests
 ./gradlew installDebug         # install on a connected device/emulator
@@ -68,7 +70,7 @@ cd ../mydemon && npm install && npm run dev   # http://localhost:3000
   its sigil guides to the direction: ADR-0020, plan
   `docs/superpowers/plans/2026-10-18-chant-direction.md`. Intro card before every ritual,
   "?"/"D" buttons on the slab and the floating debug panel: ADR-0021, plan
-  `docs/superpowers/plans/2026-10-18-chant-intro-and-debug.md`.
+  `docs/superpowers/plans/2026-10-18-chant-intro-and-debug.md`. Chant check: Whisper base on device (ADR-0027); `TranscriptRescoreTest` re-scores logged transcripts.
 - Packages: `data/` (demons, Houses, Callings), `progress/` (pure progress rules, JSON
   model, court hours, `ProgressStore`), `time/` (`GameClock`, debug settings), `ritual/`,
   `platform/` (Android implementations), `ui/`, `navigation/`.

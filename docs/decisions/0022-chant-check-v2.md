@@ -1,7 +1,7 @@
 # 0022 — Chant check v2: alignment and shuffle baseline
 
 - Date: 2026-10-18
-- Status: Accepted. Amends ADR-0018 (the verdict and rhythm parts; recording, privacy and alternatives stand).
+- Status: Accepted. Amends ADR-0018 (the verdict and rhythm parts; recording, privacy and alternatives stand). Superseded by ADR-0027.
 
 ## Context
 The ADR-0018 check judged one median formant per lit syllable. Lighting follows loudness
