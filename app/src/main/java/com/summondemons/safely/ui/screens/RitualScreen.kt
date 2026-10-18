@@ -289,6 +289,28 @@ private fun RitualContent(
     val wavering = ritual.phase == RitualPhase.Wavering
     val heartbeat = if (wavering && !reduceMotion) rememberHeartbeat() else null
     RequestLandscape(true)
+    // The altar's error panels, now in place of the phrase (ADR-0020).
+    val blocker: (@Composable () -> Unit)? = when {
+        inClimax -> null
+        state.micGranted == false -> {
+            {
+                ErrorPanel(stringResource(R.string.mic_rationale)) {
+                    PrimaryActionButton(
+                        text = stringResource(if (permanentlyDenied) R.string.action_open_settings else R.string.action_retry),
+                        onClick = if (permanentlyDenied) onOpenSettings else onRetryPermission,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+        }
+        state.micGranted == true && state.micUnavailable -> {
+            { ErrorPanel(stringResource(R.string.mic_unavailable)) }
+        }
+        state.headingUnavailable && !state.simulateHeading -> {
+            { ErrorPanel(stringResource(R.string.heading_unavailable)) }
+        }
+        else -> null
+    }
 
     Box(modifier.fillMaxSize().background(colors.background)) {
         ChantScreen(
@@ -298,6 +320,7 @@ private fun RitualContent(
             onClose = requestClose,
             onHelp = onShowIntro,
             showTurnHint = !state.introOffered,
+            blocker = blocker,
             debug = if (BuildConfig.DEBUG && !inClimax) {
                 {
                     DebugControls(

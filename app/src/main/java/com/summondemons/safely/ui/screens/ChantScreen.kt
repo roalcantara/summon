@@ -139,6 +139,8 @@ fun ChantScreen(
     onHelp: (() -> Unit)? = null,
     /** False right after the intro card, which already asked to turn sideways. */
     showTurnHint: Boolean = true,
+    /** Shown instead of the phrase when the ritual can't hear or can't sense direction (ADR-0020). */
+    blocker: (@Composable () -> Unit)? = null,
 ) {
     val demon = state.demon
     val accent = MaterialTheme.demonColors.accent(demon.accent)
@@ -159,12 +161,12 @@ fun ChantScreen(
         if (landscape) {
             Row(Modifier.fillMaxSize().safeDrawingPadding().padding(spacing.lg), horizontalArrangement = Arrangement.spacedBy(spacing.lg)) {
                 Slab(state, screen, accent, flash, vertical = true, Modifier.fillMaxHeight().weight(SLAB_WEIGHT))
-                Words(state, screen, accent, debug, Modifier.fillMaxHeight().weight(1f - SLAB_WEIGHT))
+                Words(state, screen, accent, debug, blocker, Modifier.fillMaxHeight().weight(1f - SLAB_WEIGHT))
             }
         } else {
             Column(Modifier.fillMaxSize().safeDrawingPadding().padding(spacing.lg), verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
                 Slab(state, screen, accent, flash, vertical = false, Modifier.fillMaxWidth())
-                Words(state, screen, accent, debug, Modifier.fillMaxWidth().weight(1f))
+                Words(state, screen, accent, debug, blocker, Modifier.fillMaxWidth().weight(1f))
             }
         }
         Row(Modifier.align(Alignment.TopEnd).safeDrawingPadding(), verticalAlignment = Alignment.CenterVertically) {
@@ -363,6 +365,7 @@ private fun Words(
     screen: ChantScreenState,
     accent: Color,
     debug: (@Composable () -> Unit)?,
+    blocker: (@Composable () -> Unit)?,
     modifier: Modifier,
 ) {
     Column(
@@ -370,8 +373,12 @@ private fun Words(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
     ) {
-        Phrase(screen.words, accent, Modifier.fillMaxWidth().weight(1f))
-        VerdictLine(screen, accent, state.micLevel)
+        if (blocker != null) {
+            Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) { blocker() }
+        } else {
+            Phrase(screen.words, accent, Modifier.fillMaxWidth().weight(1f))
+            VerdictLine(screen, accent, state.micLevel)
+        }
         debug?.invoke()
     }
 }
