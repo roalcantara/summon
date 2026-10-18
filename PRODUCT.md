@@ -119,7 +119,7 @@ credits Asmodeus with making men invisible.
 - Levels, power, stars, stats, synergies.
 - Currencies, bottom navigation, reagents.
 - Containment-breach / failure screen.
-- Word or speech recognition (only loudness, pitch periodicity and syllable onsets are measured).
+- Word or speech recognition (only loudness, pitch periodicity, syllable onsets and, per ADR-0018, vowel sounds and rhythm are measured).
 - Gemini / AI features.
 - More than one summon per day; notifications or reminders; cloud sync.
 - Weather (Venus' "clear weather only" is flavour text).

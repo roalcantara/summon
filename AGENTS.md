@@ -66,7 +66,8 @@ cd ../mydemon && npm install && npm run dev   # http://localhost:3000
   model, court hours, `ProgressStore`), `time/` (`GameClock`, debug settings), `ritual/`,
   `platform/` (Android implementations), `ui/`, `navigation/`.
 - Open items: the "LOVIS" question in ADR-0005; per-device tuning of the voice
-  thresholds (ADR-0008); Stitch art for the DESIGN.md Gaps.
+  thresholds (ADR-0008); the chant plausibility check and its thresholds (ADR-0018);
+  Stitch art for the DESIGN.md Gaps.
 
 ## Conventions
 
