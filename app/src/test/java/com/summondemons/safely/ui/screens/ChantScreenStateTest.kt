@@ -4,7 +4,7 @@ import com.summondemons.safely.ritual.ChantVerdict
 import com.summondemons.safely.ritual.RitualPhase
 import com.summondemons.safely.ritual.RitualState
 import com.summondemons.safely.ritual.TurnDirection
-import com.summondemons.safely.ritual.WordMark
+import com.summondemons.safely.ritual.CheckMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -14,7 +14,7 @@ import org.junit.Test
 class ChantScreenStateTest {
 
     private val phrases = listOf("DAEMONIUM RESIDENTE,", "GRATIA SIT CURA.", "HIC EST", "UT VOTA")
-    private val chanting = RitualState.start(90f, phrases, judged = true).copy(phase = RitualPhase.Chanting, azimuth = 90f)
+    private val chanting = RitualState.start(90f, phrases, mode = CheckMode.Whisper).copy(phase = RitualPhase.Chanting, azimuth = 90f)
 
     private fun state(r: RitualState, azimuth: Float? = 90f) = chantScreenState(r, phrases, azimuth, 90f)
 
@@ -34,20 +34,21 @@ class ChantScreenStateTest {
     }
 
     @Test
-    fun wordsOfPassedChunksAreHeard() {
-        val long = listOf("DAEMONIUM RESIDENTE,", "OSTENDE MIHI FACIEM TUAM POTENTIAM, VENIT AD ME.", "HIC EST", "UT VOTA")
-        val r = RitualState.start(90f, long, judged = true).copy(phase = RitualPhase.Chanting, azimuth = 90f, phrase = 1, chunk = 1, lit = 8)
-        val s = chantScreenState(r, long, 90f, 90f)
-        assertEquals(List(3) { WordLook.Heard } + WordLook.Current, s.words.take(4).map { it.look })
-        assertEquals(WordLook.Pending, s.words[4].look)
+    fun coveredWordsAreHeardInWhisperMode() {
+        val r = chanting.copy(lit = 2, covered = setOf(1))
+        val s = state(r)
+        assertEquals(listOf(WordLook.Current, WordLook.Heard), s.words.map { it.look })
     }
 
     @Test
-    fun aRejectionShowsTheDoubtfulWordsUntilChantingResumes() {
-        val r = chanting.copy(lit = 0, verdict = ChantVerdict(ChantVerdict.Kind.Rejected, 0, listOf(WordMark.Heard, WordMark.Doubtful)))
-        val s = state(r)
-        assertEquals(listOf(WordLook.Heard, WordLook.Rejected), s.words.map { it.look })
-        assertEquals(VerdictLine.ChantAgain, s.verdict)
+    fun fullyLitWordsAreHeardInLenientMode() {
+        val r = RitualState.start(90f, phrases).copy(phase = RitualPhase.Chanting, azimuth = 90f, lit = 5)
+        assertEquals(listOf(WordLook.Heard, WordLook.Current), chantScreenState(r, phrases, 90f, 90f).words.map { it.look })
+    }
+
+    @Test
+    fun aRunningCheckPulsesTheStatusBlock() {
+        assertTrue(chantScreenState(chanting, phrases, 90f, 90f, checking = true).status.checking)
     }
 
     @Test
@@ -97,7 +98,7 @@ class ChantScreenStateTest {
 
     // --- Direction in the sigil (ADR-0020) ---
 
-    private val seeking = RitualState.start(90f, phrases, judged = true)
+    private val seeking = RitualState.start(90f, phrases, mode = CheckMode.Whisper)
 
     @Test
     fun beforeTheLockTheLineIsEmptyAndStepOneSeeks() {
@@ -135,11 +136,4 @@ class ChantScreenStateTest {
         assertEquals(90f, drift.markerDegrees!!, 0.01f)
     }
 
-    @Test
-    fun theCurrentSealCountsItsPassedParts() {
-        val long = listOf("DAEMONIUM RESIDENTE,", "OSTENDE MIHI FACIEM TUAM POTENTIAM, VENIT AD ME.", "HIC EST", "UT VOTA")
-        val r = RitualState.start(90f, long, judged = true).copy(phase = RitualPhase.Chanting, azimuth = 90f, phrase = 1, chunk = 1, lit = 8)
-        val seal = chantScreenState(r, long, 90f, 90f).status.seals[1]
-        assertEquals(SealState(SealLook.Current, parts = 3, passed = 1), seal)
-    }
 }

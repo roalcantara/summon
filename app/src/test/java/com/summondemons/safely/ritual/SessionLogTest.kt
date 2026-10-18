@@ -10,20 +10,14 @@ import org.junit.Test
 class SessionLogTest {
 
     private val phrases = listOf("DAEMONIUM RESIDENTE,", "GRATIA SIT CURA.", "HIC EST", "UT VOTA")
-    private val header = SessionHeader("asmodeus", 0f, phrases, judged = true, startedMs = 1L)
-
-    private fun frame(vowel: Vowel?, onset: Boolean) =
-        if (vowel == null) VoiceFrame.SILENT else VoiceFrame(3_000.0, voiced = true, onset = onset, formants = vowel.formants())
-
-    private fun sing(vowels: List<Vowel?>): List<VoiceFrame> =
-        vowels.flatMap { v -> listOf(frame(v, true)) + List(9) { frame(v, false) } + List(3) { frame(null, false) } }
+    private val header = SessionHeader("asmodeus", 0f, phrases, mode = "Whisper", startedMs = 1L)
 
     /** Runs the engine like the ViewModel does and returns the log lines it would write. */
-    private fun record(frames: List<VoiceFrame>): List<String> {
-        var state = RitualState.start(0f, phrases, judged = true)
+    private fun record(frames: List<VoiceFrame>, heardAt: Map<Int, LineHeard> = emptyMap()): List<String> {
+        var state = RitualState.start(0f, phrases, mode = CheckMode.Whisper)
         val lines = mutableListOf(SessionRecords.encode(header))
         frames.forEachIndexed { i, voice ->
-            val input = RitualInput(0f, voice)
+            val input = RitualInput(0f, voice, heard = heardAt[i])
             val step = RitualEngine.step(state, input)
             state = step.state
             lines += SessionRecords.encode(SessionRecords.tick(i * FRAME_MS, input, step, hold = false))
@@ -42,15 +36,16 @@ class SessionLogTest {
 
     @Test
     fun aLoggedSessionReplaysToTheSameEffects() {
-        val lock = List((LOCK_HOLD_MS / FRAME_MS).toInt()) { VoiceFrame.SILENT }
-        val wrong = sing(List(8) { Vowel.A })
-        val right = sing(ChantJudge.expectedVowels(phrases[0]))
-        val (h, ticks) = SessionRecords.decode(record(lock + wrong + right))
+        val lockFrames = (LOCK_HOLD_MS / FRAME_MS).toInt()
+        val frames = List(lockFrames + 50) { VoiceFrame.SILENT }
+        val heardAt = mapOf(
+            lockFrames + 10 to LineHeard(0, found = false, distance = 0.7, covered = setOf(1)),
+            lockFrames + 20 to LineHeard(0, found = true, distance = 0.1, covered = setOf(0, 1)),
+        )
+        val (h, ticks) = SessionRecords.decode(record(frames, heardAt))
         val replayed = SessionReplay.replay(h, ticks)
-        assertEquals(ticks.count { it.isTick }, replayed.size)
         replayed.forEach { r -> assertEquals(r.logged.fx, r.step.effects.map(SessionRecords::effectName)) }
-        val judged = ticks.mapNotNull { it.judged }
-        assertEquals(listOf(false, true), judged.map { it.passed })
-        assertTrue(ticks.any { it.note == "intro:closed" })
+        assertTrue(ticks.any { "Sealed(phrase=0)" in it.fx })
+        assertEquals(listOf(false, true), ticks.mapNotNull { it.heard?.found })
     }
 }

@@ -102,11 +102,8 @@ private const val RING_STROKE_FRACTION = 0.035f
 private const val CLOCK_TWEEN_MS = 120
 private const val CURRENT_WORD_SCALE = 1.15f
 private const val DIM_ALPHA = 0.55f
-private const val DOUBT_ALPHA = 0.7f
 private const val LINE_FRACTION = 0.06f
 private const val PENDING_LINE_SCALE = 0.7f
-private const val WAVE_AMPLITUDE = 0.08f
-private const val BADGE_FRACTION = 0.22f
 private const val BLINK_HALF_MS = 300
 private const val BLINK_MIN = 0.55f
 private const val BACKDROP_DIM = 0.55f
@@ -153,8 +150,8 @@ fun ChantScreen(
 ) {
     val demon = state.demon
     val accent = MaterialTheme.demonColors.accent(demon.accent)
-    val screen = remember(state.ritual, state.azimuth) {
-        chantScreenState(state.ritual, demon.chantPhrases, state.azimuth, demon.ritualHeading)
+    val screen = remember(state.ritual, state.azimuth, state.checking) {
+        chantScreenState(state.ritual, demon.chantPhrases, state.azimuth, demon.ritualHeading, checking = state.checking)
     }
 
     BoxWithConstraints(modifier) {
@@ -423,12 +420,7 @@ private fun Phrase(words: List<ChantWord>, accent: Color, modifier: Modifier) {
             val start = length
             val sized = if (word.look == WordLook.Current) pushStyle(SpanStyle(fontSize = CURRENT_WORD_SCALE.em)) else null
             word.syllables.forEachIndexed { si, syllable ->
-                val color = when {
-                    word.look == WordLook.Rejected -> colors.error
-                    word.look == WordLook.Heard || word.look == WordLook.Doubtful -> accent
-                    si < word.lit -> accent
-                    else -> dim
-                }
+                val color = if (word.look == WordLook.Heard || si < word.lit) accent else dim
                 withStyle(SpanStyle(color = color)) { append(syllable) }
             }
             if (sized != null) pop(sized)
@@ -440,8 +432,6 @@ private fun Phrase(words: List<ChantWord>, accent: Color, modifier: Modifier) {
             WordLook.Pending -> colors.outlineVariant
             WordLook.Current -> colors.onSurfaceVariant
             WordLook.Heard -> safe
-            WordLook.Doubtful -> colors.primary.copy(alpha = DOUBT_ALPHA)
-            WordLook.Rejected -> colors.error
         }
     }
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
@@ -451,7 +441,7 @@ private fun Phrase(words: List<ChantWord>, accent: Color, modifier: Modifier) {
         autoSize = TextAutoSize.StepBased(minFontSize = MinPhraseSize, maxFontSize = MaxPhraseSize, stepSize = PhraseStep),
         onTextLayout = { layout = it },
         modifier = modifier.wrapContentHeight(Alignment.CenterVertically).drawBehind {
-            layout?.let { drawWordLines(it, ranges, words, lineColors, colors.onError) }
+            layout?.let { drawWordLines(it, ranges, words, lineColors) }
         },
     )
 }
@@ -461,7 +451,6 @@ private fun DrawScope.drawWordLines(
     ranges: List<IntRange>,
     words: List<ChantWord>,
     lineColors: List<Color>,
-    badgeInk: Color,
 ) {
     ranges.forEachIndexed { i, range ->
         if (range.isEmpty() || range.last >= layout.layoutInput.text.length) return@forEachIndexed
@@ -472,37 +461,11 @@ private fun DrawScope.drawWordLines(
         val thickness = height * LINE_FRACTION
         val y = last.bottom + thickness
         val color = lineColors[i]
-        when (words[i].look) {
-            WordLook.Rejected -> {
-                drawWave(first.left, last.right, y, height * WAVE_AMPLITUDE, color, thickness)
-                val r = height * BADGE_FRACTION
-                val c = Offset(last.right + r * 0.4f, first.top + r * 0.6f)
-                drawCircle(color, r, c)
-                val d = r * 0.45f
-                drawLine(badgeInk, Offset(c.x - d, c.y - d), Offset(c.x + d, c.y + d), thickness, StrokeCap.Round)
-                drawLine(badgeInk, Offset(c.x - d, c.y + d), Offset(c.x + d, c.y - d), thickness, StrokeCap.Round)
-            }
-            WordLook.Pending -> drawLine(color, Offset(first.left, y), Offset(last.right, y), thickness * PENDING_LINE_SCALE, StrokeCap.Round)
-            else -> drawLine(color, Offset(first.left, y), Offset(last.right, y), thickness, StrokeCap.Round)
-        }
+        val width = if (words[i].look == WordLook.Pending) thickness * PENDING_LINE_SCALE else thickness
+        drawLine(color, Offset(first.left, y), Offset(last.right, y), width, StrokeCap.Round)
     }
 }
 
-private fun DrawScope.drawWave(from: Float, to: Float, y: Float, amplitude: Float, color: Color, width: Float) {
-    val step = amplitude * 4f
-    val path = Path().apply {
-        moveTo(from, y)
-        var x = from
-        var up = true
-        while (x < to) {
-            val next = minOf(x + step, to)
-            quadraticTo((x + next) / 2f, if (up) y - amplitude * 2f else y + amplitude * 2f, next, y)
-            x = next
-            up = !up
-        }
-    }
-    drawPath(path, color, style = Stroke(width, cap = StrokeCap.Round))
-}
 
 /** The voice meter while chanting, or the one message that needs action (ADR-0024). */
 @Composable
@@ -521,9 +484,8 @@ private fun VerdictLine(screen: ChantScreenState, accent: Color, micLevel: Float
                 if (screen.drifting) colors.outline else accent,
                 Modifier.size(MeterWidth, MeterHeight),
             )
-            VerdictLine.ChantAgain, VerdictLine.SealCracked -> {
-                val label = if (screen.verdict == VerdictLine.ChantAgain) R.string.verdict_chant_again else R.string.verdict_seal_cracked
-                Text(stringResource(label).upper(), style = style, color = colors.error, maxLines = 1)
+            VerdictLine.SealCracked -> {
+                Text(stringResource(R.string.verdict_seal_cracked).upper(), style = style, color = colors.error, maxLines = 1)
                 Text("✕", style = style, color = colors.error)
             }
         }

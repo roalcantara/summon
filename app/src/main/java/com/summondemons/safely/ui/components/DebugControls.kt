@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.summondemons.safely.R
 import com.summondemons.safely.ritual.ClipLabel
-import com.summondemons.safely.ritual.RitualEffect
+import com.summondemons.safely.ritual.CheckReport
 import com.summondemons.safely.ui.theme.PillShape
 import com.summondemons.safely.ui.theme.spacing
 
@@ -41,8 +41,10 @@ fun DebugControls(
     simulateHeading: Boolean,
     onSimulateHeadingChange: (Boolean) -> Unit,
     onHoldToChantChange: (Boolean) -> Unit,
-    /** The chant check's latest chunk verdict (ADR-0022). */
-    lastJudged: RitualEffect.Judged?,
+    /** The latest Whisper check (ADR-0027). */
+    lastCheck: CheckReport?,
+    /** Why the ritual runs in lenient mode; empty in Whisper mode. */
+    modeReason: String,
     /** Clip recorder label; null = not recording (ADR-0018). */
     clipLabel: ClipLabel?,
     onCycleClipLabel: () -> Unit,
@@ -77,17 +79,16 @@ fun DebugControls(
             },
         )
         Text(
-            if (lastJudged == null) {
-                stringResource(R.string.debug_chant_score_none)
-            } else {
-                val v = lastJudged.verdict
-                stringResource(
+            when {
+                modeReason.isNotEmpty() -> stringResource(R.string.debug_chant_mode, modeReason)
+                lastCheck == null -> stringResource(R.string.debug_chant_score_none)
+                else -> stringResource(
                     R.string.debug_chant_score,
-                    ROMAN_NUMERALS[lastJudged.phrase],
-                    lastJudged.chunk + 1,
-                    v.cost,
-                    v.rank?.let { "%.0f %%".format(it * 100) } ?: "–",
-                    if (v.passed) "✓" else if (v.talk) "✗ talk" else "✗",
+                    ROMAN_NUMERALS[lastCheck.heard.phrase],
+                    lastCheck.heard.distance,
+                    if (lastCheck.heard.found) "✓" else "✗",
+                    lastCheck.checkMs,
+                    lastCheck.transcript.take(40),
                 )
             },
             style = small,

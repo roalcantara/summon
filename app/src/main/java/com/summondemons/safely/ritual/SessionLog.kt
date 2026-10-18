@@ -29,7 +29,7 @@ data class SessionHeader(
     val target: Float,
     val phrases: List<String>,
     /** CheckMode name (ADR-0027). */
-    val mode: String,
+    val mode: String = "Whisper",
     val startedMs: Long,
 )
 

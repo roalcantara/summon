@@ -83,7 +83,6 @@ import kotlin.math.abs
 private const val CUTOUT_WIDTH_FRACTION = 0.8f
 private const val SEAL_FLARE_MS = 700
 private const val CRACK_MS = 1_500
-private const val REJECT_MS = 1_500
 private const val INTRO_MS = 500
 private const val SEAL_FLASH_MIX = 0.5f
 private const val CLIMAX_SCRIM_ALPHA = 0.85f
@@ -152,9 +151,6 @@ fun RitualScreen(
                 }
                 is RitualEffect.Cracked -> {
                     flash = SigilFlash(effect.phrase + 1, crackColor, CRACK_MS, ++serial)
-                }
-                is RitualEffect.Rejected -> {
-                    flash = SigilFlash(effect.phrase + 1, crackColor, REJECT_MS, ++serial)
                 }
                 else -> Unit
             }
@@ -248,7 +244,8 @@ private fun RitualContent(
                         simulateHeading = state.simulateHeading,
                         onSimulateHeadingChange = onSimulateHeadingChange,
                         onHoldToChantChange = onHoldToChantChange,
-                        lastJudged = state.lastJudged,
+                        lastCheck = state.lastCheck,
+                        modeReason = state.modeReason,
                         clipLabel = state.clipLabel,
                         onCycleClipLabel = onCycleClipLabel,
                     )

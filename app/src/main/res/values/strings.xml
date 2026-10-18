@@ -14,7 +14,8 @@
     <string name="debug_clip_off">Record clip</string>
     <string name="debug_clip_chant">Recording · chant</string>
     <string name="debug_clip_nonsense">Recording · nonsense</string>
-    <string name="debug_chant_score">Chant check %1$s·%2$d · cost %3$.2f · rank %4$s %5$s</string>
+    <string name="debug_chant_score">Check %1$s %2$.2f %3$s · %4$d ms · “%5$s”</string>
+    <string name="debug_chant_mode">Check mode: lenient (%1$s)</string>
     <string name="debug_chant_score_none">Chant check · no verdict yet</string>
     <string name="debug_controls">Debug controls</string>
 
@@ -67,18 +68,17 @@
     <string name="chant_a11y_facing">Facing %1$s</string>
     <string name="chant_a11y_turn_left">Turn left to face %1$s</string>
     <string name="chant_a11y_turn_right">Turn right to face %1$s</string>
-    <string name="verdict_chant_again">Chant again</string>
     <string name="verdict_seal_cracked">Seal cracked</string>
     <string name="chant_help">How to chant</string>
     <string name="intro_title">How to chant</string>
     <string name="intro_direction_title">1. Face</string>
     <string name="intro_direction_body">Turn until the frame turns green.</string>
     <string name="intro_chant_title">2. Chant</string>
-    <string name="intro_chant_body">Read each line aloud to light its seal.</string>
+    <string name="intro_chant_body">Read the line aloud until it seals.</string>
     <string name="intro_lines_title">Lines</string>
-    <string name="intro_lines_body">Green: heard. Red: say it again.</string>
+    <string name="intro_lines_body">Green: heard.</string>
     <string name="intro_focus_title">Focus</string>
-    <string name="intro_focus_body">Each part gets a minute; the ring shows what is left.</string>
+    <string name="intro_focus_body">Each line gets a minute; the ring shows what is left.</string>
     <string name="intro_summon">Summon</string>
     <string name="intro_close">Close and start the chant</string>
     <string name="abandon_title">Abandon the ritual?</string>

@@ -153,7 +153,7 @@ private fun ChantRow(status: StatusBlock, stateColor: Color, accent: Color, labe
         StepLabel("2.", stringResource(R.string.chant_step_chant), stateColor, label, Modifier.weight(1f, fill = false))
         Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs)) {
             status.seals.forEachIndexed { i, seal ->
-                Seal(ROMAN_NUMERALS[i], seal, accent, dimmed = status.step == StepState.Drifting, Modifier.size(SealSize))
+                Seal(ROMAN_NUMERALS[i], seal, accent, dimmed = status.step == StepState.Drifting, checking = status.checking, modifier = Modifier.size(SealSize))
             }
         }
     }
@@ -179,13 +179,13 @@ private fun StepLabel(number: String, text: String, numberColor: Color, style: T
 
 /** A numeral disc inside a ring split into one arc per chunk; passed arcs in the accent. */
 @Composable
-private fun Seal(numeral: String, seal: SealState, accent: Color, dimmed: Boolean, modifier: Modifier) {
+private fun Seal(numeral: String, seal: SealState, accent: Color, dimmed: Boolean, checking: Boolean, modifier: Modifier) {
     val colors = MaterialTheme.colorScheme
     val reduceMotion = LocalReduceMotion.current
     val current = seal.look == SealLook.Current
     val breath = if (current && !dimmed && !reduceMotion) {
         rememberInfiniteTransition(label = "seal").animateFloat(
-            1f, BREATH_MIN, infiniteRepeatable(tween(BREATH_HALF_MS), RepeatMode.Reverse), label = "sealBreath",
+            1f, BREATH_MIN, infiniteRepeatable(tween(if (checking) BREATH_HALF_MS / 3 else BREATH_HALF_MS), RepeatMode.Reverse), label = "sealBreath",
         ).value
     } else {
         1f

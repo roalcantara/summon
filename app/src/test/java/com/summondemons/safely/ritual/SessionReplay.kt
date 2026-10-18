@@ -10,7 +10,7 @@ object SessionReplay {
     fun read(file: File): Pair<SessionHeader, List<SessionTick>> = SessionRecords.decode(file.readLines())
 
     fun replay(header: SessionHeader, ticks: List<SessionTick>): List<Replayed> {
-        var state = RitualState.start(header.target, header.phrases, judged = header.judged)
+        var state = RitualState.start(header.target, header.phrases, mode = CheckMode.valueOf(header.mode))
         return ticks.filter { it.isTick }.map { logged ->
             val step = RitualEngine.step(state, logged.input())
             state = step.state
