@@ -178,7 +178,8 @@ private fun RitualDestination(
             inCourt = { game.inCourtNow(demon.house) },
             commitSummon = { flawless -> game.commitSummon(demon.id, startDay, flawless) },
             clipRecorder = ClipRecorders.create(appContext),
-            showIntro = true,
+            // First ritual only; "?" on the chant screen reopens it (ADR-0019).
+            showIntro = !state.progress.chantIntroSeen,
             onIntroSeen = game::markChantIntroSeen,
         )
     }
