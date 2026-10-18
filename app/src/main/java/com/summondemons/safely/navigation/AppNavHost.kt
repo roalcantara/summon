@@ -1,5 +1,7 @@
 package com.summondemons.safely.navigation
 
+import android.content.pm.ActivityInfo
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -75,6 +77,7 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
             CompositionLocalProvider(LocalSharedTransitionScope provides this) {
                 NavHost(navController = navController, startDestination = Home) {
                     composable<Home> {
+                        LockPortrait()
                         ProvideDestinationScope {
                             HomeDestination(state, onDebug, onOpen = dropUnlessResumed {
                                 game.openGrimoireFromHome()
@@ -84,6 +87,7 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
                     }
 
                     composable<Grimoire> {
+                        LockPortrait()
                         ProvideDestinationScope {
                             val lifecycle = LocalLifecycleOwner.current.lifecycle
                             GrimoireScreen(
@@ -197,10 +201,19 @@ private fun RitualDestination(
             game.celebrate(demon.id, ritual.uiState.value.ritual.flawless)
             navController.popBackStack<Grimoire>(inclusive = false)
         },
-        onAbort = dropUnlessResumed { navController.popBackStack() },
+        onAbort = dropUnlessResumed { navController.popBackStack<Grimoire>(inclusive = false) },
     )
 }
 
 @Composable
 private fun AnimatedVisibilityScope.ProvideDestinationScope(content: @Composable () -> Unit) =
     CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides this, content = content)
+
+@Composable
+private fun LockPortrait() {
+    val activity = LocalActivity.current ?: return
+    DisposableEffect(activity) {
+        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        onDispose {}
+    }
+}
