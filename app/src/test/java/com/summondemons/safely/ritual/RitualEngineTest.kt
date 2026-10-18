@@ -316,8 +316,8 @@ class RitualEngineTest {
 
     @Test
     fun budgetsAreThreeSecondsPlusHalfASecondPerSyllableScaledInCourt() {
-        assertEquals(12_000L, focusBudget(18, 1))
-        assertEquals(7_500L, focusBudget(6, 1, 1.25f))
+        assertEquals(17_500L, focusBudget(18, 1))
+        assertEquals(10_625L, focusBudget(6, 1, 1.25f))
         assertEquals(0L, focusBudget(8, 0))
     }
 

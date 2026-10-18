@@ -1,6 +1,6 @@
 package com.summondemons.safely.ritual
 
-/** Ritual-wide tuning (ADR-0008, ADR-0010, ADR-0018). Per-demon parameters live in `Demon` (ADR-0006). */
+/** Ritual-wide tuning (ADR-0008, ADR-0010, ADR-0018, ADR-0019). Per-demon parameters live in `Demon` (ADR-0006). */
 object RitualConfig {
     const val PHRASE_COUNT = 4
     const val HEADING_TOLERANCE_DEG = 20f
@@ -13,9 +13,9 @@ object RitualConfig {
     const val SUSTAIN_SYLLABLE_MS = 350L
     const val PROXIMITY_RANGE_DEG = 60f
 
-    // Focus clock (ADR-0010) and the Court Hours bonus (ADR-0012)
-    const val FOCUS_BASE_MS = 3_000L
-    const val FOCUS_PER_SYLLABLE_MS = 500L
+    // Focus clock (ADR-0010, longer per ADR-0019) and the Court Hours bonus (ADR-0012)
+    const val FOCUS_BASE_MS = 4_000L
+    const val FOCUS_PER_SYLLABLE_MS = 750L
     const val FOCUS_DRIFT_MULTIPLIER = 3
     const val COURT_BONUS = 0.25f
     /** Below this focus fraction the focus bar beats. */

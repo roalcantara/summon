@@ -12,7 +12,7 @@ import com.summondemons.safely.ritual.RitualConfig.PROXIMITY_STEP_DEG
 import com.summondemons.safely.ritual.RitualConfig.SEAL_LISTEN_MS
 import com.summondemons.safely.ritual.RitualConfig.SUSTAIN_SYLLABLE_MS
 
-/** Pure ritual rules (ADR-0008, the focus clock of ADR-0010, the chant check of ADR-0018): one call per 20 ms tick. */
+/** Pure ritual rules (ADR-0008, the focus clock of ADR-0010, the chant check of ADR-0018, verdicts of ADR-0019): one call per 20 ms tick. */
 object RitualEngine {
 
     fun step(state: RitualState, input: RitualInput): Step {
@@ -80,7 +80,8 @@ object RitualEngine {
         effects += RitualEffect.SyllableLit
         val lit = s.lit + 1
         val last = lit == s.syllables[s.phrase]
-        val reset = chanting.copy(sinceSyllableMs = 0L, voicedRunMs = 0L, lit = lit)
+        // Chanting again clears the last verdict (ADR-0019).
+        val reset = chanting.copy(sinceSyllableMs = 0L, voicedRunMs = 0L, lit = lit, verdict = null)
             .hearing { light(voice, first = s.lit == 0, last = last) }
         // With the chant check on, the last syllable's vowel is heard before the verdict (ADR-0018).
         if (!last || reset.take.closing) return drain(reset, 1, effects)
@@ -91,11 +92,16 @@ object RitualEngine {
     private fun close(s: RitualState, voice: VoiceFrame, effects: MutableList<RitualEffect>): Step {
         val take = s.take.hear(voice, begun = true)
         if (voice.voiced && take.closingMs < SEAL_LISTEN_MS) return drain(s.copy(take = take), 1, effects)
-        val score = ChantJudge.score(s.vowels!![s.phrase], take)
+        val expected = s.vowels!![s.phrase]
+        val score = ChantJudge.score(expected, take)
+        val marks = s.wordSizes?.let { ChantJudge.wordMarks(expected, take.heard, it[s.phrase]) }.orEmpty()
         effects += RitualEffect.Judged(s.phrase, score)
-        if (score.passed) return seal(s.copy(take = ChantTake()), effects)
+        if (score.passed) {
+            return seal(s.copy(take = ChantTake(), verdict = ChantVerdict(ChantVerdict.Kind.Sealed, s.phrase, marks)), effects)
+        }
         effects += RitualEffect.Rejected(s.phrase)
-        return drain(s.copy(lit = 0, take = ChantTake()), 1, effects)
+        val rejected = ChantVerdict(ChantVerdict.Kind.Rejected, s.phrase, marks)
+        return Step(s.copy(lit = 0, take = ChantTake(), verdict = rejected), effects)
     }
 
     /** Seals the current phrase: the next one starts with a full clock, or the 4th starts the climax. */
@@ -115,15 +121,24 @@ object RitualEngine {
     private inline fun RitualState.hearing(update: ChantTake.() -> ChantTake): RitualState =
         if (vowels == null) this else copy(take = take.update())
 
-    /** Drains the focus clock (phrases II–IV only); at 0 the last seal cracks. */
+    /**
+     * Drains the focus clock (phrases II–IV only); at 0 the last seal cracks. While a fresh
+     * verdict is on screen the clock waits instead (ADR-0019).
+     */
     private fun drain(s: RitualState, multiplier: Int, effects: MutableList<RitualEffect>): Step {
         if (s.phrase < 1) return Step(s, effects)
+        val verdict = s.verdict
+        if (verdict != null && verdict.holdsClock) return Step(s.copy(verdict = verdict.copy(heldMs = verdict.heldMs + FRAME_MS)), effects)
         val focus = s.focusMs - FRAME_MS * multiplier
         if (focus > 0L) return Step(s.copy(focusMs = focus), effects)
         val phrase = s.phrase - 1
         effects += RitualEffect.Cracked(phrase)
         val budget = focusBudget(s.syllables[phrase], phrase, s.courtMultiplier)
-        return Step(s.copy(phrase = phrase, lit = 0, focusMs = budget, focusBudgetMs = budget, flawless = false, take = ChantTake()), effects)
+        val cracked = if (s.vowels != null) ChantVerdict(ChantVerdict.Kind.Cracked, phrase) else null
+        return Step(
+            s.copy(phrase = phrase, lit = 0, focusMs = budget, focusBudgetMs = budget, flawless = false, take = ChantTake(), verdict = cracked),
+            effects,
+        )
     }
 
     private fun climax(s: RitualState): Step {

@@ -5,6 +5,7 @@ import com.summondemons.safely.ritual.RitualConfig.FOCUS_BASE_MS
 import com.summondemons.safely.ritual.RitualConfig.FOCUS_PER_SYLLABLE_MS
 import com.summondemons.safely.ritual.RitualConfig.ONSET_REFRACTORY_MS
 import com.summondemons.safely.ritual.RitualConfig.PHRASE_COUNT
+import com.summondemons.safely.ritual.RitualConfig.VERDICT_HOLD_MS
 import kotlin.math.roundToLong
 
 enum class RitualPhase { Seeking, Locking, Chanting, Wavering, Climax, Done }
@@ -68,6 +69,10 @@ data class RitualState(
     val vowels: List<List<Vowel?>>? = null,
     /** What has been heard of the current phrase; only advanced while the chant check is on. */
     val take: ChantTake = ChantTake(),
+    /** Syllables of each word, per phrase; set with [vowels] (ADR-0019 word hints). */
+    val wordSizes: List<List<Int>>? = null,
+    /** The last verdict, until the next syllable lights; only while the chant check is on (ADR-0019). */
+    val verdict: ChantVerdict? = null,
 ) {
     init {
         require(syllables.size == PHRASE_COUNT) { "need exactly $PHRASE_COUNT phrases" }
@@ -102,6 +107,7 @@ data class RitualState(
             target = target,
             syllables = phrases.map { LatinSyllables.count(it).coerceAtLeast(1) },
             vowels = if (judged) phrases.map(ChantJudge::expectedVowels) else null,
+            wordSizes = if (judged) phrases.map(LatinSyllables::wordSizes) else null,
         )
     }
 }
@@ -111,3 +117,19 @@ fun focusBudget(syllables: Int, phrase: Int, courtMultiplier: Float = 1f): Long 
     if (phrase <= 0) 0L else ((FOCUS_BASE_MS + FOCUS_PER_SYLLABLE_MS * syllables) * courtMultiplier).roundToLong()
 
 data class Step(val state: RitualState, val effects: List<RitualEffect> = emptyList())
+
+/**
+ * The last phrase verdict while the chant check is on (ADR-0019): shown on the chant screen
+ * until the next syllable lights. While it is fresh ([holdsClock]) the focus clock waits.
+ */
+data class ChantVerdict(
+    val kind: Kind,
+    val phrase: Int,
+    /** Word hints of the judged attempt; doubtful words of a rejection are the ones to fix. */
+    val marks: List<WordMark> = emptyList(),
+    val heldMs: Long = 0L,
+) {
+    enum class Kind { Sealed, Rejected, Cracked }
+
+    val holdsClock: Boolean get() = heldMs < VERDICT_HOLD_MS
+}
