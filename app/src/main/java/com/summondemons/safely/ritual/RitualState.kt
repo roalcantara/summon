@@ -29,6 +29,12 @@ sealed interface RitualEffect {
     data class Cracked(val phrase: Int) : RitualEffect
     data object Drift : RitualEffect
     data object Resumed : RitualEffect
+
+    /** The chant check judged [phrase] (ADR-0018); always followed by [Sealed] or [Rejected]. */
+    data class Judged(val phrase: Int, val score: ChantScore) : RitualEffect
+
+    /** [phrase] didn't sound like its text: it stays open with no syllable lit (ADR-0018). */
+    data class Rejected(val phrase: Int) : RitualEffect
     data class ClimaxStart(val flawless: Boolean) : RitualEffect
     data object Summoned : RitualEffect
 }
@@ -58,10 +64,15 @@ data class RitualState(
     val voicedRunMs: Long = 0L,
     /** Last 5 degree proximity bucket while seeking; null when out of range or unknown. */
     val proximityBucket: Int? = null,
+    /** Expected vowel per syllable of each phrase; null turns the chant check off (ADR-0018). */
+    val vowels: List<List<Vowel?>>? = null,
+    /** What has been heard of the current phrase; only advanced while the chant check is on. */
+    val take: ChantTake = ChantTake(),
 ) {
     init {
         require(syllables.size == PHRASE_COUNT) { "need exactly $PHRASE_COUNT phrases" }
         require(syllables.all { it >= 1 }) { "every phrase needs at least one syllable" }
+        require(vowels == null || vowels.size == PHRASE_COUNT) { "need vowels for exactly $PHRASE_COUNT phrases" }
     }
 
     val aligned: Boolean get() = azimuth != null && isAligned(azimuth, target)
@@ -86,8 +97,12 @@ data class RitualState(
         }
 
     companion object {
-        fun start(target: Float, phrases: List<String>): RitualState =
-            RitualState(target, phrases.map { LatinSyllables.count(it).coerceAtLeast(1) })
+        /** [judged] turns the chant check on (ADR-0018); the app always does, most engine tests don't. */
+        fun start(target: Float, phrases: List<String>, judged: Boolean = false): RitualState = RitualState(
+            target = target,
+            syllables = phrases.map { LatinSyllables.count(it).coerceAtLeast(1) },
+            vowels = if (judged) phrases.map(ChantJudge::expectedVowels) else null,
+        )
     }
 }
 
