@@ -30,6 +30,8 @@ data class SessionHeader(
     val phrases: List<String>,
     /** CheckMode name (ADR-0027). */
     val mode: String = "Whisper",
+    /** ChantLayout name (ADR-0029). */
+    val layout: String = "Split",
     val startedMs: Long,
 )
 
@@ -58,6 +60,8 @@ data class SessionTick(
     val heard: HeardRecord? = null,
     /** Details of a check that finished on this tick (debug readout, threshold re-check). */
     val check: CheckRecord? = null,
+    /** The phrase size the chant screen settled on; an event line, not a tick (ADR-0029). */
+    val ui: UiRecord? = null,
     val note: String? = null,
 ) {
     val isTick: Boolean get() = ph != null
@@ -84,6 +88,17 @@ data class CheckRecord(
     val windowMs: Long,
     val voicedMs: Long,
     val checkMs: Long,
+)
+
+/** The chant screen's settled phrase size and boxes in one arrangement (ADR-0029). */
+@Serializable
+data class UiRecord(
+    val layout: String,
+    val phrase: Int,
+    val phraseSp: Float,
+    val boxWidthDp: Int,
+    val boxHeightDp: Int,
+    val sigilDp: Int,
 )
 object SessionRecords {
     val json = Json {

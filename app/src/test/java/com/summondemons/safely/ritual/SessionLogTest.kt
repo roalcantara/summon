@@ -48,4 +48,15 @@ class SessionLogTest {
         assertTrue(ticks.any { "Sealed(phrase=0)" in it.fx })
         assertEquals(listOf(false, true), ticks.mapNotNull { it.heard?.found })
     }
+
+    @Test
+    fun theLayoutAndPhraseSizesRoundTrip() {
+        val h = header.copy(layout = "Centred")
+        val ui = SessionTick(t = 1_000, ui = UiRecord("Centred", phrase = 1, phraseSp = 42f, boxWidthDp = 700, boxHeightDp = 90, sigilDp = 104))
+        val (decoded, ticks) = SessionRecords.decode(listOf(SessionRecords.encode(h), SessionRecords.encode(ui)))
+        assertEquals(h, decoded)
+        assertEquals(listOf(ui), ticks)
+        assertTrue("a ui record is not a tick", !ticks.single().isTick)
+        assertTrue("the header always names its layout", SessionRecords.encode(header).contains("\"layout\":\"Split\""))
+    }
 }
