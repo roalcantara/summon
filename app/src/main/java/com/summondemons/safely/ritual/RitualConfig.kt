@@ -34,6 +34,8 @@ object RitualConfig {
     const val CHECK_MIN_VOICED_MS = 800L
     const val CHECK_CONTINUOUS_MS = 6_000L
     const val CHECK_WINDOW_MS = 12_000L
+    /** Past the line's last syllable, it starts over only after a pause this long (ADR-0028). */
+    const val RECITE_AGAIN_PAUSE_MS = 1_000L
     /** Words turn green only from checks at most this far from the line (no green from babble; ADR-0028). */
     const val COVER_MAX_DISTANCE = 0.75
     /** Lenient mode when a 5 s device check takes longer than this. */

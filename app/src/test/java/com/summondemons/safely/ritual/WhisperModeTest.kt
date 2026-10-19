@@ -51,12 +51,21 @@ class WhisperModeTest {
     @Test
     fun chantingPastTheEndStartsTheLineOver() {
         val full = syllables(locked(CheckMode.Whisper), 8).copy(covered = setOf(0))
-        val again = run(full, 1, voice = onset)
+        val paused = run(full, (RitualConfig.RECITE_AGAIN_PAUSE_MS / FRAME_MS).toInt()).state
+        val again = run(paused, 1, voice = onset)
         assertTrue(RitualEffect.Retry(0) in again.effects)
         assertEquals(1, again.state.lit)
         assertEquals(emptySet<Int>(), again.state.covered)
         val rested = run(again.state, (ONSET_REFRACTORY_MS / FRAME_MS).toInt()).state
         assertEquals(4, syllables(rested, 3).lit)
+    }
+
+    @Test
+    fun extraOnsetsMidSpeechDoNotStartTheLineOver() {
+        val full = syllables(locked(CheckMode.Whisper), 8)
+        val more = syllables(full, 3) // still chanting, no pause
+        assertEquals(8, more.lit)
+        assertEquals(0, more.phrase)
     }
 
     @Test

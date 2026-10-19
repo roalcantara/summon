@@ -12,6 +12,7 @@ import com.summondemons.safely.ritual.RitualConfig.ONSET_REFRACTORY_MS
 import com.summondemons.safely.ritual.RitualConfig.PHRASE_COUNT
 import com.summondemons.safely.ritual.RitualConfig.PROXIMITY_RANGE_DEG
 import com.summondemons.safely.ritual.RitualConfig.PROXIMITY_STEP_DEG
+import com.summondemons.safely.ritual.RitualConfig.RECITE_AGAIN_PAUSE_MS
 import com.summondemons.safely.ritual.RitualConfig.SUSTAIN_SYLLABLE_MS
 
 /**
@@ -94,8 +95,10 @@ object RitualEngine {
             }
         }
 
-        // In Whisper mode the line can always be recited again; lenient seals at its last syllable.
-        val lights = voice.voiced && (chanting.lit < total || s.mode == CheckMode.Whisper) &&
+        // In Whisper mode the line can be recited again, but only after a pause: extra onsets
+        // mid-speech must not clear the words while the player is still reading (ADR-0028).
+        val canStartOver = s.mode == CheckMode.Whisper && since >= RECITE_AGAIN_PAUSE_MS
+        val lights = voice.voiced && (chanting.lit < total || canStartOver) &&
             ((voice.onset && since >= ONSET_REFRACTORY_MS) || run >= SUSTAIN_SYLLABLE_MS)
         if (!lights) return drain(chanting, 1, effects)
 
