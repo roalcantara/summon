@@ -15,6 +15,8 @@
     <string name="debug_check_auto">Check: auto</string>
     <string name="debug_check_whisper">Check: Whisper (next ritual)</string>
     <string name="debug_check_lenient">Check: lenient (next ritual)</string>
+    <string name="debug_layout_split">Layout: split</string>
+    <string name="debug_layout_centred">Layout: centred</string>
     <string name="debug_clip_chant">Recording · chant</string>
     <string name="debug_clip_nonsense">Recording · nonsense</string>
     <string name="debug_chant_score">Check %1$s %2$.2f %3$s · %4$d ms · “%5$s”</string>
@@ -66,7 +68,11 @@
 
     <!-- Chant screen (ADR-0019) -->
     <string name="chant_face">Face %1$s</string>
-    <string name="chant_step_chant">Chant</string>
+    <string name="chant_paused">Paused</string>
+    <string name="chant_a11y_paused">Paused. Turn back to face %1$s</string>
+    <string name="chant_checking">Checking…</string>
+    <string name="chant_heard">heard: “%1$s”</string>
+    <string name="chant_a11y_locked">Face the demon to chant</string>
     <string name="chant_a11y_seals">%1$d of 4 lines sealed</string>
     <string name="chant_a11y_facing">Facing %1$s</string>
     <string name="chant_a11y_turn_left">Turn left to face %1$s</string>

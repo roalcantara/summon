@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import com.summondemons.safely.platform.DeviceCheck
 import com.summondemons.safely.ritual.CheckMode
+import com.summondemons.safely.ritual.ChantLayout
 
 /** As tall as a chip, so "Hold to Chant" lines up with its neighbours. */
 private val ChipHeight = 32.dp
@@ -52,6 +53,9 @@ fun DebugControls(
     /** Clip recorder label; null = not recording (ADR-0018). */
     clipLabel: ClipLabel?,
     onCycleClipLabel: () -> Unit,
+    /** The chant screen's arrangement; the chip switches it live (ADR-0029). */
+    layout: ChantLayout,
+    onLayoutChange: (ChantLayout) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
@@ -67,6 +71,7 @@ fun DebugControls(
             HoldToChantChip(onHoldToChantChange)
         }
         CheckModeChip(small)
+        LayoutChip(layout, onLayoutChange, small)
         FilterChip(
             selected = clipLabel != null,
             onClick = onCycleClipLabel,
@@ -169,6 +174,21 @@ private fun CheckModeChip(style: TextStyle) {
                         CheckMode.Lenient -> R.string.debug_check_lenient
                     },
                 ),
+                style = style,
+            )
+        },
+    )
+}
+
+/** Debug: split ↔ centred, applied at once (ADR-0029). */
+@Composable
+private fun LayoutChip(layout: ChantLayout, onLayoutChange: (ChantLayout) -> Unit, style: TextStyle) {
+    FilterChip(
+        selected = layout == ChantLayout.Centred,
+        onClick = { onLayoutChange(if (layout == ChantLayout.Split) ChantLayout.Centred else ChantLayout.Split) },
+        label = {
+            Text(
+                stringResource(if (layout == ChantLayout.Split) R.string.debug_layout_split else R.string.debug_layout_centred),
                 style = style,
             )
         },

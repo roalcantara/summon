@@ -1,10 +1,11 @@
 package com.summondemons.safely.ui.screens
 
 import com.summondemons.safely.ritual.ChantVerdict
+import com.summondemons.safely.ritual.CheckMode
+import com.summondemons.safely.ritual.LineFeedback
 import com.summondemons.safely.ritual.RitualPhase
 import com.summondemons.safely.ritual.RitualState
 import com.summondemons.safely.ritual.TurnDirection
-import com.summondemons.safely.ritual.CheckMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -14,9 +15,13 @@ import org.junit.Test
 class ChantScreenStateTest {
 
     private val phrases = listOf("DAEMONIUM RESIDENTE,", "GRATIA SIT CURA.", "HIC EST", "UT VOTA")
-    private val chanting = RitualState.start(90f, phrases, mode = CheckMode.Whisper).copy(phase = RitualPhase.Chanting, azimuth = 90f)
+    private val seeking = RitualState.start(90f, phrases, mode = CheckMode.Whisper)
+    private val chanting = seeking.copy(phase = RitualPhase.Chanting, azimuth = 90f)
 
-    private fun state(r: RitualState, azimuth: Float? = 90f) = chantScreenState(r, phrases, azimuth, 90f)
+    private fun state(r: RitualState, azimuth: Float? = 90f, checking: Boolean = false, feedback: LineFeedback? = null) =
+        chantScreenState(r, phrases, azimuth, 90f, checking, feedback)
+
+    // --- Words (ADR-0019, ADR-0027) ---
 
     @Test
     fun wordsKeepTheirSyllablesAndPunctuation() {
@@ -30,110 +35,120 @@ class ChantScreenStateTest {
         assertEquals(WordLook.Current, s.words[0].look)
         assertEquals(2, s.words[0].lit)
         assertEquals(WordLook.Pending, s.words[1].look)
-        assertEquals(VerdictLine.Listening, s.verdict)
     }
 
     @Test
     fun coveredWordsAreHeardInWhisperMode() {
-        val r = chanting.copy(lit = 2, covered = setOf(1))
-        val s = state(r)
-        assertEquals(listOf(WordLook.Current, WordLook.Heard), s.words.map { it.look })
+        assertEquals(listOf(WordLook.Current, WordLook.Heard), state(chanting.copy(lit = 2, covered = setOf(1))).words.map { it.look })
     }
 
     @Test
     fun fullyLitWordsAreHeardInLenientMode() {
         val r = RitualState.start(90f, phrases).copy(phase = RitualPhase.Chanting, azimuth = 90f, lit = 5)
-        assertEquals(listOf(WordLook.Heard, WordLook.Current), chantScreenState(r, phrases, 90f, 90f).words.map { it.look })
+        assertEquals(listOf(WordLook.Heard, WordLook.Current), state(r).words.map { it.look })
     }
 
-    @Test
-    fun aRunningCheckPulsesTheStatusBlock() {
-        assertTrue(chantScreenState(chanting, phrases, 90f, 90f, checking = true).status.checking)
-    }
+    // --- Gate and pill (ADR-0029 §3.3, §3.6) ---
 
     @Test
-    fun aSealedPhraseLightsItsSealAndTheLineKeepsListening() {
-        val r = chanting.copy(phrase = 1, verdict = ChantVerdict(ChantVerdict.Kind.Sealed, 0))
-        val s = state(r)
-        assertEquals(VerdictLine.Listening, s.verdict)
-        assertEquals(SealLook.Sealed, s.status.seals[0].look)
-        assertEquals(SealLook.Current, s.status.seals[1].look)
-        assertEquals(SealLook.Pending, s.status.seals[2].look)
-    }
-
-    @Test
-    fun aCrackSaysSoAndMarksItsSeal() {
-        val s = state(chanting.copy(verdict = ChantVerdict(ChantVerdict.Kind.Cracked, 0)))
-        assertEquals(VerdictLine.SealCracked, s.verdict)
-        assertEquals(SealLook.Cracked, s.status.seals[0].look)
-    }
-
-    @Test
-    fun offCourseItPausesAndPointsTheWay() {
-        val s = state(chanting.copy(phase = RitualPhase.Wavering, azimuth = 0f), azimuth = 0f)
-        assertFalse(s.facing)
-        assertEquals(TurnDirection.Right, s.turn)
-        assertEquals(VerdictLine.Listening, s.verdict)
-        assertEquals(StepState.Drifting, s.status.step)
-        assertEquals(TurnDirection.Right, s.status.turn)
-    }
-
-    @Test
-    fun phraseIHasAFullRingAndStepOneIsDone() {
-        val s = state(chanting)
-        assertTrue(s.facing)
-        assertNull(s.turn)
-        assertEquals(1f, s.clockFraction)
-        assertEquals(StepState.Aligned, s.status.step)
-        assertNull(s.status.turn)
-    }
-
-    @Test
-    fun afterTheFourthSealEveryWordIsHeard() {
-        val s = state(chanting.copy(phase = RitualPhase.Climax, phrase = 4))
-        assertTrue(s.words.all { it.look == WordLook.Heard })
-        assertEquals(StepState.Done, s.status.step)
-        assertTrue(s.status.seals.all { it.look == SealLook.Sealed })
-    }
-
-    // --- Direction in the sigil (ADR-0020) ---
-
-    private val seeking = RitualState.start(90f, phrases, mode = CheckMode.Whisper)
-
-    @Test
-    fun beforeTheLockTheLineIsEmptyAndStepOneSeeks() {
+    fun beforeTheLockTheLineIsGatedAndThePillPointsTheWay() {
         val s = state(seeking.copy(azimuth = 0f), azimuth = 0f)
-        assertEquals(VerdictLine.None, s.verdict)
-        assertEquals(StepState.Seeking, s.status.step)
+        assertTrue(s.gated)
+        assertEquals(SlotContent.Empty, s.slot)
+        assertEquals(DirectionPill(PillLook.Seeking, TurnDirection.Right), s.pill)
         assertEquals(RingMode.Seeking, s.ring)
         assertFalse(s.facing)
-        assertFalse("not an error before the lock", s.drifting)
+        assertFalse("not paused before the lock", s.drifting)
     }
+
+    @Test
+    fun lockingIsStillGatedButFacing() {
+        val s = state(seeking.copy(phase = RitualPhase.Locking, azimuth = 90f, lockMs = 300L))
+        assertTrue(s.gated)
+        assertEquals(DirectionPill(PillLook.Facing, null), s.pill)
+        assertEquals(RingMode.Locking, s.ring)
+        assertEquals(0.5f, s.lockFraction, 0.001f)
+        assertEquals(0f, s.tiltDegrees, 0f)
+    }
+
+    @Test
+    fun chantingOpensTheLineAndListens() {
+        val s = state(chanting)
+        assertFalse(s.gated)
+        assertEquals(SlotContent.Meter, s.slot)
+        assertEquals(DirectionPill(PillLook.Facing, null), s.pill)
+        assertEquals(RingMode.Clock, s.ring)
+        assertEquals("phrase I has no clock: a full ring", 1f, s.clockFraction, 0f)
+    }
+
+    @Test
+    fun offCourseItPausesPointsBackAndTilts() {
+        val s = state(chanting.copy(phase = RitualPhase.Wavering, azimuth = 0f), azimuth = 0f)
+        assertTrue(s.drifting)
+        assertFalse(s.gated)
+        assertEquals(DirectionPill(PillLook.Paused, TurnDirection.Right), s.pill)
+        assertEquals(SIGIL_TILT_MAX_DEG, s.tiltDegrees, 0.01f)
+        assertEquals(SlotContent.Meter, s.slot)
+    }
+
+    @Test
+    fun afterTheFourthSealThePillHidesAndEveryWordIsHeard() {
+        val s = state(chanting.copy(phase = RitualPhase.Climax, phrase = 4))
+        assertEquals(PillLook.Hidden, s.pill.look)
+        assertTrue(s.words.all { it.look == WordLook.Heard })
+        assertEquals(SlotContent.Empty, s.slot)
+        assertTrue(s.seals.all { it == SealLook.Sealed })
+    }
+
+    // --- Sigil (ADR-0020, ADR-0029 §3.4) ---
 
     @Test
     fun theMarkerPointsAtTheDemonRelativeToThePhone() {
-        // Demon at 90° (East): facing North puts him a quarter turn clockwise, facing South a quarter turn back.
         assertEquals(90f, state(seeking.copy(azimuth = 0f), azimuth = 0f).markerDegrees!!, 0.01f)
         assertEquals(-90f, state(seeking.copy(azimuth = 180f), azimuth = 180f).markerDegrees!!, 0.01f)
-        assertEquals(0f, state(seeking.copy(azimuth = 90f), azimuth = 90f).markerDegrees!!, 0.01f)
         assertNull(state(seeking, azimuth = null).markerDegrees)
     }
 
     @Test
-    fun lockingFillsTheRingAndShowsOnlyTheCount() {
-        val s = state(seeking.copy(phase = RitualPhase.Locking, azimuth = 90f, lockMs = 300L))
-        assertEquals(RingMode.Locking, s.ring)
-        assertEquals(0.5f, s.lockFraction, 0.001f)
-        assertEquals(VerdictLine.None, s.verdict)
+    fun whileSeekingTheSigilTiltsTowardTheDemonClamped() {
+        assertEquals(10f, state(seeking.copy(azimuth = 80f), azimuth = 80f).tiltDegrees, 0.01f)
+        assertEquals(-SIGIL_TILT_MAX_DEG, state(seeking.copy(azimuth = 180f), azimuth = 180f).tiltDegrees, 0.01f)
+        assertEquals(0f, state(seeking, azimuth = null).tiltDegrees, 0f)
+        assertEquals("upright while chanting", 0f, state(chanting.copy(azimuth = 100f), azimuth = 100f).tiltDegrees, 0f)
+    }
+
+    // --- Seals (ADR-0029 §3.2) ---
+
+    @Test
+    fun sealsFollowTheLines() {
+        assertEquals(listOf(SealLook.Sealed, SealLook.Current, SealLook.Pending, SealLook.Pending), state(chanting.copy(phrase = 1)).seals)
+        assertTrue(state(chanting, checking = true).checking)
+    }
+
+    // --- Feedback slot (ADR-0029 §3.5) ---
+
+    @Test
+    fun aRunningCheckShowsChecking() {
+        assertEquals(SlotContent.Checking, state(chanting, checking = true).slot)
     }
 
     @Test
-    fun afterTheLockTheRingIsTheClockAndDriftingIsRed() {
-        assertEquals(RingMode.Clock, state(chanting).ring)
-        assertEquals(0f, state(chanting).lockFraction, 0f)
-        val drift = state(chanting.copy(phase = RitualPhase.Wavering, azimuth = 0f), azimuth = 0f)
-        assertTrue(drift.drifting)
-        assertEquals(90f, drift.markerDegrees!!, 0.01f)
+    fun feedbackWinsOverChecking() {
+        val sealed = LineFeedback(LineFeedback.Kind.Sealed, 0, 82, null, untilMs = 9_999)
+        assertEquals(SlotContent.Sealed(82), state(chanting.copy(phrase = 1), checking = true, feedback = sealed).slot)
     }
 
+    @Test
+    fun aMissShowsItsScoreAndWhatWasHeard() {
+        val missed = LineFeedback(LineFeedback.Kind.Missed, 1, 25, "gracia tu pi", untilMs = 9_999)
+        assertEquals(SlotContent.Missed(25, "gracia tu pi"), state(chanting.copy(phrase = 1), feedback = missed).slot)
+    }
+
+    @Test
+    fun aCrackWinsOverEverything() {
+        val sealed = LineFeedback(LineFeedback.Kind.Sealed, 0, 82, null, untilMs = 9_999)
+        val s = state(chanting.copy(verdict = ChantVerdict(ChantVerdict.Kind.Cracked, 0)), checking = true, feedback = sealed)
+        assertEquals(SlotContent.Cracked, s.slot)
+        assertEquals(SealLook.Cracked, s.seals[0])
+    }
 }
