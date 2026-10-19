@@ -14,6 +14,14 @@ per request; exact content for every state (real Latin line, lit syllables, hear
 heard text); a closed list of what may appear on screen plus an explicit "do not add" list;
 "not yet" instead of failure language; six full screens instead of a spec sheet.
 
+Round 2 (after proposal 01) adds four mandatory layout rules: each fact in exactly one place;
+? top-left and ✕ alone top-right; score and heard text next to the line; the sigil itself shows
+the direction and the proximity. Regenerate with `python3 -I tools/gen_stitch_prompts.py`.
+
+Stitch's exported `screen.png` files come out cropped (the screen sits below the capture), so
+judge proposals from `code.html` rendered at 800 × 360, e.g. with headless Chrome:
+`"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --hide-scrollbars --force-device-scale-factor=2 --window-size=800,360 --screenshot=out.png file:///…/code.html`
+
 | # | Concept | Demon |
 |---|---|---|
 | 01 | Split stage, refined | Asmodeus |

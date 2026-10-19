@@ -27,7 +27,7 @@ The phone is held **at mouth distance (~30 cm)** while the player reads aloud, o
 - From line II on, a **focus timer** (no numbers: a ring, bar or fill). Line I has no timer.
 - After a check, a **score from 0 to 100 %** for 2–3 s; on a miss also, small: **heard: "…"** (what the phone understood).
 - A subtle **listening/checking** indicator while a check runs (about half a second).
-- A small round **?** button (rules) and an **✕** (leave the ritual).
+- A small round **?** button (rules), **top-left**, and an **✕** (leave the ritual), **alone in the top-right corner**.
 - Short cues of **at most three words** (e.g. "FACE EAST", "PAUSED", "AGAIN", "SEALED").
 
 **Do not add** anything else: no points, XP, grades, ranks, currencies, combo counters, frequencies (Hz), phonemes, decibels, tolerances or degree read-outs beyond "FACE EAST", microphone status, "distance OK" labels, timers in seconds, or any sentence longer than three words. No red "FAIL", "ERROR", "DISSONANCE" or penalty language anywhere.
@@ -40,9 +40,15 @@ The phone is held **at mouth distance (~30 cm)** while the player reads aloud, o
 - **E. Sealed** — Line II sealed with score **82 %**; its progress mark fills; line III, **"DONA MIHI PER FOEDUS QUOD EST IRE AD PRAESENS SUM VOBIS,"**, is appearing. Timer full again.
 - **F. Paused** — After the lock, mid-line II (**OS·TEN·DE MI·HI (5 of 18 syllables lit)**), the phone turned 30° away; the chant is **paused** (words still visible) and the screen points the way back (**turn left**). Timer draining.
 
+## Layout rules (mandatory)
+1. **Each fact appears in exactly one place.** Direction (face / turn which way), line progress (I–IV), heard words, score, paused, and the timer are each shown **once**. No second copy in another panel, footer, header or pill. In particular: no "LINE II OF IV" text if the I–IV marks exist; no footer or header status lines ("MICROPHONE ACTIVE", "LISTENING…", "STEP 1…", "HOLD DIRECTION STABLE"); heard words carry **one** mark, not a colour plus a badge plus an underline.
+2. **Buttons:** **?** sits **top-left**; **✕** sits **alone in the top-right corner**, with nothing else in either corner (no pills, scores or bars there). Nothing may overlap the buttons.
+3. **Feedback appears where the eyes are:** the score and the "heard" text appear **next to the chant line** (just above or below it), never in a corner.
+4. **The sigil itself shows the direction and the proximity.** Before the lock, the sigil (or a ring, light or pointer bound to it) must point toward the way to turn, and must visibly grow stronger as the phone gets closer to the target (brighter, fuller, steadier). A tiny arrow on the ring is not enough. This replaces any separate direction text while turning except "FACE EAST" shown once.
+
 ## Problems this concept must solve (in its own way)
 1. Order of steps: chant area disabled until the lock; enabling it is one clear moment.
-2. Wrong direction: a strong, wordless cue for "not facing" and "which way", conveying getting closer; colour never the only signal.
+2. Wrong direction: a strong, wordless cue on the sigil for "not facing", "which way" and "getting closer" (layout rule 4); colour never the only signal.
 3. Performance: the 0–100 % score per check, and the "heard" text on a miss.
 4. Retry: after a miss the words clear and the player recites again — no buttons.
 5. Paused after the lock: obvious, with the way back, without hiding the words.
