@@ -1,5 +1,7 @@
 # Stitch prompt: chant screen redesign (10 genuinely different proposals)
 
+> Superseded by `chant-screen/` (one proposal per request, exact content per state). Kept for history.
+
 Paste the block below into the Summon Demons Safely Stitch project, so Stitch reuses its
 design system. Attach two screenshots as the **current** reference: the chant screen while
 turning (not facing the demon) and while chanting (line locked, words lighting).
