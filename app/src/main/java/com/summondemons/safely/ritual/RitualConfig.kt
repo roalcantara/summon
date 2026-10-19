@@ -73,6 +73,8 @@ object RitualConfig {
     // Chant screen (ADR-0019)
     /** After a verdict (sealed, rejected, cracked) the focus clock waits this long, or until the next syllable. */
     const val VERDICT_HOLD_MS = 3_000L
+    /** How long the chant screen shows a line's score (and, on a miss, what was heard) (ADR-0029). */
+    const val FEEDBACK_HOLD_MS = 2_500L
 
     // Mic level for glow only (never progress)
     const val MIC_LEVEL_CEILING = 8_000.0
