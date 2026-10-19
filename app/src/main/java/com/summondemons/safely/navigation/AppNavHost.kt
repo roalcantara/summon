@@ -44,8 +44,6 @@ import com.summondemons.safely.platform.WhisperTranscriber
 import com.summondemons.safely.ritual.CheckMode
 import com.summondemons.safely.platform.GameSounds
 import com.summondemons.safely.platform.LocalGameSounds
-import com.summondemons.safely.platform.DebugPrefs
-import com.summondemons.safely.ritual.ChantLayout
 import com.summondemons.safely.progress.ProgressRules
 import com.summondemons.safely.ritual.RitualPhase
 import com.summondemons.safely.ritual.RitualViewModel
@@ -198,8 +196,6 @@ private fun RitualDestination(
                     else -> CheckMode.Whisper to ""
                 }
             },
-            // Debug builds remember the chant screen's arrangement from the debug panel (ADR-0029).
-            layout = if (BuildConfig.DEBUG) DebugPrefs.chantLayout(appContext) else ChantLayout.Split,
             // Before every ritual; "?" on the chant screen reopens it (ADR-0021).
             showIntro = true,
         )

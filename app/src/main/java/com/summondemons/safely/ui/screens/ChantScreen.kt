@@ -26,8 +26,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import com.summondemons.safely.R
-import com.summondemons.safely.ritual.ChantLayout
 import com.summondemons.safely.ritual.RitualUiState
+import com.summondemons.safely.ritual.TurnDirection
 import com.summondemons.safely.ritual.UiRecord
 import com.summondemons.safely.ui.components.StageBackground
 import com.summondemons.safely.ui.fx.SigilFlash
@@ -44,8 +44,9 @@ private const val WORDS_SCRIM_ALPHA = 0.85f
 private const val PHRASE_SETTLE_MS = 300L
 
 /**
- * The chant screen (ADR-0019, ADR-0029): the shared pieces of ChantPieces.kt, arranged split or
- * centred (debug switch; ChantArrangements.kt), over the House stage. ✕ sits alone top-right.
+ * The chant screen (ADR-0019, ADR-0029): the pieces of ChantPieces.kt in the split arrangement
+ * (ChantArrangements.kt) over the House stage. ✕ sits alone top-right; chevrons on the edge
+ * point the way to turn while seeking or paused.
  */
 @Composable
 fun ChantScreen(
@@ -60,7 +61,7 @@ fun ChantScreen(
     onHelp: (() -> Unit)? = null,
     /** Shown instead of the line when the ritual can't hear or can't sense direction (ADR-0020). */
     blocker: (@Composable () -> Unit)? = null,
-    /** The phrase size each arrangement settles on, for the debug log (ADR-0029). */
+    /** The phrase size the screen settles on, for the debug log (ADR-0029). */
     onPhraseLaid: (UiRecord) -> Unit = {},
 ) {
     val demon = state.demon
@@ -77,7 +78,7 @@ fun ChantScreen(
         ChantBackdrop(demon.house.stage(), landscape, Modifier.fillMaxSize())
         val parts = ChantParts(
             buttons = { CornerButtons(onHelp, debug) },
-            title = { stacked -> ChantTitle(demon.name, screen.seals, screen.checking, screen.drifting, accent, stacked) },
+            title = { ChantTitle(demon.name, screen.seals, screen.checking, screen.drifting, accent) },
             pill = { DirectionPillView(screen.pill, demon.ritualHeading) },
             sigil = { m -> ChantSigil(state, screen, accent, flash, m.onSizeChanged { sigilPx = it.width }) },
             slot = { if (blocker == null) FeedbackSlot(screen.slot, accent, state.micLevel, screen.drifting) },
@@ -85,18 +86,25 @@ fun ChantScreen(
                 if (blocker != null) {
                     Box(m, contentAlignment = Alignment.Center) { blocker() }
                 } else {
-                    LineBox(screen.words, screen.gated, screen.drifting, accent, onPhraseSize = { phraseSp = it }, modifier = m.onSizeChanged { box = it })
+                    ChantLine(screen.words, screen.gated, screen.lockFraction, accent, onPhraseSize = { phraseSp = it }, modifier = m.onSizeChanged { box = it })
                 }
             },
         )
         val content = Modifier.fillMaxSize().safeDrawingPadding().padding(MaterialTheme.spacing.lg)
-        when {
-            !landscape -> PortraitArrangement(parts, content)
-            state.layout == ChantLayout.Centred -> CentredArrangement(parts, content)
-            else -> SplitArrangement(parts, content)
+        if (landscape) SplitArrangement(parts, content) else PortraitArrangement(parts, content)
+        val turn = screen.pill.turn
+        if (turn != null && blocker == null) {
+            EdgeChevrons(
+                turn,
+                paused = screen.drifting,
+                modifier = Modifier
+                    .align(if (turn == TurnDirection.Right) Alignment.CenterEnd else Alignment.CenterStart)
+                    .safeDrawingPadding()
+                    .padding(horizontal = MaterialTheme.spacing.xs),
+            )
         }
         if (showClose) {
-            IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).safeDrawingPadding()) {
+            IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).safeDrawingPadding().padding(MaterialTheme.spacing.lg)) {
                 Icon(
                     painter = painterResource(R.drawable.ic_close),
                     contentDescription = stringResource(R.string.action_abort),
@@ -109,13 +117,12 @@ fun ChantScreen(
     // Logged once the size settles; any change restarts the wait (ADR-0029).
     val density = LocalDensity.current
     val phrase = state.ritual.phrase
-    LaunchedEffect(state.layout, phrase, phraseSp, box, sigilPx, blocker == null) {
+    LaunchedEffect(phrase, phraseSp, box, sigilPx, blocker == null) {
         if (phraseSp <= 0f || blocker != null) return@LaunchedEffect
         delay(PHRASE_SETTLE_MS)
         with(density) {
             onPhraseLaid(
                 UiRecord(
-                    layout = state.layout.name,
                     phrase = phrase,
                     phraseSp = phraseSp,
                     boxWidthDp = box.width.toDp().value.roundToInt(),

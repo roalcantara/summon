@@ -36,6 +36,8 @@ data class DirectionPill(val look: PillLook, val turn: TurnDirection?)
 /** The one slot above the phrase (ADR-0029 §3.5). */
 sealed interface SlotContent {
     data object Empty : SlotContent
+    /** Before the lock: the line is closed until the player faces the demon. */
+    data object Locked : SlotContent
     data object Meter : SlotContent
     data object Checking : SlotContent
     /** [score] is null in lenient mode. */
@@ -121,7 +123,8 @@ fun chantScreenState(
         seals = seals(ritual, verdict),
         checking = checking && !done,
         slot = when {
-            done || gated -> SlotContent.Empty
+            done -> SlotContent.Empty
+            gated -> SlotContent.Locked
             cracked -> SlotContent.Cracked
             feedback?.kind == LineFeedback.Kind.Sealed -> SlotContent.Sealed(feedback.score)
             feedback?.kind == LineFeedback.Kind.Missed -> SlotContent.Missed(feedback.score ?: 0, feedback.heard)
@@ -157,4 +160,21 @@ private fun seals(ritual: RitualState, verdict: ChantVerdict?): List<SealLook> =
         p == ritual.phrase -> SealLook.Current
         else -> SealLook.Pending
     }
+}
+
+/**
+ * True when a word of [text] starts on one line and ends on another ([lineOf] maps a character
+ * offset to its line). The phrase's auto-sizer rejects such sizes: "DAEMONIU / M" (ADR-0029).
+ */
+fun splitsAWord(text: String, lineOf: (Int) -> Int): Boolean {
+    var start = -1
+    for (i in 0..text.length) {
+        val space = i == text.length || text[i] == ' '
+        if (!space && start < 0) start = i
+        if (space && start >= 0) {
+            if (lineOf(start) != lineOf(i - 1)) return true
+            start = -1
+        }
+    }
+    return false
 }

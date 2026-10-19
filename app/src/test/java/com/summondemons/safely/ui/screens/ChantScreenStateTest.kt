@@ -54,7 +54,7 @@ class ChantScreenStateTest {
     fun beforeTheLockTheLineIsGatedAndThePillPointsTheWay() {
         val s = state(seeking.copy(azimuth = 0f), azimuth = 0f)
         assertTrue(s.gated)
-        assertEquals(SlotContent.Empty, s.slot)
+        assertEquals(SlotContent.Locked, s.slot)
         assertEquals(DirectionPill(PillLook.Seeking, TurnDirection.Right), s.pill)
         assertEquals(RingMode.Seeking, s.ring)
         assertFalse(s.facing)
@@ -150,5 +150,15 @@ class ChantScreenStateTest {
         val s = state(chanting.copy(verdict = ChantVerdict(ChantVerdict.Kind.Cracked, 0)), checking = true, feedback = sealed)
         assertEquals(SlotContent.Cracked, s.slot)
         assertEquals(SealLook.Cracked, s.seals[0])
+    }
+
+    // --- Whole words (ADR-0029) ---
+
+    @Test
+    fun aWordBrokenAcrossLinesIsDetected() {
+        val text = "DAEMONIUM RESIDENTE,"
+        assertTrue("DAEMONIU / M", splitsAWord(text) { if (it < 8) 0 else 1 })
+        assertFalse("break at the space", splitsAWord(text) { if (it < 10) 0 else 1 })
+        assertFalse("one line", splitsAWord(text) { 0 })
     }
 }

@@ -6,7 +6,7 @@ import java.io.File
 
 /**
  * Replays sessions logged on a device (ADR-0025) through today's engine and tuning, and prints
- * every verdict as it was on the phone and as it would be now, the aligned path, and the phrase size each chant layout reached (ADR-0029).
+ * every verdict as it was on the phone and as it would be now, the aligned path, and the phrase size the chant screen reached (ADR-0029).
  *
  * Put the `.jsonl` files from `tools/pull_sessions.sh` in `app/src/test/sessions/` (git-ignored).
  * Run: `./gradlew testDebugUnitTest --tests '*SessionReplayTest*' -i`. The report is also
@@ -25,12 +25,11 @@ class SessionReplayTest {
                 val (header, ticks) = SessionReplay.read(file)
                 appendLine("== ${file.name}  ${header.demon}  ticks ${ticks.count { it.isTick }}")
                 ticks.filter { it.note != null }.forEach { appendLine("   %6.1fs note %s".format(it.t / 1000.0, it.note)) }
-                appendLine("   layout ${header.layout}")
                 val sizes = ticks.mapNotNull { it.ui }
                 if (sizes.isNotEmpty()) {
-                    appendLine("   layout    line  phrase sp  box dp      sigil dp")
+                    appendLine("   line  phrase sp  box dp      sigil dp")
                     sizes.forEach { u ->
-                        appendLine("   %-8s  %-4s  %9.0f  %4dx%-5d  %d".format(u.layout, ROMAN[u.phrase.coerceAtMost(3)], u.phraseSp, u.boxWidthDp, u.boxHeightDp, u.sigilDp))
+                        appendLine("   %-4s  %9.0f  %4dx%-5d  %d".format(ROMAN[u.phrase.coerceAtMost(3)], u.phraseSp, u.boxWidthDp, u.boxHeightDp, u.sigilDp))
                     }
                 }
                 val replayed = SessionReplay.replay(header, ticks)

@@ -30,8 +30,6 @@ data class SessionHeader(
     val phrases: List<String>,
     /** CheckMode name (ADR-0027). */
     val mode: String = "Whisper",
-    /** ChantLayout name (ADR-0029). */
-    val layout: String = "Split",
     val startedMs: Long,
 )
 
@@ -90,10 +88,9 @@ data class CheckRecord(
     val checkMs: Long,
 )
 
-/** The chant screen's settled phrase size and boxes in one arrangement (ADR-0029). */
+/** The chant screen's settled phrase size and boxes (ADR-0029). */
 @Serializable
 data class UiRecord(
-    val layout: String,
     val phrase: Int,
     val phraseSp: Float,
     val boxWidthDp: Int,

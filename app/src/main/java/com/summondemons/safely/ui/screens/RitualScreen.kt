@@ -62,8 +62,6 @@ import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
 import com.summondemons.safely.platform.RitualFeedback
 import com.summondemons.safely.ritual.RitualEffect
-import com.summondemons.safely.platform.DebugPrefs
-import com.summondemons.safely.ritual.ChantLayout
 import com.summondemons.safely.ritual.RitualPhase
 import com.summondemons.safely.ritual.RitualUiState
 import com.summondemons.safely.ritual.RitualViewModel
@@ -175,10 +173,6 @@ fun RitualScreen(
         onCycleClipLabel = viewModel::cycleClipLabel,
         onDismissIntro = viewModel::dismissIntro,
         onShowIntro = viewModel::openIntro,
-        onLayoutChange = { layout ->
-            DebugPrefs.setChantLayout(context, layout)
-            viewModel.setLayout(layout)
-        },
         onPhraseLaid = viewModel::onPhraseLaid,
         onAbort = onAbort,
         modifier = modifier,
@@ -197,7 +191,6 @@ private fun RitualContent(
     onCycleClipLabel: () -> Unit,
     onDismissIntro: () -> Unit,
     onShowIntro: () -> Unit,
-    onLayoutChange: (ChantLayout) -> Unit,
     onPhraseLaid: (UiRecord) -> Unit,
     onAbort: () -> Unit,
     modifier: Modifier = Modifier,
@@ -259,8 +252,6 @@ private fun RitualContent(
                         modeReason = state.modeReason,
                         clipLabel = state.clipLabel,
                         onCycleClipLabel = onCycleClipLabel,
-                        layout = state.layout,
-                        onLayoutChange = onLayoutChange,
                     )
                 }
             } else {

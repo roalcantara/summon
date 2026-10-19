@@ -50,13 +50,20 @@ class SessionLogTest {
     }
 
     @Test
-    fun theLayoutAndPhraseSizesRoundTrip() {
-        val h = header.copy(layout = "Centred")
-        val ui = SessionTick(t = 1_000, ui = UiRecord("Centred", phrase = 1, phraseSp = 42f, boxWidthDp = 700, boxHeightDp = 90, sigilDp = 104))
-        val (decoded, ticks) = SessionRecords.decode(listOf(SessionRecords.encode(h), SessionRecords.encode(ui)))
-        assertEquals(h, decoded)
+    fun phraseSizesRoundTrip() {
+        val ui = SessionTick(t = 1_000, ui = UiRecord(phrase = 1, phraseSp = 42f, boxWidthDp = 700, boxHeightDp = 90, sigilDp = 104))
+        val (decoded, ticks) = SessionRecords.decode(listOf(SessionRecords.encode(header), SessionRecords.encode(ui)))
+        assertEquals(header, decoded)
         assertEquals(listOf(ui), ticks)
         assertTrue("a ui record is not a tick", !ticks.single().isTick)
-        assertTrue("the header always names its layout", SessionRecords.encode(header).contains("\"layout\":\"Split\""))
+    }
+
+    @Test
+    fun logsFromTheLayoutTrialStillDecode() {
+        val old = SessionRecords.encode(header).replace("\"mode\"", "\"layout\":\"Centred\",\"mode\"")
+        val tick = "{\"t\":20,\"ui\":{\"layout\":\"Split\",\"phrase\":0,\"phraseSp\":64.0,\"boxWidthDp\":600,\"boxHeightDp\":250,\"sigilDp\":160}}"
+        val (h, ticks) = SessionRecords.decode(listOf(old, tick))
+        assertEquals(header, h)
+        assertEquals(64f, ticks.single().ui!!.phraseSp)
     }
 }

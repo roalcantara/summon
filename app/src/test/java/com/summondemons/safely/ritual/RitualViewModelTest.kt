@@ -462,15 +462,10 @@ class RitualViewModelTest {
     }
 
     @Test
-    fun theLayoutIsLoggedAndEachSettledSizeOnce() {
+    fun eachSettledPhraseSizeIsLoggedOnce() {
         val log = FakeLog()
-        val vm = RitualViewModel(demon, FakeHeading(), silentPcm(), analysisDispatcher = dispatcher, sessionLog = log, layout = ChantLayout.Centred)
-        assertEquals("Centred", log.header!!.layout)
-
-        vm.setLayout(ChantLayout.Split)
-        assertEquals("layout:Split", log.lines.last().note)
-
-        val record = UiRecord("Split", 0, 64f, 600, 250, 160)
+        val vm = RitualViewModel(demon, FakeHeading(), silentPcm(), analysisDispatcher = dispatcher, sessionLog = log)
+        val record = UiRecord(0, 64f, 600, 250, 160)
         vm.onPhraseLaid(record)
         vm.onPhraseLaid(record)
         assertEquals(listOf(record), log.lines.mapNotNull { it.ui })

@@ -65,8 +65,6 @@ data class RitualUiState(
     val introVisible: Boolean = false,
     /** The last attempt's score and heard text while shown (ADR-0029). */
     val feedback: LineFeedback? = null,
-    /** How the chant screen is arranged (debug switch; ADR-0029). */
-    val layout: ChantLayout = ChantLayout.Split,
 )
 
 /** One analysed mic frame plus its 16 kHz audio for the line listener (null when silent or synthetic). */
@@ -92,8 +90,6 @@ class RitualViewModel(
     private val transcriber: Transcriber? = null,
     /** The device's check mode and its reason, read once when the ritual opens (ADR-0027). */
     private val checkMode: () -> Pair<CheckMode, String> = { CheckMode.Lenient to "" },
-    /** The chant screen's arrangement when the ritual opens (ADR-0029). */
-    layout: ChantLayout = ChantLayout.Split,
 ) : ViewModel() {
 
     private val mode = checkMode()
@@ -104,7 +100,6 @@ class RitualViewModel(
             headingUnavailable = !headingSource.available,
             introVisible = showIntro,
             modeReason = mode.second,
-            layout = layout,
         ),
     )
 
@@ -161,12 +156,6 @@ class RitualViewModel(
     /** "?" on the chant screen: show the intro card again. */
     fun openIntro() = state.update { it.copy(introVisible = true) }
 
-    /** Debug: switch the chant screen's arrangement live (ADR-0029). */
-    fun setLayout(layout: ChantLayout) {
-        note("layout:${layout.name}")
-        state.update { it.copy(layout = layout) }
-    }
-
     private var lastUi: UiRecord? = null
 
     /** The chant screen settled on a phrase size; logged once per change (ADR-0029). */
@@ -200,7 +189,7 @@ class RitualViewModel(
 
     init {
         sessionLog.start(
-            SessionHeader(demon.id, demon.ritualHeading, demon.chantPhrases, mode = mode.first.name, layout = layout.name, startedMs = System.currentTimeMillis()),
+            SessionHeader(demon.id, demon.ritualHeading, demon.chantPhrases, mode = mode.first.name, startedMs = System.currentTimeMillis()),
         )
         if (mode.second.isNotEmpty()) note("mode:${mode.first}:${mode.second}")
     }
@@ -324,7 +313,6 @@ class RitualViewModel(
             sessionLog: SessionLog = SessionLog.None,
             transcriber: Transcriber? = null,
             checkMode: () -> Pair<CheckMode, String> = { CheckMode.Lenient to "" },
-            layout: ChantLayout = ChantLayout.Split,
         ): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 RitualViewModel(
@@ -338,7 +326,6 @@ class RitualViewModel(
                     sessionLog = sessionLog,
                     transcriber = transcriber,
                     checkMode = checkMode,
-                    layout = layout,
                 )
             }
         }
