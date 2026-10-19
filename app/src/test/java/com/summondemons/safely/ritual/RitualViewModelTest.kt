@@ -452,4 +452,29 @@ class RitualViewModelTest {
         advanceTimeBy(100); runCurrent()
         assertNull(vm.uiState.value.azimuth)
     }
+
+    private class FakeLog : SessionLog {
+        var header: SessionHeader? = null
+        val lines = mutableListOf<SessionTick>()
+        override fun start(header: SessionHeader) { this.header = header }
+        override fun write(tick: SessionTick) { lines += tick }
+        override fun stop() = Unit
+    }
+
+    @Test
+    fun theLayoutIsLoggedAndEachSettledSizeOnce() {
+        val log = FakeLog()
+        val vm = RitualViewModel(demon, FakeHeading(), silentPcm(), analysisDispatcher = dispatcher, sessionLog = log, layout = ChantLayout.Centred)
+        assertEquals("Centred", log.header!!.layout)
+
+        vm.setLayout(ChantLayout.Split)
+        assertEquals("layout:Split", log.lines.last().note)
+
+        val record = UiRecord("Split", 0, 64f, 600, 250, 160)
+        vm.onPhraseLaid(record)
+        vm.onPhraseLaid(record)
+        assertEquals(listOf(record), log.lines.mapNotNull { it.ui })
+        vm.onPhraseLaid(record.copy(phraseSp = 66f))
+        assertEquals(2, log.lines.mapNotNull { it.ui }.size)
+    }
 }

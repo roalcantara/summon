@@ -63,6 +63,10 @@ data class RitualUiState(
     val clipLabel: ClipLabel? = null,
     /** The intro card is on screen; the microphone is ignored meanwhile (ADR-0019). */
     val introVisible: Boolean = false,
+    /** The last attempt's score and heard text while shown (ADR-0029). */
+    val feedback: LineFeedback? = null,
+    /** How the chant screen is arranged (debug switch; ADR-0029). */
+    val layout: ChantLayout = ChantLayout.Split,
 )
 
 /** One analysed mic frame plus its 16 kHz audio for the line listener (null when silent or synthetic). */
@@ -88,6 +92,8 @@ class RitualViewModel(
     private val transcriber: Transcriber? = null,
     /** The device's check mode and its reason, read once when the ritual opens (ADR-0027). */
     private val checkMode: () -> Pair<CheckMode, String> = { CheckMode.Lenient to "" },
+    /** The chant screen's arrangement when the ritual opens (ADR-0029). */
+    layout: ChantLayout = ChantLayout.Split,
 ) : ViewModel() {
 
     private val mode = checkMode()
@@ -98,6 +104,7 @@ class RitualViewModel(
             headingUnavailable = !headingSource.available,
             introVisible = showIntro,
             modeReason = mode.second,
+            layout = layout,
         ),
     )
 
@@ -154,6 +161,20 @@ class RitualViewModel(
     /** "?" on the chant screen: show the intro card again. */
     fun openIntro() = state.update { it.copy(introVisible = true) }
 
+    /** Debug: switch the chant screen's arrangement live (ADR-0029). */
+    fun setLayout(layout: ChantLayout) {
+        note("layout:${layout.name}")
+        state.update { it.copy(layout = layout) }
+    }
+
+    private var lastUi: UiRecord? = null
+
+    /** The chant screen settled on a phrase size; logged once per change (ADR-0029). */
+    fun onPhraseLaid(record: UiRecord) {
+        if (record == lastUi) return
+        lastUi = record
+        sessionLog.write(SessionTick(t = ticks * RitualConfig.FRAME_MS, ui = record))
+    }
     /** Debug: Off → Chant → Nonsense → Off. Each label starts a new clip (ADR-0018). */
     fun cycleClipLabel() {
         val next = when (state.value.clipLabel) {
@@ -178,7 +199,9 @@ class RitualViewModel(
     private fun note(text: String) = sessionLog.write(SessionTick(t = ticks * RitualConfig.FRAME_MS, note = text))
 
     init {
-        sessionLog.start(SessionHeader(demon.id, demon.ritualHeading, demon.chantPhrases, mode = mode.first.name, startedMs = System.currentTimeMillis()))
+        sessionLog.start(
+            SessionHeader(demon.id, demon.ritualHeading, demon.chantPhrases, mode = mode.first.name, layout = layout.name, startedMs = System.currentTimeMillis()),
+        )
         if (mode.second.isNotEmpty()) note("mode:${mode.first}:${mode.second}")
     }
 
@@ -218,16 +241,20 @@ class RitualViewModel(
         val inCourt = if (RitualEngine.canLock(ritual, current.azimuth)) inCourt() else false
         val input = RitualInput(current.azimuth, voice, inCourt, heard)
         val step = RitualEngine.step(ritual, input)
-        sessionLog.write(SessionRecords.tick(ticks++ * RitualConfig.FRAME_MS, input, step, hold = current.holdToChant, check = report))
+        val now = ticks * RitualConfig.FRAME_MS
+        sessionLog.write(SessionRecords.tick(now, input, step, hold = current.holdToChant, check = report))
+        ticks++
         // The summon is saved here, not through the lossy effects flow, before the climax plays.
         step.effects.filterIsInstance<RitualEffect.ClimaxStart>().firstOrNull()?.let { commitSummon(it.flawless) }
         if (step.effects.any { it is RitualEffect.Retry }) listener?.restart()
+        val feedback = LineFeedback.next(step, report?.transcript, current.feedback, now)
         state.update {
             it.copy(
                 ritual = step.state,
                 micLevel = smoothMicLevel(it.micLevel, voice.rms),
                 lastCheck = report ?: it.lastCheck,
                 checking = listener?.checking ?: false,
+                feedback = feedback,
             )
         }
         step.effects.forEach { _effects.tryEmit(it) }
@@ -297,9 +324,22 @@ class RitualViewModel(
             sessionLog: SessionLog = SessionLog.None,
             transcriber: Transcriber? = null,
             checkMode: () -> Pair<CheckMode, String> = { CheckMode.Lenient to "" },
+            layout: ChantLayout = ChantLayout.Split,
         ): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                RitualViewModel(demon, headingSource, pcmSource, inCourt, commitSummon, clipRecorder, showIntro, sessionLog = sessionLog, transcriber = transcriber, checkMode = checkMode)
+                RitualViewModel(
+                    demon,
+                    headingSource,
+                    pcmSource,
+                    inCourt,
+                    commitSummon,
+                    clipRecorder,
+                    showIntro,
+                    sessionLog = sessionLog,
+                    transcriber = transcriber,
+                    checkMode = checkMode,
+                    layout = layout,
+                )
             }
         }
     }
