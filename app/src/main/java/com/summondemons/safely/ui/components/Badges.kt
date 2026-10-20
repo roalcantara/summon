@@ -62,8 +62,8 @@ fun rememberBadges(demon: Demon): List<BadgeInfo> {
     val liege = demon.liege?.let { stringResource(R.string.badge_liege, stringResource(it)) } ?: stringResource(R.string.badge_no_liege)
     return listOf(
         BadgeInfo(BadgeKey.Direction, direction, stringResource(R.string.badge_direction_text, direction, liege)),
-        BadgeInfo(BadgeKey.House, demon.house.planet, demon.house.tooltip),
-        BadgeInfo(BadgeKey.Calling, demon.calling.label, demon.calling.tooltip),
+        BadgeInfo(BadgeKey.House, demon.house.planet, stringResource(demon.house.tooltip)),
+        BadgeInfo(BadgeKey.Calling, stringResource(demon.calling.label), stringResource(demon.calling.tooltip)),
         BadgeInfo(
             BadgeKey.Legions,
             pluralStringResource(R.plurals.badge_legions_label, demon.legions, demon.legions),
