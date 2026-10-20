@@ -190,3 +190,163 @@ Entry format:
 - **Translation (65):** Reis de Sol: corte das 9 às 12 e das 15 ao poente. Óculos de sol!
 - **Lost:** Hours compressed ("9 às 12 e das 15 ao poente"); gains a pun: "Óculos de sol!" (sunglasses = 'Sol' glasses).
 - **Alternatives:** Reis de Sol: corte das 9 ao meio-dia e das 15h ao pôr do sol. Leve óculos. (needs exception).
+
+### es · compass_points[6]
+
+- **Status:** open
+- **English (4):** West
+- **Translation (5):** Oeste
+- **Lost:** Nothing: "Oeste" is the only word for West.
+- **Alternatives:** None that fit.
+
+### es · calling_oracle_label
+
+- **Status:** open
+- **English (6):** Oracle
+- **Translation (7):** Oráculo
+- **Lost:** Nothing; one character over.
+- **Alternatives:** Vidente (7), Profeta (7) — also over; Sabio (5) fits but loses the oracle.
+
+### es · badge_legions_label
+
+- **Status:** open
+- **English (12):** %1$d legions
+- **Translation (12):** %1$d huestes
+- **Lost:** "legiones" (13) was first logged as an exception, but on the device "72 LEGIONES" wrapped out of the badge, leaving only "72". The badge has no spare room, so the label became "huestes" (hosts); the badge explanation still says "legiones".
+- **Alternatives:** none that keep "legiones" on the badge; "%1$d leg." (abbreviation) fits but reads poorly.
+
+### es · chant_sealed
+
+- **Status:** open
+- **English (6):** Sealed
+- **Translation (7):** Sellado
+- **Lost:** Nothing; "Sellado" is one character over in the result chip.
+- **Alternatives:** Listo (5, "done") — loses "sealed".
+
+### es · chant_face
+
+- **Status:** open
+- **English (9):** Face %1$s
+- **Translation (9):** Mira %1$s
+- **Lost:** Telegraphic: "Mira Norte" has no article ("Mira al Norte").
+- **Alternatives:** Mira al %1$s (12, needs exception).
+
+### es · badge_direction_text
+
+- **Status:** open
+- **English (25):** Face %1$s to summon. %2$s
+- **Translation (24):** Mira %1$s e invoca. %2$s
+- **Lost:** Same telegraphic "Mira Este" as chant_face.
+- **Alternatives:** Mira al %1$s e invoca. %2$s (27, needs exception).
+
+### es · dossier_weakness
+
+- **Status:** open
+- **English (8):** Weakness
+- **Translation (8):** Flaqueza
+- **Lost:** Glossary changed from "Debilidad" (9) to "Flaqueza" (8).
+- **Alternatives:** Debilidad (9, needs exception).
+
+### es · dossier_secret
+
+- **Status:** open
+- **English (6):** Secret
+- **Translation (6):** Sigilo
+- **Lost:** "Secreto" (7) does not fit; "Sigilo" means secrecy. Glossary updated.
+- **Alternatives:** Secreto (7, needs exception).
+
+### es · demon_asmodeus_title
+
+- **Status:** open
+- **English (34):** Lord of Arithmetic & Hidden Wealth
+- **Translation (33):** Señor del Cálculo y el Oro Oculto
+- **Lost:** "Arithmetic" became "Calculation" and "Hidden Wealth" became "Hidden Gold".
+- **Alternatives:** Señor de la Aritmética y el Oro Oculto (38, needs exception).
+
+### es · demon_asmodeus_ability_2_name
+
+- **Status:** open
+- **English (13):** Now You Don’t
+- **Translation (11):** Ya No Estoy
+- **Lost:** "Now You Don't" became "I'm Not Here Anymore".
+- **Alternatives:** Ahora No Me Ves (15, needs exception).
+
+### es · demon_asmodeus_ability_3_line
+
+- **Status:** open
+- **English (50):** Finds buried treasure, counts it, then sits on it.
+- **Translation (45):** Halla tesoros, los cuenta y se sienta encima.
+- **Lost:** "buried" dropped.
+- **Alternatives:** Halla tesoros enterrados, los cuenta y se sienta encima. (56, needs exception).
+
+### es · demon_asmodeus_weakness_name
+
+- **Status:** open
+- **English (9):** Name-Drop
+- **Translation (9):** El Nombre
+- **Lost:** "Name-Drop" became "The Name"; the pun is lost.
+- **Alternatives:** Por Nombre (10, needs exception).
+
+### es · demon_asmodeus_weakness_line
+
+- **Status:** open
+- **English (101):** Ask “Art thou Asmodeus?” and he must admit it and bow to the floor. Three heads, one ego, zero chill.
+- **Translation (94):** Pregunta “¿Sois vos Asmodeus?” y debe admitirlo y postrarse. Tres cabezas, un ego, cero calma.
+- **Lost:** "Art thou" became archaic "¿Sois vos…?" (kept); "bow to the floor" became "prostrate himself".
+- **Alternatives:** …y debe admitirlo y hacer una reverencia hasta el suelo. (over budget)
+
+### es · demon_astaroth_title
+
+- **Status:** open
+- **English (30):** Duke of Past, Present & Future
+- **Translation (27):** Duque de Ayer, Hoy y Mañana
+- **Lost:** "Past, Present & Future" became "Yesterday, Today and Tomorrow".
+- **Alternatives:** Duque del Pasado, Presente y Futuro (35, needs exception).
+
+### es · demon_astaroth_ability_2_name
+
+- **Status:** open
+- **English (11):** Open Secret
+- **Translation (6):** Chisme
+- **Lost:** "Open Secret" became "Gossip"; Spanish has the exact idiom "Secreto a Voces" (15).
+- **Alternatives:** Secreto a Voces (15, needs exception) — the best fit, recommended.
+
+### es · demon_astaroth_ability_3_name
+
+- **Status:** open
+- **English (25):** The Fall (Director’s Cut)
+- **Translation (25):** La Caída: Edición Íntegra
+- **Lost:** "Director's Cut" became "Uncut Edition".
+- **Alternatives:** La Caída (Versión Extendida) (28, needs exception).
+
+### es · demon_astaroth_appearance
+
+- **Status:** open
+- **English (138):** An angel with bad intentions on a dragon-ish beast, holding a viper in his right hand like a fancy pen. His breath arrives before he does.
+- **Translation (134):** Un ángel con mala intención sobre una bestia medio dragón, con una víbora en la diestra como pluma elegante. Su aliento llega primero.
+- **Lost:** "His breath arrives before he does" became "His breath arrives first".
+- **Alternatives:** …Su aliento llega antes que él. (142, needs exception).
+
+### es · demon_astaroth_offices[3]
+
+- **Status:** open
+- **English (44):** Makes you a scholar of all the liberal arts.
+- **Translation (36):** Te enseña todas las artes liberales.
+- **Lost:** "Makes you a scholar" became "Teaches you": "erudito" would give the player a gender.
+- **Alternatives:** Te vuelve una eminencia en las artes liberales. (47, needs exception).
+
+### es · calling_warlord_label
+
+- **Status:** open
+- **English (7):** Warlord
+- **Translation (7):** General
+- **Lost:** "Warlord" became "General"; "Caudillo" (8) does not fit and has political baggage.
+- **Alternatives:** Caudillo (8, needs exception).
+
+### es · calling_menace_label
+
+- **Status:** open
+- **English (6):** Menace
+- **Translation (5):** Plaga
+- **Lost:** "Menace" became "Plague" (Plaga): "Amenaza" (7) does not fit.
+- **Alternatives:** Amenaza (7, needs exception).

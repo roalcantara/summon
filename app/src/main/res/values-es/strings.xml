@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_awesome">¡Genial!</string>
+    <string name="action_abort">Parar ritual</string>
+    <string name="mic_rationale">El ritual escucha el ritmo de tu canto. No se graba ni se guarda nada: el micrófono solo mide volumen y tono.</string>
+    <string name="action_retry">Permitir micro</string>
+    <string name="action_open_settings">Abrir ajustes</string>
+    <string name="mic_unavailable">Los espíritus no te oyen: el micrófono no arrancó. Cierra otras apps que lo usen, aborta e invoca de nuevo.</string>
+    <string name="heading_unavailable">Sin brújula en este equipo, el ritual no puede empezar.</string>
+    <!-- Home (ADR-0014) -->
+    <string name="home_court">En corte · %1$s</string>
+    <string name="home_court_join">" y "</string>
+    <string name="home_out_of_office">Ausente</string>
+    <plurals name="home_bound">
+        <item quantity="one">%1$d/%2$d espíritu atado</item>
+        <item quantity="many">%1$d/%2$d espíritus atados</item>
+        <item quantity="other">%1$d/%2$d espíritus atados</item>
+    </plurals>
+    <string name="home_hint">Toca el grimorio</string>
+    <string name="home_open">Abrir el grimorio</string>
+    <string name="escape_banner">¡Sello roto!</string>
+    <string name="escape_one">¡%1$s escapó de su sello en tu ausencia!</string>
+    <string name="escape_all">¡Los dos escaparon de sus sellos en tu ausencia!</string>
+    <string name="escape_dismiss">Toca y listo</string>
+    <!-- Grimoire (ADR-0016) -->
+    <string name="grimoire_back">Volver a la cámara</string>
+    <string name="avatar_sealed">%1$s sellado</string>
+    <string name="celebration_banner">¡Demonio recibido!</string>
+    <string name="quote_tap_to_summon">Toca e invoca</string>
+    <string name="quote_cooling">Enfriándose</string>
+    <string name="quote_next_summon">Invoca en %1$d h</string>
+    <string name="cd_summon">Invoca %1$s</string>
+    <plurals name="cd_cooling">
+        <item quantity="one">Círculo enfriándose. Invoca en %1$d hora.</item>
+        <item quantity="many">Círculo enfriándose. Invoca en %1$d horas.</item>
+        <item quantity="other">Círculo enfriándose. Invoca en %1$d horas.</item>
+    </plurals>
+    <string name="badge_direction_text">Mira %1$s e invoca. %2$s</string>
+    <string name="badge_liege">Sirve a %1$s.</string>
+    <string name="badge_no_liege">No jura a ningún rey.</string>
+    <plurals name="badge_legions_label">
+        <item quantity="one">%1$d hueste</item>
+        <item quantity="many">%1$d huestes</item>
+        <item quantity="other">%1$d huestes</item>
+    </plurals>
+    <plurals name="badge_legions_text">
+        <item quantity="one">Un %1$s que manda %2$d legión de espíritus.</item>
+        <item quantity="many">Un %1$s que manda %2$d legiones de espíritus.</item>
+        <item quantity="other">Un %1$s que manda %2$d legiones de espíritus.</item>
+    </plurals>
+    <string name="badge_explain">%1$s: qué es</string>
+    <string name="dossier_weakness">Flaqueza</string>
+    <string name="dossier_weakness_named">Flaqueza · %1$s</string>
+    <string name="dossier_abilities">Poderes</string>
+    <string name="dossier_offices">Oficios</string>
+    <string name="dossier_appearance">Aspecto</string>
+    <string name="dossier_warning">Aviso</string>
+    <string name="dossier_secret">Sigilo</string>
+    <string name="dossier_secret_locked">Invoca sin fallo para ver</string>
+    <string name="dossier_sealed">Sellado. Invoca para ver.</string>
+    <string name="dossier_page">%1$d / %2$d</string>
+    <string name="dossier_previous">Página previa</string>
+    <string name="dossier_next">Siguiente</string>
+    <!-- Chant screen (ADR-0019) -->
+    <string name="chant_face">Mira %1$s</string>
+    <string name="chant_paused">Pausa</string>
+    <string name="chant_a11y_paused">Pausa. Vuelve a mirar %1$s</string>
+    <string name="chant_locked">Cierre</string>
+    <string name="chant_sealed">Sellado</string>
+    <string name="chant_checking">Oyendo…</string>
+    <string name="chant_heard">oí: “%1$s”</string>
+    <string name="chant_score">%1$d%%</string>
+    <string name="chant_a11y_locked">Mira al demonio y canta</string>
+    <plurals name="chant_a11y_seals">
+        <item quantity="one">%1$d/4 versos sellados</item>
+        <item quantity="many">%1$d/4 versos sellados</item>
+        <item quantity="other">%1$d/4 versos sellados</item>
+    </plurals>
+    <string name="chant_a11y_facing">Miras: %1$s</string>
+    <string name="chant_a11y_turn_left">A la izquierda: %1$s</string>
+    <string name="chant_a11y_turn_right">A la derecha: %1$s</string>
+    <string name="verdict_seal_cracked">Sello rajado</string>
+    <string name="chant_help">Cómo recitar</string>
+    <string name="intro_title">Cómo recitar</string>
+    <string name="intro_direction_title">1. Mira</string>
+    <string name="intro_direction_body">Gira hasta ver el marco verde.</string>
+    <string name="intro_chant_title">2. Canta</string>
+    <string name="intro_chant_body">Lee el verso en alto hasta sellar.</string>
+    <string name="intro_lines_title">Verso</string>
+    <string name="intro_lines_body">Verde: oído.</string>
+    <string name="intro_focus_title">Foco</string>
+    <string name="intro_focus_body">Un minuto por verso; el anillo muestra lo que queda.</string>
+    <string name="intro_summon">Invoca</string>
+    <string name="intro_close">Cerrar y empezar a cantar</string>
+    <string name="abandon_title">¿Dejar el ritual?</string>
+    <string name="abandon_body">Tus sellos se irán.</string>
+    <string name="action_abandon">Dejar</string>
+    <string name="action_stay">Sigo</string>
+    <!-- Compass points, in compassIndex order (HeadingMath.kt) -->
+    <string-array name="compass_points">
+        <item>Norte</item>
+        <item>Noreste</item>
+        <item>Este</item>
+        <item>Sureste</item>
+        <item>Sur</item>
+        <item>Suroeste</item>
+        <item>Oeste</item>
+        <item>Noroeste</item>
+    </string-array>
+    <string-array name="compass_letters">
+        <item>N</item>
+        <item>NE</item>
+        <item>E</item>
+        <item>SE</item>
+        <item>S</item>
+        <item>SO</item>
+        <item>O</item>
+        <item>NO</item>
+    </string-array>
+</resources>
