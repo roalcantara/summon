@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Summon Demons Safely</string>
+    <string name="app_name" translatable="false">Summon Demons Safely</string>
 
     <string name="action_awesome">Awesome!</string>
     <string name="action_abort">Abort Ritual</string>
@@ -7,20 +7,6 @@
     <string name="action_retry">Allow microphone</string>
     <string name="action_open_settings">Open settings</string>
     <string name="mic_unavailable">The spirits can\'t hear you — the microphone wouldn\'t start. Close other apps using it, then abort and summon again.</string>
-
-    <string name="debug_simulate_heading">Simulate heading</string>
-    <string name="debug_hold_to_chant">Hold to Chant</string>
-    <string name="debug_chanting">Chanting…</string>
-    <string name="debug_clip_off">Record clip</string>
-    <string name="debug_check_auto">Check: auto</string>
-    <string name="debug_check_whisper">Check: Whisper (next ritual)</string>
-    <string name="debug_check_lenient">Check: lenient (next ritual)</string>
-    <string name="debug_clip_chant">Recording · chant</string>
-    <string name="debug_clip_nonsense">Recording · nonsense</string>
-    <string name="debug_chant_score">Check %1$s %2$.2f %3$s · %4$d ms · “%5$s”</string>
-    <string name="debug_chant_mode">Check mode: lenient (%1$s)</string>
-    <string name="debug_chant_score_none">Chant check · no verdict yet</string>
-    <string name="debug_controls">Debug controls</string>
 
     <string name="heading_unavailable">This device can\'t sense direction, so the ritual can\'t begin.</string>
 
@@ -94,23 +80,4 @@
     <string name="abandon_body">Your seals will fade.</string>
     <string name="action_abandon">Abandon</string>
     <string name="action_stay">Stay</string>
-
-    <!-- Debug sheet (debug builds only, §7) -->
-    <string name="debug_chip">Debug</string>
-    <string name="debug_advance_day">Advance +1 day</string>
-    <string name="debug_reset_daily">Reset daily summon</string>
-    <string name="debug_court">Court</string>
-    <string name="debug_court_auto">Auto</string>
-    <string name="debug_court_in">In</string>
-    <string name="debug_court_out">Out</string>
-    <string name="debug_bind">Bind</string>
-    <string name="debug_bind_flawless">Bind flawless</string>
-    <string name="debug_unsummon">Unsummon</string>
-    <string name="debug_reset_all">Reset all</string>
-    <string name="debug_status_sealed">sealed</string>
-    <string name="debug_status_escaped">escaped (lore kept)</string>
-    <string name="debug_status_bound">bound · %1$dd since visit</string>
-    <string name="debug_status_restless">restless</string>
-    <string name="debug_status_flawless">flawless</string>
-    <string name="debug_tester_note">Advancing a day while a bound demon is on the Grimoire visits him at once; test restlessness by advancing from Home.</string>
 </resources>
