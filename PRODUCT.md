@@ -43,7 +43,16 @@ the new summon. One summon per local calendar day across all demons (ADR-0015).
 | Motion | If system animations are off: no particles, parallax, floating, jitter, shimmer, sunburst rotation, grimoire bob/hop/peek, dust puff, pulses or climax flash; the grimoire opening, the avatar burn-away and badge/carousel changes become short fades; the climax keeps its timing but the demon simply fades in. Ink-in, karaoke and the focus bar still update. |
 | Privacy | No network access, no data collection. The mic and heading sensor run only while the Ritual is in the foreground; audio is analysed in memory and never stored or sent (ADR-0017, docs/PRIVACY_POLICY.md). Debug builds can save tester clips on the device (ADR-0018); release builds contain no recording code. |
 
+## Languages
+
+English, Spanish, Brazilian Portuguese, Italian and French (ADR-0031). The phone's language
+picks one (on Android 13+ also the per-app language in system Settings); any other language
+gets English. The chant is Latin in every language. No translation is longer than its English
+text. The app name, demon names and planets stay as they are.
+
 ## Demons
+
+The English demon text in this section is the source for `res/values/demons.xml`.
 
 | | Asmodeus | Astaroth |
 |---|---|---|
