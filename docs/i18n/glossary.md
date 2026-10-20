@@ -10,7 +10,7 @@ the term. Numbers in brackets are character counts where the English budget is t
 | summon (noun) | invocación | invocação | evocazione | invocation |
 | seal (noun) | sello | selo | sigillo | sceau |
 | seal / sealed | sellar / sellado | selar / selado | sigillare / sigillato | sceller / scellé |
-| bound | atado | preso | vincolato | lié |
+| bound | atado | preso | legato | lié |
 | restless | inquieto | inquieto | irrequieto | agité |
 | escaped (slipped his seal) | se escapó | escapou | è fuggito | s’est échappé |
 | Grimoire | Grimorio | Grimório | Grimorio | Grimoire |
@@ -29,12 +29,12 @@ the term. Numbers in brackets are character counts where the English budget is t
 | Oracle [6] | Oráculo [7] | Oráculo [7] | Oracolo [7] | Oracle |
 | Treasurer [9] | Tesorero | Banqueiro | Tesoriere | Trésorier |
 | Menace [6] | Plaga | Ameaça | Peste | Fléau |
-| dossier: Weakness | Flaqueza | Fraqueza | Debolezza | Faiblesse |
+| dossier: Weakness | Flaqueza | Fraqueza | Tallone | Faiblesse |
 | dossier: Abilities | Poderes | Poderes | Poteri | Pouvoirs |
 | dossier: Offices | Oficios | Ofícios | Uffici | Offices |
 | dossier: Appearance | Aspecto | Aparência | Aspetto | Apparence |
 | dossier: Summoner’s warning | Aviso | Aviso | Avviso | Avis |
-| dossier: Secret | Sigilo | Sigilo | Segreto | Secret |
+| dossier: Secret | Sigilo | Sigilo | Arcano | Secret |
 | compass N NE E SE S SW W NW | N NE E SE S SO O NO | N NE L SE S SO O NO | N NE E SE S SO O NO | N NE E SE S SO O NO |
 | compass names | Norte, Noreste, Este, Sureste, Sur, Suroeste, Oeste, Noroeste | Norte, Nordeste, Leste, Sudeste, Sul, Sudoeste, Oeste, Noroeste | Nord, Nord-Est, Est, Sud-Est, Sud, Sud-Ovest, Ovest, Nord-Ovest | Nord, Nord-Est, Est, Sud-Est, Sud, Sud-Ouest, Ouest, Nord-Ouest |
 
