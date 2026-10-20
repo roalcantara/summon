@@ -53,6 +53,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            // English (XA) and Arabic (XB) in the device language list, for layout checks (i18n spec §5.2)
+            isPseudoLocalesEnabled = true
+        }
         release {
             optimization {
                 enable = true
@@ -84,6 +88,11 @@ android {
     }
     androidResources {
         noCompress += "bin"
+        // Lists the shipped languages for Android 13+ per-app language settings (i18n spec §4)
+        generateLocaleConfig = true
+    }
+    lint {
+        error += "MissingTranslation"
     }
 }
 
