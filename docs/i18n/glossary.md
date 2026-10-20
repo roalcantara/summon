@@ -15,7 +15,7 @@ the term. Numbers in brackets are character counts where the English budget is t
 | escaped (slipped his seal) | se escapó | escapou | è fuggito | s’est échappé |
 | Grimoire | Grimorio | Grimório | Grimorio | Grimoire |
 | ritual | ritual | ritual | rituale | rituel |
-| chant (verb) | recitar | recitar | recitare | réciter |
+| chant (verb) | recitar / cantar | recitar / cantar | cantare | chanter |
 | line (of the chant) | verso | verso | verso | vers |
 | in court | en corte | na corte | a corte | en cour |
 | out of office [13] | ausente [7] | de folga [8] | fuori ufficio [13] | absent [6] |
@@ -29,7 +29,7 @@ the term. Numbers in brackets are character counts where the English budget is t
 | Oracle [6] | Oráculo [7] | Oráculo [7] | Oracolo [7] | Oracle |
 | Treasurer [9] | Tesorero | Banqueiro | Tesoriere | Trésorier |
 | Menace [6] | Plaga | Ameaça | Peste | Fléau |
-| dossier: Weakness | Flaqueza | Fraqueza | Tallone | Faiblesse |
+| dossier: Weakness | Flaqueza | Fraqueza | Tallone | Talon |
 | dossier: Abilities | Poderes | Poderes | Poteri | Pouvoirs |
 | dossier: Offices | Oficios | Ofícios | Uffici | Offices |
 | dossier: Appearance | Aspecto | Aparência | Aspetto | Apparence |

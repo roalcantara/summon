@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_awesome">Génial !</string>
+    <string name="action_abort">Interrompre</string>
+    <string name="mic_rationale">Le rituel écoute le rythme de ton chant. Rien n’est enregistré : le micro mesure seulement le volume et la hauteur.</string>
+    <string name="action_retry">Activer le micro</string>
+    <string name="action_open_settings">Paramètres</string>
+    <string name="mic_unavailable">Les esprits ne t’entendent pas : micro indisponible. Ferme les autres apps, arrête et invoque à nouveau.</string>
+    <string name="heading_unavailable">Cet appareil ne capte pas la direction : pas de rituel.</string>
+    <!-- Home (ADR-0014) -->
+    <string name="home_court">En cour · %1$s</string>
+    <string name="home_court_join">" &amp; "</string>
+    <string name="home_out_of_office">Absent</string>
+    <plurals name="home_bound">
+        <item quantity="one">%1$d/%2$d esprit lié</item>
+        <item quantity="many">%1$d/%2$d esprits liés</item>
+        <item quantity="other">%1$d/%2$d esprits liés</item>
+    </plurals>
+    <string name="home_hint">Touche le livre</string>
+    <string name="home_open">Ouvre le grimoire</string>
+    <string name="escape_banner">Évasion !</string>
+    <string name="escape_one">%1$s a fui son sceau en ton absence !</string>
+    <string name="escape_all">Les deux ont fui leurs sceaux en ton absence !</string>
+    <string name="escape_dismiss">Fermer</string>
+    <!-- Grimoire (ADR-0016) -->
+    <string name="grimoire_back">Retour à la salle</string>
+    <string name="avatar_sealed">%1$s, scellé</string>
+    <string name="celebration_banner">Démon reçu !</string>
+    <string name="quote_tap_to_summon">Invoque-le !</string>
+    <string name="quote_cooling">Ça refroidit</string>
+    <string name="quote_next_summon">Invoque dans %1$d h</string>
+    <string name="cd_summon">Évoque %1$s</string>
+    <plurals name="cd_cooling">
+        <item quantity="one">Ça refroidit. Invoque dans %1$d heure.</item>
+        <item quantity="many">Ça refroidit. Invoque dans %1$d heures.</item>
+        <item quantity="other">Ça refroidit. Invoque dans %1$d heures.</item>
+    </plurals>
+    <string name="badge_direction_text">Cap %1$s et invoque. %2$s</string>
+    <string name="badge_liege">Il sert %1$s.</string>
+    <string name="badge_no_liege">Il ne sert aucun roi.</string>
+    <plurals name="badge_legions_label">
+        <item quantity="one">%1$d légion</item>
+        <item quantity="many">%1$d légions</item>
+        <item quantity="other">%1$d légions</item>
+    </plurals>
+    <plurals name="badge_legions_text">
+        <item quantity="one">Un %1$s à la tête de %2$d légion d’esprits.</item>
+        <item quantity="many">Un %1$s à la tête de %2$d légions d’esprits.</item>
+        <item quantity="other">Un %1$s à la tête de %2$d légions d’esprits.</item>
+    </plurals>
+    <string name="badge_explain">%1$s : infos</string>
+    <string name="dossier_weakness">Talon</string>
+    <string name="dossier_weakness_named">Talon · %1$s</string>
+    <string name="dossier_abilities">Pouvoirs</string>
+    <string name="dossier_offices">Offices</string>
+    <string name="dossier_appearance">Apparence</string>
+    <string name="dossier_warning">Avis</string>
+    <string name="dossier_secret">Secret</string>
+    <string name="dossier_secret_locked">Invoque sans faute et lis</string>
+    <string name="dossier_sealed">Scellé. Invoque et vois.</string>
+    <string name="dossier_page">%1$d / %2$d</string>
+    <string name="dossier_previous">Précédente</string>
+    <string name="dossier_next">Suivante</string>
+    <!-- Chant screen (ADR-0019) -->
+    <string name="chant_face">Cap %1$s</string>
+    <string name="chant_paused">Pause</string>
+    <string name="chant_a11y_paused">Pause. Reviens au cap %1$s</string>
+    <string name="chant_locked">Bloqué</string>
+    <string name="chant_sealed">Scellé</string>
+    <string name="chant_checking">Écoute…</string>
+    <string name="chant_heard">ouï « %1$s »</string>
+    <string name="chant_score">%1$d %%</string>
+    <string name="chant_a11y_locked">Vise le démon et chante</string>
+    <plurals name="chant_a11y_seals">
+        <item quantity="one">%1$d/4 vers scellés</item>
+        <item quantity="many">%1$d/4 vers scellés</item>
+        <item quantity="other">%1$d/4 vers scellés</item>
+    </plurals>
+    <string name="chant_a11y_facing">Cap %1$s</string>
+    <string name="chant_a11y_turn_left">À gauche : %1$s</string>
+    <string name="chant_a11y_turn_right">À droite : %1$s</string>
+    <string name="verdict_seal_cracked">Sceau fêlé</string>
+    <string name="chant_help">Bien chanter</string>
+    <string name="intro_title">Bien chanter</string>
+    <string name="intro_direction_title">1. Vise</string>
+    <string name="intro_direction_body">Tourne jusqu’au cadre vert.</string>
+    <string name="intro_chant_title">2. Chant</string>
+    <string name="intro_chant_body">Lis tout haut jusqu’au sceau.</string>
+    <string name="intro_lines_title">Vers</string>
+    <string name="intro_lines_body">Vert : ouï.</string>
+    <string name="intro_focus_title">Focus</string>
+    <string name="intro_focus_body">Une minute par vers ; l’anneau montre le reste.</string>
+    <string name="intro_summon">Hop !</string>
+    <string name="intro_close">Fermer et lancer le chant</string>
+    <string name="abandon_title">Quitter le rituel ?</string>
+    <string name="abandon_body">Adieu tes sceaux.</string>
+    <string name="action_abandon">Quitter</string>
+    <string name="action_stay">Non</string>
+    <!-- Compass points, in compassIndex order (HeadingMath.kt) -->
+    <string-array name="compass_points">
+        <item>Nord</item>
+        <item>Nord-Est</item>
+        <item>Est</item>
+        <item>Sud-Est</item>
+        <item>Sud</item>
+        <item>Sud-Ouest</item>
+        <item>Ouest</item>
+        <item>Nord-Ouest</item>
+    </string-array>
+    <string-array name="compass_letters">
+        <item>N</item>
+        <item>NE</item>
+        <item>E</item>
+        <item>SE</item>
+        <item>S</item>
+        <item>SO</item>
+        <item>O</item>
+        <item>NO</item>
+    </string-array>
+</resources>
