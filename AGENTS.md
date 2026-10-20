@@ -29,7 +29,7 @@ If two sources disagree, the higher one wins. Fix the lower one or note it in an
 | `docs/superpowers/specs/`, `docs/superpowers/plans/` | Design specs and implementation plans |
 | `docs/PRIVACY_POLICY.md`, `docs/STORE_LISTING.md` | Privacy policy and Play Store listing drafts (release prep: `docs/superpowers/plans/play-store-readiness.md`) |
 | `docs/play-store/` | Store graphics and assets (`icon-512.png`, `feature-graphic.png`, screenshots) |
-| `tools/gen_icons.py` | Launcher and store graphics generator |
+| `tools/gen_icons.py` | Launcher and store graphics generator (`mise run icon`, ADR-0030) |
 | `reference/prompts/` | The two original Stitch prompts, verbatim |
 | `reference/stitch/` | Stitch mockups, character art, logo, sigil |
 | `reference/src/` | Draft Compose code (input for the port; does not compile as-is) |
