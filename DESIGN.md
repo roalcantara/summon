@@ -110,6 +110,8 @@ Smoke particles use `on-surface-variant`; Home embers and the compass rose use `
 - Inter for body and labels; numbers use tabular figures.
 - Both are bundled in `res/font/` as static, Latin-subset instances generated from the
   Google Fonts variable fonts (SIL OFL 1.1; licences in `app/src/main/assets/licenses/`).
+  The subset covers every letter of es, pt-BR and it, but not œ, Œ or Ÿ (French text avoids
+  them; ADR-0031).
 
 ### Text roles (ADR-0014)
 
@@ -135,6 +137,9 @@ dark palette carries the RPG feel.
 
 ## Rules
 
+- Layout must fit the English text length; translations never exceed it (ADR-0031). Check
+  new screens in English (XA), a pseudo-locale in debug builds, and in Spanish, the widest
+  badge language.
 - Composables read colors, type, shapes and spacing from `MaterialTheme` (and
   `DemonColors`, `textRoles`) only. No hardcoded colors or ad-hoc dimensions.
 - A demon's accent and House metal come from its data, never from a `when (id)` in UI code.

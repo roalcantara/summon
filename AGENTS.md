@@ -71,6 +71,8 @@ cd ../mydemon && npm install && npm run dev   # http://localhost:3000
   `docs/superpowers/plans/2026-10-18-chant-direction.md`. Intro card before every ritual,
   "?"/"D" buttons on the slab and the floating debug panel: ADR-0021, plan
   `docs/superpowers/plans/2026-10-18-chant-intro-and-debug.md`. Chant check: Whisper base on device (ADR-0027); `TranscriptRescoreTest` re-scores logged transcripts.
+- i18n (ADR-0031, spec `docs/superpowers/specs/2026-10-20-i18n-design.md`): five languages;
+  terms, style and the hard-case review queue in `docs/i18n/`.
 - Chant screen UX (ADR-0029, plan `docs/superpowers/plans/2026-10-18-chant-screen-ux.md`): split
   layout in the Stitch "stage HUD" style; the session log records the phrase size reached, printed
   by `SessionReplayTest`.
@@ -94,6 +96,9 @@ cd ../mydemon && npm install && npm run dev   # http://localhost:3000
 - Ritual parameters (heading, chant phrases, accent color) are demon data, never
   constants in UI code (ADR-0006).
 - UI reads colors, type, shapes and spacing from the theme only (DESIGN.md).
+- All player text lives in string resources (`strings.xml`, `demons.xml`), never in Kotlin. A
+  new string needs all five languages (en, es, pt-BR, it, fr), no longer than English, and must
+  pass `TranslationResourcesTest` (ADR-0031). Debug-only text goes in `strings_debug.xml`.
 - Commits: Conventional Commits, e.g. `docs(product): ...`, `feat(ritual): ...`.
 
 ## Rules for agents
