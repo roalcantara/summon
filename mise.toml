@@ -1,0 +1,2 @@
+[tools]
+"cargo:https://github.com/RayanBO/todo/" = "tag:v0.2.9"
