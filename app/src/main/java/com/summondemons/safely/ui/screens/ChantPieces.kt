@@ -89,7 +89,7 @@ import androidx.compose.ui.util.lerp
 import com.summondemons.safely.R
 import com.summondemons.safely.ritual.RitualUiState
 import com.summondemons.safely.ritual.TurnDirection
-import com.summondemons.safely.ritual.headingLabel
+import com.summondemons.safely.ui.components.headingLabel
 import com.summondemons.safely.ui.components.ROMAN_NUMERALS
 import com.summondemons.safely.ui.fx.InkedSigil
 import com.summondemons.safely.ui.fx.LocalReduceMotion

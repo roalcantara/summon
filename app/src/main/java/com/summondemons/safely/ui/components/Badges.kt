@@ -35,8 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
-import com.summondemons.safely.ritual.headingLabel
-import com.summondemons.safely.ritual.headingLetter
 import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.textRoles

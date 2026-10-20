@@ -33,4 +33,13 @@ class EnglishTextTest {
     fun chantScoreIsAString() {
         assertEquals("%1\$d%%", english.strings["chant_score"]) // formats to "85%"
     }
+
+    @Test
+    fun compassPointsAreEightInOrder() {
+        assertEquals(
+            listOf("North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West"),
+            english.arrays["compass_points"],
+        )
+        assertEquals(listOf("N", "NE", "E", "SE", "S", "SW", "W", "NW"), english.arrays["compass_letters"])
+    }
 }

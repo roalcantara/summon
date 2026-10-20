@@ -20,19 +20,10 @@ fun isAligned(
     tolerance: Float = RitualConfig.HEADING_TOLERANCE_DEG,
 ): Boolean = angularDistance(azimuth, target) <= tolerance
 
-private val COMPASS_POINTS = listOf(
-    "North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West",
-)
+private const val COMPASS_SIZE = 8
 
-private val COMPASS_LETTERS = listOf("N", "NE", "E", "SE", "S", "SW", "W", "NW")
-
-private fun compassIndex(degrees: Float): Int = ((normalizeDegrees(degrees) + 22.5f) / 45f).toInt() % COMPASS_POINTS.size
-
-/** Nearest of 8 compass points, e.g. for "face {direction}". */
-fun headingLabel(degrees: Float): String = COMPASS_POINTS[compassIndex(degrees)]
-
-/** Abbreviation of [headingLabel] ("N", "NE"…), for the Direction badge glyph. */
-fun headingLetter(degrees: Float): String = COMPASS_LETTERS[compassIndex(degrees)]
+/** Nearest of the 8 compass points, 0 = North, clockwise; names in `R.array.compass_points`. */
+fun compassIndex(degrees: Float): Int = ((normalizeDegrees(degrees) + 22.5f) / 45f).toInt() % COMPASS_SIZE
 
 /**
  * Heading the player faces, in degrees [0, 360), from a rotation matrix as filled by
