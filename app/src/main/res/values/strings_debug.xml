@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug panel and debug controls: read by testers only, never translated (i18n spec §3.1). -->
+<resources>
+    <string translatable="false" name="debug_simulate_heading">Simulate heading</string>
+    <string translatable="false" name="debug_hold_to_chant">Hold to Chant</string>
+    <string translatable="false" name="debug_chanting">Chanting…</string>
+    <string translatable="false" name="debug_clip_off">Record clip</string>
+    <string translatable="false" name="debug_check_auto">Check: auto</string>
+    <string translatable="false" name="debug_check_whisper">Check: Whisper (next ritual)</string>
+    <string translatable="false" name="debug_check_lenient">Check: lenient (next ritual)</string>
+    <string translatable="false" name="debug_clip_chant">Recording · chant</string>
+    <string translatable="false" name="debug_clip_nonsense">Recording · nonsense</string>
+    <string translatable="false" name="debug_chant_score">Check %1$s %2$.2f %3$s · %4$d ms · “%5$s”</string>
+    <string translatable="false" name="debug_chant_mode">Check mode: lenient (%1$s)</string>
+    <string translatable="false" name="debug_chant_score_none">Chant check · no verdict yet</string>
+    <string translatable="false" name="debug_controls">Debug controls</string>
+    <string translatable="false" name="debug_chip">Debug</string>
+    <string translatable="false" name="debug_advance_day">Advance +1 day</string>
+    <string translatable="false" name="debug_reset_daily">Reset daily summon</string>
+    <string translatable="false" name="debug_court">Court</string>
+    <string translatable="false" name="debug_court_auto">Auto</string>
+    <string translatable="false" name="debug_court_in">In</string>
+    <string translatable="false" name="debug_court_out">Out</string>
+    <string translatable="false" name="debug_bind">Bind</string>
+    <string translatable="false" name="debug_bind_flawless">Bind flawless</string>
+    <string translatable="false" name="debug_unsummon">Unsummon</string>
+    <string translatable="false" name="debug_reset_all">Reset all</string>
+    <string translatable="false" name="debug_status_sealed">sealed</string>
+    <string translatable="false" name="debug_status_escaped">escaped (lore kept)</string>
+    <string translatable="false" name="debug_status_bound">bound · %1$dd since visit</string>
+    <string translatable="false" name="debug_status_restless">restless</string>
+    <string translatable="false" name="debug_status_flawless">flawless</string>
+    <string translatable="false" name="debug_tester_note">Advancing a day while a bound demon is on the Grimoire visits him at once; test restlessness by advancing from Home.</string>
+</resources>
