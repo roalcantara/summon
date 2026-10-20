@@ -34,7 +34,7 @@ the term. Numbers in brackets are character counts where the English budget is t
 | dossier: Offices | Oficios | Ofícios | Uffici | Offices |
 | dossier: Appearance | Aspecto | Aparência | Aspetto | Apparence |
 | dossier: Summoner’s warning | Aviso | Aviso | Avviso | Avis |
-| dossier: Secret | Secreto | Segredo | Segreto | Secret |
+| dossier: Secret | Secreto | Sigilo | Segreto | Secret |
 | compass N NE E SE S SW W NW | N NE E SE S SO O NO | N NE L SE S SO O NO | N NE E SE S SO O NO | N NE E SE S SO O NO |
 | compass names | Norte, Noreste, Este, Sureste, Sur, Suroeste, Oeste, Noroeste | Norte, Nordeste, Leste, Sudeste, Sul, Sudoeste, Oeste, Noroeste | Nord, Nord-Est, Est, Sud-Est, Sud, Sud-Ovest, Ovest, Nord-Ovest | Nord, Nord-Est, Est, Sud-Est, Sud, Sud-Ouest, Ouest, Nord-Ouest |
 
