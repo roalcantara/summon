@@ -1,0 +1,14 @@
+<resources>
+    <string name="plain">Hello</string>
+    <string name="escaped">Can\'t stop · “%1$s”</string>
+    <string name="quoted">" &amp; "</string>
+    <string name="fixed" translatable="false">Debug</string>
+    <string-array name="list">
+        <item>One</item>
+        <item>Two\'s</item>
+    </string-array>
+    <plurals name="count">
+        <item quantity="one">%1$d legion</item>
+        <item quantity="other">%1$d legions</item>
+    </plurals>
+</resources>
