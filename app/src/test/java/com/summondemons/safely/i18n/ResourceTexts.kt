@@ -76,11 +76,14 @@ fun valuesDir(qualifier: String? = null): File =
 
 val english: ResourceTexts by lazy { ResourceTexts.load(valuesDir()) }
 
-/** Resource name of a string resource id (Task 3 adds `R.plurals`, Task 4 adds `R.array`). */
+/** Resource name of an `R.string`, `R.array` or `R.plurals` id. */
 fun resName(id: Int): String =
-    listOf<Class<*>>(R.string::class.java, R.plurals::class.java)
+    listOf<Class<*>>(R.string::class.java, R.array::class.java, R.plurals::class.java)
         .firstNotNullOfOrNull { type -> type.fields.firstOrNull { it.getInt(null) == id }?.name }
-        ?: error("No string resource with id $id")
+        ?: error("No string, array or plurals resource with id $id")
 
 /** English text of a string resource. */
 fun en(id: Int): String = english.strings.getValue(resName(id))
+
+/** English items of a string-array resource. */
+fun enArray(id: Int): List<String> = english.arrays.getValue(resName(id))

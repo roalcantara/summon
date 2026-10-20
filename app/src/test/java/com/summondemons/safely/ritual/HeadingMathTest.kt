@@ -39,13 +39,15 @@ class HeadingMathTest {
     }
 
     @Test
-    fun headingLabelsRoundToEightPoints() {
-        assertEquals("North", headingLabel(0f))
-        assertEquals("North", headingLabel(350f))
-        assertEquals("North-East", headingLabel(45f))
-        assertEquals("East", headingLabel(90f))
-        assertEquals("South", headingLabel(180f))
-        assertEquals("North-West", headingLabel(315f))
+    fun compassIndexRoundsToEightPoints() {
+        assertEquals(0, compassIndex(0f))
+        assertEquals(0, compassIndex(350f))
+        assertEquals(1, compassIndex(30f))
+        assertEquals(1, compassIndex(45f))
+        assertEquals(2, compassIndex(90f))
+        assertEquals(4, compassIndex(180f))
+        assertEquals(5, compassIndex(-135f))
+        assertEquals(7, compassIndex(315f))
     }
 
     @Test
@@ -75,15 +77,6 @@ class HeadingMathTest {
         assertEquals(TurnDirection.Right, turnDirection(270f, 0f))
         assertEquals(null, turnDirection(5f, 0f))
         assertEquals(null, turnDirection(null, 0f))
-    }
-
-    @Test
-    fun headingLetterIsTheNearestCompassPointAbbreviation() {
-        assertEquals("N", headingLetter(0f))
-        assertEquals("E", headingLetter(90f))
-        assertEquals("NE", headingLetter(30f))
-        assertEquals("N", headingLetter(350f))
-        assertEquals("SW", headingLetter(-135f))
     }
 
     @Test
