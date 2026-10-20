@@ -203,11 +203,13 @@ large sources are not density-scaled and the APK stays small.
 | `chant_summon_button` | `art/splash/chant_summon_button_unpressed.png` | 800×359, alpha; plum-enamel stone plaque button |
 | `chant_summon_button_pressed` | `art/splash/chant_summon_button_pressed.png` | 800×359, alpha; pressed state |
 | `ic_home_grimoire` | `art/etc/RestlessGrimoire.png` | 1024×1024 opaque square asset, Home grimoire book |
-| `ic_launcher_foreground` | `tools/gen_icons.py` | Generated mipmaps (`mipmap-{m,h,xh,xxh,xxxh}dpi`), adaptive icon foreground |
-| `ic_launcher_monochrome` | Hand-crafted vector | 108×108 dp vector drawable (`res/drawable/`), themed icon layer |
+| `ic_launcher_foreground` | `art/icon/cutout-dark.png` via `mise run icon` (`tools/gen_icons.py`) | 1024×1024 opaque on `obsidian`; drawn at 84 of 108 dp, raised 10 dp, margins extend the edge pixels (ADR-0030) |
+| `ic_launcher_background` | `tools/gen_icons.py` | Solid `obsidian`, hidden behind the full-bleed foreground |
+| `ic_launcher_monochrome` | `art/icon/cutout.png` via `tools/gen_icons.py` | Cutout silhouette with the ink lines cut out, themed icon layer |
+| `ic_launcher`, `ic_launcher_round`, Play `icon-512.png` | `tools/gen_icons.py` | Layers flattened to the visible 72 dp. `art/icon/full.png` and `backdrop.png` are reference art only |
 
 `full_body_…` = `full_body_cute_funny_stylized_2d_cartoon_fantasy_rpg_character_artwork_of_demon`.
-Regenerate launcher and store graphics with `python3 -I tools/gen_icons.py app/src/main/res/drawable-nodpi/ic_game_logo.webp app/src/main/res docs/play-store`.
+Regenerate launcher and store graphics with `mise run icon` (see `mise run icon --help`; it also writes a preview sheet to `build/icon-preview.png`).
 Unused references: `the_sacred_magical_sigil_of_*` (superseded by vector sigils, ADR-0009).
 
 ### Sigils

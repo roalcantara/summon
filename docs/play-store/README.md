@@ -6,8 +6,8 @@ Assets required for the Google Play Store listing (see `docs/STORE_LISTING.md` �
 
 | Asset | Spec | Location | How to generate |
 |---|---|---|---|
-| App icon | 512 × 512 PNG, 32-bit, full-bleed opaque, ≤ 1 MB | `icon-512.png` | `python3 -I tools/gen_icons.py app/src/main/res/drawable-nodpi/ic_game_logo.webp app/src/main/res docs/play-store` |
-| Feature graphic | 1024 × 500 PNG, RGB (no alpha) | `feature-graphic.png` | `python3 -I tools/gen_icons.py app/src/main/res/drawable-nodpi/ic_game_logo.webp app/src/main/res docs/play-store` |
+| App icon | 512 × 512 PNG, 32-bit, full-bleed opaque, ≤ 1 MB | `icon-512.png` | `mise run icon` |
+| Feature graphic | 1024 × 500 PNG, RGB (no alpha) | `feature-graphic.png` | `mise run icon` |
 | Phone screenshots | 2–8 portrait images (9:16, 1080 × 1920 recommended) | `screenshots/` | Captured on device / emulator following the screenshot order in `docs/STORE_LISTING.md` |
 
 ## Screenshot Guide
