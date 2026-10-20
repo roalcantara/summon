@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
@@ -177,7 +178,7 @@ private fun SummonCue(demon: Demon, accent: Color, onTap: () -> Unit) {
 private fun CoolingCue(accent: Color, hours: Int, shake: Int, onTap: () -> Unit) {
     val colors = MaterialTheme.colorScheme
     val offset = rememberShake(shake)
-    val label = stringResource(R.string.cd_cooling, hours)
+    val label = pluralStringResource(R.plurals.cd_cooling, hours, hours)
     DashedBubble(
         color = colors.outlineVariant,
         modifier = Modifier

@@ -66,6 +66,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -378,7 +379,7 @@ private fun Stage(
         QuoteSlotState.Celebration -> stringResource(R.string.action_awesome)
         QuoteSlotState.Bound -> demon.name
         QuoteSlotState.Ready -> stringResource(R.string.cd_summon, demon.name)
-        QuoteSlotState.Cooling -> stringResource(R.string.cd_cooling, hours)
+        QuoteSlotState.Cooling -> pluralStringResource(R.plurals.cd_cooling, hours, hours)
     }
     Column(
         modifier

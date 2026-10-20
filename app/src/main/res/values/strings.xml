@@ -14,7 +14,10 @@
     <string name="home_court">In court · %1$s</string>
     <string name="home_court_join">" &amp; "</string>
     <string name="home_out_of_office">Out of office</string>
-    <string name="home_bound">%1$d of %2$d spirits bound</string>
+    <plurals name="home_bound">
+        <item quantity="one">%1$d of %2$d spirit bound</item>
+        <item quantity="other">%1$d of %2$d spirits bound</item>
+    </plurals>
     <string name="home_hint">Tap the grimoire</string>
     <string name="home_open">Open the grimoire</string>
     <string name="escape_banner">Seal broken!</string>
@@ -30,12 +33,21 @@
     <string name="quote_cooling">Circle cooling</string>
     <string name="quote_next_summon">Next summon in %1$d h</string>
     <string name="cd_summon">Summon %1$s</string>
-    <string name="cd_cooling">Circle cooling. Next summon in %1$d hours.</string>
+    <plurals name="cd_cooling">
+        <item quantity="one">Circle cooling. Next summon in %1$d hour.</item>
+        <item quantity="other">Circle cooling. Next summon in %1$d hours.</item>
+    </plurals>
     <string name="badge_direction_text">Face %1$s to summon. %2$s</string>
     <string name="badge_liege">He serves %1$s.</string>
     <string name="badge_no_liege">He swears to no king.</string>
-    <string name="badge_legions_label">%1$d legions</string>
-    <string name="badge_legions_text">A %1$s at the head of %2$d legions of spirits.</string>
+    <plurals name="badge_legions_label">
+        <item quantity="one">%1$d legion</item>
+        <item quantity="other">%1$d legions</item>
+    </plurals>
+    <plurals name="badge_legions_text">
+        <item quantity="one">A %1$s at the head of %2$d legion of spirits.</item>
+        <item quantity="other">A %1$s at the head of %2$d legions of spirits.</item>
+    </plurals>
     <string name="badge_explain">%1$s: explain</string>
     <string name="dossier_weakness">Weakness</string>
     <string name="dossier_weakness_named">Weakness · %1$s</string>
@@ -58,8 +70,12 @@
     <string name="chant_sealed">Sealed</string>
     <string name="chant_checking">Checking…</string>
     <string name="chant_heard">heard: “%1$s”</string>
+    <string name="chant_score">%1$d%%</string>
     <string name="chant_a11y_locked">Face the demon to chant</string>
-    <string name="chant_a11y_seals">%1$d of 4 lines sealed</string>
+    <plurals name="chant_a11y_seals">
+        <item quantity="one">%1$d of 4 lines sealed</item>
+        <item quantity="other">%1$d of 4 lines sealed</item>
+    </plurals>
     <string name="chant_a11y_facing">Facing %1$s</string>
     <string name="chant_a11y_turn_left">Turn left to face %1$s</string>
     <string name="chant_a11y_turn_right">Turn right to face %1$s</string>

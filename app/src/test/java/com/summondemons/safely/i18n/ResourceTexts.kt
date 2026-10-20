@@ -78,7 +78,7 @@ val english: ResourceTexts by lazy { ResourceTexts.load(valuesDir()) }
 
 /** Resource name of a string resource id (Task 3 adds `R.plurals`, Task 4 adds `R.array`). */
 fun resName(id: Int): String =
-    listOf<Class<*>>(R.string::class.java)
+    listOf<Class<*>>(R.string::class.java, R.plurals::class.java)
         .firstNotNullOfOrNull { type -> type.fields.firstOrNull { it.getInt(null) == id }?.name }
         ?: error("No string resource with id $id")
 

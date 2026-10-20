@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -182,7 +183,7 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(spacing.md),
         ) {
-            Text(stringResource(R.string.home_bound, boundCount, demonCount).upper(), style = MaterialTheme.textRoles.meta)
+            Text(pluralStringResource(R.plurals.home_bound, demonCount, boundCount, demonCount).upper(), style = MaterialTheme.textRoles.meta)
             if (showHint) CueChip(stringResource(R.string.home_hint), CueTone.Neutral)
         }
 
