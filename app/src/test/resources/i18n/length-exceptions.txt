@@ -3,4 +3,7 @@
 # Every line needs a "### <locale> · <key>" entry in docs/i18n/review.md.
 pt-BR compass_points[2] Leste is the standard word; the direction pill and badges fit 10-character names
 pt-BR compass_points[6] Oeste is the only word; the pill fits 10-character names
-pt-BR calling_oracle_label badge fits 10 characters (72 LEGIONS)
+pt-BR calling_oracle_label verified on device: ORÁCULO fits its badge
+es compass_points[6] Oeste is the only word; the pill fits 10-character names
+es calling_oracle_label verified on device: ORÁCULO fits its badge
+es chant_sealed chip text; the chip grows with its content
