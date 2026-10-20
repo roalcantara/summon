@@ -58,6 +58,7 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
@@ -246,7 +247,8 @@ private class BelowAnchor(private val gap: Int) : PopupPositionProvider {
 @Composable
 internal fun ChantTitle(name: String, seals: List<SealLook>, checking: Boolean, paused: Boolean, accent: Color) {
     val spacing = MaterialTheme.spacing
-    val description = stringResource(R.string.chant_a11y_seals, seals.count { it == SealLook.Sealed })
+    val sealed = seals.count { it == SealLook.Sealed }
+    val description = pluralStringResource(R.plurals.chant_a11y_seals, sealed, sealed)
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(spacing.md)) {
         Text(name.uppercase(), style = MaterialTheme.textRoles.name.copy(fontSize = NameSize, letterSpacing = 0.12.em), color = accent, maxLines = 1)
         Row(
@@ -523,13 +525,13 @@ internal fun FeedbackSlot(slot: SlotContent, accent: Color, micLevel: Float, pau
             }
             is SlotContent.Sealed -> Chip(safe) {
                 if (slot.score != null) {
-                    Text("${slot.score} %", style = style, color = safe, maxLines = 1)
+                    Text(stringResource(R.string.chant_score, slot.score), style = style, color = safe, maxLines = 1)
                     Text("·", style = style, color = colors.outline)
                 }
                 Text("${stringResource(R.string.chant_sealed).upper()} ✓", style = style, color = safe, maxLines = 1)
             }
             is SlotContent.Missed -> Chip(colors.outline) {
-                Text("${slot.score} %", style = style, color = colors.onSurface, maxLines = 1)
+                Text(stringResource(R.string.chant_score, slot.score), style = style, color = colors.onSurface, maxLines = 1)
                 if (slot.heard != null) {
                     Text("·", style = style, color = colors.outline)
                     Text(

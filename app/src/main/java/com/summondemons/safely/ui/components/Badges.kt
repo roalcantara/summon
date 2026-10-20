@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -67,8 +68,8 @@ fun rememberBadges(demon: Demon): List<BadgeInfo> {
         BadgeInfo(BadgeKey.Calling, demon.calling.label, demon.calling.tooltip),
         BadgeInfo(
             BadgeKey.Legions,
-            stringResource(R.string.badge_legions_label, demon.legions),
-            stringResource(R.string.badge_legions_text, demon.rank, demon.legions),
+            pluralStringResource(R.plurals.badge_legions_label, demon.legions, demon.legions),
+            pluralStringResource(R.plurals.badge_legions_text, demon.legions, demon.rank, demon.legions),
         ),
     )
 }
