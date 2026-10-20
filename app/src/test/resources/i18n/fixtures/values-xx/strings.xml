@@ -1,0 +1,12 @@
+<resources>
+    <string name="plain">Bonjour tout le monde</string>
+    <string name="escaped">Impossible · «%1$d»</string>
+    <string-array name="list">
+        <item>Un</item>
+    </string-array>
+    <plurals name="count">
+        <item quantity="one">%1$d légion</item>
+        <item quantity="other">%1$d légions</item>
+    </plurals>
+    <string name="extra">Not in English</string>
+</resources>
