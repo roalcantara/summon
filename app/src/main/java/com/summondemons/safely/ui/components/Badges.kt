@@ -59,7 +59,7 @@ private val SelectedGlow = 8.dp
 @Composable
 fun rememberBadges(demon: Demon): List<BadgeInfo> {
     val direction = headingLabel(demon.ritualHeading)
-    val liege = demon.liege?.let { stringResource(R.string.badge_liege, it) } ?: stringResource(R.string.badge_no_liege)
+    val liege = demon.liege?.let { stringResource(R.string.badge_liege, stringResource(it)) } ?: stringResource(R.string.badge_no_liege)
     return listOf(
         BadgeInfo(BadgeKey.Direction, direction, stringResource(R.string.badge_direction_text, direction, liege)),
         BadgeInfo(BadgeKey.House, demon.house.planet, demon.house.tooltip),
@@ -67,7 +67,7 @@ fun rememberBadges(demon: Demon): List<BadgeInfo> {
         BadgeInfo(
             BadgeKey.Legions,
             pluralStringResource(R.plurals.badge_legions_label, demon.legions, demon.legions),
-            pluralStringResource(R.plurals.badge_legions_text, demon.legions, demon.rank, demon.legions),
+            pluralStringResource(R.plurals.badge_legions_text, demon.legions, stringResource(demon.rank), demon.legions),
         ),
     )
 }
@@ -152,7 +152,7 @@ fun InfoBand(demons: List<Demon>, demon: Demon, badge: BadgeKey?, modifier: Modi
             val current = d.id == demon.id
             BandLayer(visible = current && badge == null) {
                 Text(
-                    d.description,
+                    stringResource(d.description),
                     style = roles.body.copy(fontSize = BandTextSize, fontWeight = FontWeight.SemiBold),
                     color = colors.primary,
                     textAlign = TextAlign.Center,
