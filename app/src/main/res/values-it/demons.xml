@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Asmodeus -->
+    <string name="demon_asmodeus_title">Re dei Conti e dell’Oro Nascosto</string>
+    <string name="demon_asmodeus_description">Insegna aritmetica, astronomia, geometria e invisibilità. Risponde a tutto—se reggi la sua aria da saputello.</string>
+    <string name="demon_asmodeus_quote">Tre teste sono meglio di una—specie se due vogliono la tua anima!</string>
+    <string name="demon_asmodeus_restless_quote">Ho contato ogni granello di polvere. Due volte. In tre basi.</string>
+    <string name="demon_asmodeus_rank">Gran Re</string>
+    <string name="demon_asmodeus_liege">Amaymon, Re dell’Est</string>
+    <string name="demon_asmodeus_appearance">Tre teste (toro, uomo e montone): ogni riunione è un comitato. Sputa fuoco, agita una coda di serpente e cammina su piedi d’oca. Arriva su un drago con lancia e stendardo, perché la finezza è roba da Duchi.</string>
+    <string-array name="demon_asmodeus_offices">
+        <item>Distribuisce l’Anello delle Virtù (uno a testa).</item>
+        <item>Insegna aritmetica, astronomia, geometria e ogni mestiere.</item>
+        <item>Risponde a ogni domanda, con appendici.</item>
+        <item>Ti rende invisibile.</item>
+        <item>Sa dove sono i tesori, e li custodisce.</item>
+    </string-array>
+    <string name="demon_asmodeus_warning">Evocalo all’aperto, resta in piedi e togliti il cappello. Se lo tieni, il suo capo Amaymon ti rovina tutto il rituale.</string>
+    <string name="demon_asmodeus_ability_1_name">Anello di Virtù</string>
+    <string name="demon_asmodeus_ability_1_line">Ti dà un anello. Le virtù si vendono a parte.</string>
+    <string name="demon_asmodeus_ability_2_name">Non Ci Sono</string>
+    <string name="demon_asmodeus_ability_2_line">Ti rende invisibile. Ottimo per furti, pessimo per selfie.</string>
+    <string name="demon_asmodeus_ability_3_name">Cassa del Drago</string>
+    <string name="demon_asmodeus_ability_3_line">Scova tesori sepolti, li conta, ci si siede sopra.</string>
+    <string name="demon_asmodeus_weakness_name">Per Nome</string>
+    <string name="demon_asmodeus_weakness_line">Chiedi “Sei tu Asmodeus?” e deve ammetterlo e inchinarsi a terra. Tre teste, un ego, zero calma.</string>
+    <string name="demon_asmodeus_secret">In un racconto antico, il fumo di cuore e fegato di pesce lo fece fuggire fino in Egitto. Non mangia pesce. Non ne parla.</string>
+    <!-- Astaroth -->
+    <string name="demon_astaroth_title">Duca di Ieri, Oggi e Domani</string>
+    <string name="demon_astaroth_description">Conosce ogni segreto e ogni tempo verbale. Spiega la sua caduta, a lungo.</string>
+    <string name="demon_astaroth_quote">Conosco il tuo passato, il tuo futuro e che non hai letto i termini d’uso.</string>
+    <string name="demon_astaroth_restless_quote">Previsto: mi hai dimenticato. Odio avere ragione. Bugia.</string>
+    <string name="demon_astaroth_rank">Gran Duca</string>
+    <string name="demon_astaroth_appearance">Un angelo malintenzionato su una bestia quasi drago, con una vipera nella destra come penna elegante. Il suo alito arriva prima di lui.</string>
+    <string-array name="demon_astaroth_offices">
+        <item>Risposte vere su passato, presente e futuro.</item>
+        <item>Svela ogni segreto, anche quelli scritti a matita.</item>
+        <item>Spiega la caduta degli spiriti, e perché la sua non fu colpa sua.</item>
+        <item>Ti insegna tutte le arti liberali.</item>
+    </string-array>
+    <string name="demon_astaroth_warning">Non farlo avvicinare: l’alito è un’arma. Alza l’anello magico al viso come mini maschera antigas e sorridi.</string>
+    <string name="demon_astaroth_ability_1_name">I Tre Tempi</string>
+    <string name="demon_astaroth_ability_1_line">Sa il finale e non smette di alludere.</string>
+    <string name="demon_astaroth_ability_2_name">Pettegolo</string>
+    <string name="demon_astaroth_ability_2_line">I tuoi segreti: ora il suo argomento preferito.</string>
+    <string name="demon_astaroth_ability_3_name">La Caduta: Edizione Lunga</string>
+    <string name="demon_astaroth_ability_3_line">Un resoconto completo e non richiesto. Spoiler: l’hanno spinto.</string>
+    <string name="demon_astaroth_weakness_name">Alito Letale</string>
+    <string name="demon_astaroth_weakness_line">I coraggiosi si tengono un anello al naso e vincono. Rispetta lo spazio personale solo se imposto coi gioielli.</string>
+    <string name="demon_astaroth_secret">Prima del drago e dell’alito, il suo nome era di Astarte, dea dell’amore e della guerra. Preferisce che non lo ricordi.</string>
+    <!-- Houses (ADR-0011) -->
+    <string name="house_sol_tooltip">Re di Sol: corte 9–12 e dalle 15 al tramonto. Occhiali da sole!</string>
+    <string name="house_venus_tooltip">Duchi di Venus: corte dall’alba a mezzogiorno, solo col bel tempo. Molto esigenti.</string>
+    <!-- Callings (ADR-0011) -->
+    <string name="calling_warlord_label">Tiranno</string>
+    <string name="calling_warlord_tooltip">Per avere un esercito.</string>
+    <string name="calling_tutor_label">Prof</string>
+    <string name="calling_tutor_tooltip">Per imparare cose.</string>
+    <string name="calling_oracle_label">Oracolo</string>
+    <string name="calling_oracle_tooltip">Per sapere cose.</string>
+    <string name="calling_treasurer_label">Tesoriere</string>
+    <string name="calling_treasurer_tooltip">Per fare bottino.</string>
+    <string name="calling_menace_label">Peste</string>
+    <string name="calling_menace_tooltip">A tuo rischio e pericolo.</string>
+</resources>

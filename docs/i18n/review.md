@@ -350,3 +350,171 @@ Entry format:
 - **Translation (5):** Plaga
 - **Lost:** "Menace" became "Plague" (Plaga): "Amenaza" (7) does not fit.
 - **Alternatives:** Amenaza (7, needs exception).
+
+### it · compass_points[6]
+
+- **Status:** open
+- **English (4):** West
+- **Translation (5):** Ovest
+- **Lost:** Nothing: "Ovest" is the only word for West.
+- **Alternatives:** None that fit.
+
+### it · calling_oracle_label
+
+- **Status:** open
+- **English (6):** Oracle
+- **Translation (7):** Oracolo
+- **Lost:** Nothing; one character over, like Oráculo in pt-BR/es.
+- **Alternatives:** Veggente (8), Profeta (7) — also over.
+
+### it · action_stay
+
+- **Status:** open
+- **English (4):** Stay
+- **Translation (5):** Resto
+- **Lost:** Nothing; "Resto" is the natural word, one character over.
+- **Alternatives:** Sto (3) — reads oddly alone.
+
+### it · chant_face
+
+- **Status:** open
+- **English (9):** Face %1$s
+- **Translation (9):** Mira %1$s
+- **Lost:** Telegraphic: "Mira Nord" has no preposition ("Mira a Nord").
+- **Alternatives:** Mira a %1$s (11, needs exception).
+
+### it · escape_banner
+
+- **Status:** open
+- **English (12):** Seal broken!
+- **Translation (9):** Evasione!
+- **Lost:** "Seal broken!" became "Jailbreak!" (Evasione!): "Sigillo rotto!" (14) does not fit.
+- **Alternatives:** Sigillo rotto! (14, needs exception).
+
+### it · avatar_sealed
+
+- **Status:** open
+- **English (12):** %1$s, sealed
+- **Translation (12):** %1$s, chiuso
+- **Lost:** "sealed" became "closed" (chiuso): "sigillato" does not fit (a11y label).
+- **Alternatives:** %1$s sigillato (14, needs exception).
+
+### it · chant_sealed
+
+- **Status:** open
+- **English (6):** Sealed
+- **Translation (5):** Fatto
+- **Lost:** "Sealed" became "Done" (Fatto) in the result chip.
+- **Alternatives:** Sigillo (7, noun, needs exception).
+
+### it · verdict_seal_cracked
+
+- **Status:** open
+- **English (12):** Seal cracked
+- **Translation (12):** Si è crepato
+- **Lost:** "Seal cracked" became "It cracked".
+- **Alternatives:** Sigillo rotto (13, needs exception).
+
+### it · home_hint
+
+- **Status:** open
+- **English (16):** Tap the grimoire
+- **Translation (16):** Apri il grimorio
+- **Lost:** "Tap the grimoire" became "Open the grimoire" (same as home_open).
+- **Alternatives:** Tocca il grimorio (17, needs exception).
+
+### it · dossier_weakness
+
+- **Status:** open
+- **English (8):** Weakness
+- **Translation (7):** Tallone
+- **Lost:** "Weakness" became "Heel" (Tallone, as in Achilles' heel): "Debolezza" (9) does not fit.
+- **Alternatives:** Debolezza (9, needs exception).
+
+### it · dossier_secret
+
+- **Status:** open
+- **English (6):** Secret
+- **Translation (6):** Arcano
+- **Lost:** "Secret" became "Arcane" (Arcano): "Segreto" (7) does not fit.
+- **Alternatives:** Segreto (7, needs exception).
+
+### it · demon_asmodeus_title
+
+- **Status:** open
+- **English (34):** Lord of Arithmetic & Hidden Wealth
+- **Translation (32):** Re dei Conti e dell’Oro Nascosto
+- **Lost:** "Lord of Arithmetic & Hidden Wealth" became "King of Accounts and Hidden Gold".
+- **Alternatives:** Signore dell'Aritmetica e dei Tesori (36, needs exception).
+
+### it · demon_asmodeus_ability_2_name
+
+- **Status:** open
+- **English (13):** Now You Don’t
+- **Translation (11):** Non Ci Sono
+- **Lost:** "Now You Don't" became "I'm Not Here".
+- **Alternatives:** Ora Non Mi Vedi (15, needs exception); Chi l'ha visto? (15, the TV show).
+
+### it · demon_asmodeus_weakness_name
+
+- **Status:** open
+- **English (9):** Name-Drop
+- **Translation (8):** Per Nome
+- **Lost:** "Name-Drop" became "By Name"; the pun is lost.
+- **Alternatives:** none found.
+
+### it · demon_astaroth_title
+
+- **Status:** open
+- **English (30):** Duke of Past, Present & Future
+- **Translation (27):** Duca di Ieri, Oggi e Domani
+- **Lost:** "Past, Present & Future" became "Yesterday, Today and Tomorrow".
+- **Alternatives:** Duca del Passato, Presente e Futuro (35, needs exception).
+
+### it · demon_astaroth_ability_2_name
+
+- **Status:** open
+- **English (11):** Open Secret
+- **Translation (9):** Pettegolo
+- **Lost:** "Open Secret" became "Gossip"; Italian has the exact idiom "Segreto di Pulcinella" (21).
+- **Alternatives:** Segreto di Pulcinella (21, needs exception) — the best fit.
+
+### it · demon_astaroth_ability_3_name
+
+- **Status:** open
+- **English (25):** The Fall (Director’s Cut)
+- **Translation (25):** La Caduta: Edizione Lunga
+- **Lost:** "Director's Cut" became "Long Edition".
+- **Alternatives:** La Caduta (Director's Cut) (26, needs exception).
+
+### it · demon_astaroth_offices[3]
+
+- **Status:** open
+- **English (44):** Makes you a scholar of all the liberal arts.
+- **Translation (34):** Ti insegna tutte le arti liberali.
+- **Lost:** "Makes you a scholar" became "Teaches you": "erudito" would give the player a gender.
+- **Alternatives:** Ti fa sapiente in ogni arte liberale. (37) — "sapiente" is invariant; a valid alternative.
+
+### it · calling_warlord_label
+
+- **Status:** open
+- **English (7):** Warlord
+- **Translation (7):** Tiranno
+- **Lost:** "Warlord" became "Tyrant" (Tiranno): "Condottiero" (11) does not fit.
+- **Alternatives:** Generale (8, needs exception).
+
+### it · calling_tutor_label
+
+- **Status:** open
+- **English (5):** Tutor
+- **Translation (4):** Prof
+- **Lost:** "Tutor" became "Prof": "Tutore" (6) does not fit.
+- **Alternatives:** Tutore (6, needs exception) — also means legal guardian.
+
+### it · calling_menace_label
+
+- **Status:** open
+- **English (6):** Menace
+- **Translation (5):** Peste
+- **Lost:** "Menace" became "Pest" (Peste, also "brat"): "Minaccia" (8) does not fit.
+- **Alternatives:** Minaccia (8, needs exception).

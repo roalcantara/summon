@@ -7,3 +7,6 @@ pt-BR calling_oracle_label verified on device: ORÁCULO fits its badge
 es compass_points[6] Oeste is the only word; the pill fits 10-character names
 es calling_oracle_label verified on device: ORÁCULO fits its badge
 es chant_sealed chip text; the chip grows with its content
+it compass_points[6] Ovest is the only word; the pill fits 10-character names
+it calling_oracle_label same length as ORÁCULO, verified on device to fit its badge
+it action_stay dialog button; the button grows with its label
