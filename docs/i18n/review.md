@@ -518,3 +518,203 @@ Entry format:
 - **Translation (5):** Peste
 - **Lost:** "Menace" became "Pest" (Peste, also "brat"): "Minaccia" (8) does not fit.
 - **Alternatives:** Minaccia (8, needs exception).
+
+### fr · secret wording (œ)
+
+- **Status:** open
+- **English:** n/a
+- **Translation:** n/a
+- **Lost:** French needs œ (cœur, œuvre, sœur); see the "fr · fonts" entry. The French text avoids it: Asmodeus's secret says "fish offal" (abats) instead of "fish heart and liver" (cœur et foie).
+- **Alternatives:** Fix the fonts, then restore "la fumée d’un cœur et d’un foie de poisson".
+
+### fr · compass_points[6]
+
+- **Status:** open
+- **English (4):** West
+- **Translation (5):** Ouest
+- **Lost:** Nothing: "Ouest" is the only word for West.
+- **Alternatives:** None that fit.
+
+### fr · chant_score
+
+- **Status:** open
+- **English (6):** %1$d%%
+- **Translation (7):** %1$d %%
+- **Lost:** Nothing: French writes a narrow no-break space before % (spec §4).
+- **Alternatives:** %1$d%% (6) — fits but is typographically wrong in French.
+
+### fr · chant_face
+
+- **Status:** open
+- **English (9):** Face %1$s
+- **Translation (8):** Cap %1$s
+- **Lost:** Nautical: "Cap Nord" (heading North) instead of an article-dependent "Face au Nord / à l’Est".
+- **Alternatives:** Face : %1$s (11, needs exception).
+
+### fr · chant_heard
+
+- **Status:** open
+- **English (13):** heard: “%1$s”
+- **Translation (12):** ouï « %1$s »
+- **Lost:** "heard" became archaic "ouï"; no colon, to fit with « ».
+- **Alternatives:** entendu : « %1$s » (18, needs exception).
+
+### fr · escape_banner
+
+- **Status:** open
+- **English (12):** Seal broken!
+- **Translation (9):** Évasion !
+- **Lost:** "Seal broken!" became "Jailbreak!" (Évasion !): "Sceau brisé !" (13) does not fit.
+- **Alternatives:** Sceau brisé ! (13, needs exception).
+
+### fr · escape_dismiss
+
+- **Status:** open
+- **English (14):** Tap to dismiss
+- **Translation (6):** Fermer
+- **Lost:** "Tap to dismiss" became "Close".
+- **Alternatives:** Touche pour fermer (18, needs exception).
+
+### fr · home_hint
+
+- **Status:** open
+- **English (16):** Tap the grimoire
+- **Translation (15):** Touche le livre
+- **Lost:** "Tap the grimoire" became "Tap the book".
+- **Alternatives:** Touche le grimoire (18, needs exception).
+
+### fr · action_stay
+
+- **Status:** open
+- **English (4):** Stay
+- **Translation (3):** Non
+- **Lost:** "Stay" became "No" (answer to "Quitter le rituel ?").
+- **Alternatives:** Rester (6, needs exception).
+
+### fr · intro_summon
+
+- **Status:** open
+- **English (6):** Summon
+- **Translation (5):** Hop !
+- **Lost:** "Summon" became "Hop!" ("Here we go!").
+- **Alternatives:** Invoquer (8, needs exception).
+
+### fr · abandon_body
+
+- **Status:** open
+- **English (21):** Your seals will fade.
+- **Translation (17):** Adieu tes sceaux.
+- **Lost:** "Your seals will fade." became "Farewell, your seals."
+- **Alternatives:** Tes sceaux vont s’effacer. (26, needs exception).
+
+### fr · dossier_weakness
+
+- **Status:** open
+- **English (8):** Weakness
+- **Translation (5):** Talon
+- **Lost:** "Weakness" became "Heel" (Talon, as in talon d’Achille): "Faiblesse" (9) does not fit.
+- **Alternatives:** Faiblesse (9, needs exception).
+
+### fr · chant_help
+
+- **Status:** open
+- **English (12):** How to chant
+- **Translation (12):** Bien chanter
+- **Lost:** "How to chant" became "Chanting well".
+- **Alternatives:** Comment chanter (15, needs exception).
+
+### fr · demon_asmodeus_appearance
+
+- **Status:** open
+- **English (214):** Three heads (bull, man and ram), so every meeting is a committee. He breathes fire, swishes a serpent’s tail and waddles on goose feet. He arrives on a dragon with a lance and a banner, because subtle is for Dukes.
+- **Translation (214):** Trois têtes (taureau, homme, bélier) : chaque réunion est un comité. Crache du feu, fouette d’une queue de serpent, marche en pattes d’oie. Arrive sur un dragon, lance au poing : la discrétion, c’est pour les Ducs.
+- **Lost:** The banner and the waddle are gone; "waddles on goose feet" became "walks on goose feet".
+- **Alternatives:** Restore "se dandine sur des pattes d’oie" and "lance et bannière au poing" (233, needs exception).
+
+### fr · demon_asmodeus_restless_quote
+
+- **Status:** open
+- **English (64):** I've counted every grain of dust in here. Twice. In three bases.
+- **Translation (62):** J’ai compté chaque grain de poussière. Deux fois. Trois bases.
+- **Lost:** "In three bases." became "Three bases."
+- **Alternatives:** En trois bases. (65 total, needs exception).
+
+### fr · demon_asmodeus_ability_2_name
+
+- **Status:** open
+- **English (13):** Now You Don’t
+- **Translation (9):** Disparu !
+- **Lost:** "Now You Don't" became "Vanished!"; French has the perfect idiom "Ni vu ni connu" (14).
+- **Alternatives:** Ni Vu Ni Connu (14, needs exception) — the best fit.
+
+### fr · demon_asmodeus_weakness_name
+
+- **Status:** open
+- **English (9):** Name-Drop
+- **Translation (8):** Démasqué
+- **Lost:** "Name-Drop" became "Unmasked".
+- **Alternatives:** none found.
+
+### fr · demon_astaroth_quote
+
+- **Status:** open
+- **English (77):** I know your past, your future, and that you didn't read the terms of service.
+- **Translation (60):** Je sais ton passé, ton futur, et que tu n’as pas lu les CGU.
+- **Lost:** "terms of service" became "CGU" (the French acronym everyone ignores).
+- **Alternatives:** …les conditions d’utilisation. (80, needs exception).
+
+### fr · demon_astaroth_restless_quote
+
+- **Status:** open
+- **English (58):** I foresaw you'd forget me. I hate being right. No I don't.
+- **Translation (58):** Je savais que tu m’oublierais. Je hais avoir raison. Faux.
+- **Lost:** "No I don't." became "False."
+- **Alternatives:** Mensonge. (+4, needs exception).
+
+### fr · demon_astaroth_ability_2_name
+
+- **Status:** open
+- **English (11):** Open Secret
+- **Translation (7):** Commère
+- **Lost:** "Open Secret" became "Gossip" (Commère); French has "secret de Polichinelle".
+- **Alternatives:** Polichinelle (12, needs exception).
+
+### fr · demon_astaroth_secret
+
+- **Status:** open
+- **English (126):** Before the dragon and the breath, his name belonged to Astarte, a goddess of love and war. He’d rather you didn’t bring it up.
+- **Translation (105):** Avant le dragon et l’haleine, son nom était à Astarte, déesse de l’amour et de la guerre. Évite le sujet.
+- **Lost:** "He'd rather you didn't bring it up" became "Avoid the subject."
+- **Alternatives:** Il préfère qu’on n’en parle pas. (needs exception).
+
+### fr · demon_astaroth_offices[3]
+
+- **Status:** open
+- **English (44):** Makes you a scholar of all the liberal arts.
+- **Translation (33):** T’apprend tous les arts libéraux.
+- **Lost:** "Makes you a scholar" became "Teaches you": "savant" would give the player a gender.
+- **Alternatives:** none that stay neutral.
+
+### fr · house_sol_tooltip
+
+- **Status:** open
+- **English (68):** Kings of Sol hold court 9 to noon and 3 to sunset. Bring sunglasses.
+- **Translation (66):** Rois de Sol : cour de 9 h à midi, puis de 15 h au soir. Lunettes !
+- **Lost:** "Bring sunglasses" became "Glasses!" (Lunettes !); "to sunset" became "to evening".
+- **Alternatives:** …Lunettes de soleil ! (needs exception).
+
+### fr · calling_warlord_label
+
+- **Status:** open
+- **English (7):** Warlord
+- **Translation (7):** Général
+- **Lost:** "Warlord" became "General": "Chef de guerre" (14) does not fit.
+- **Alternatives:** Chef de guerre (14, needs exception).
+
+### fr · calling_tutor_label
+
+- **Status:** open
+- **English (5):** Tutor
+- **Translation (4):** Prof
+- **Lost:** "Tutor" became "Prof": "Tuteur" (6) does not fit.
+- **Alternatives:** Tuteur (6, needs exception).

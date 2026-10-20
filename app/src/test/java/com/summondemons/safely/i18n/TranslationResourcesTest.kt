@@ -6,7 +6,7 @@ import org.junit.Test
 import java.io.File
 
 /** Locale → `values-` qualifier. Each translation task adds its locale here first. */
-val SHIPPED_LOCALES: Map<String, String> = mapOf("pt-BR" to "pt-rBR", "es" to "es", "it" to "it")
+val SHIPPED_LOCALES: Map<String, String> = mapOf("pt-BR" to "pt-rBR", "es" to "es", "it" to "it", "fr" to "fr")
 
 /** Plural forms each language must provide (CLDR); English needs one/other. */
 private val QUANTITIES = mapOf(
