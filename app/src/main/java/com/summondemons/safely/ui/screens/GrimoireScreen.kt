@@ -277,7 +277,7 @@ fun GrimoireScreen(
                         restless = restless,
                         party = party != null,
                         canSummon = state.canSummonToday,
-                        quote = if (restless) demon.restlessQuote else demon.quote,
+                        quote = stringResource(if (restless) demon.restlessQuote else demon.quote),
                         hours = state.hoursToNextSummon,
                         shake = shake,
                         onPrimary = primary,
@@ -540,7 +540,7 @@ private fun CardHeader(demon: Demon, bound: Boolean, modifier: Modifier) {
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                demon.title,
+                stringResource(demon.title),
                 style = roles.body.copy(fontSize = TitleSize),
                 color = colors.outline,
                 maxLines = 1,

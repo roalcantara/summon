@@ -1,6 +1,8 @@
 package com.summondemons.safely.data
 
 import com.summondemons.safely.R
+import com.summondemons.safely.i18n.en
+import com.summondemons.safely.i18n.enArray
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -21,9 +23,11 @@ class DemonCatalogTest {
         DemonCatalog.all.forEach { demon ->
             assertEquals(4, demon.chantPhrases.size)
             assertEquals(3, demon.abilities.size)
-            assertTrue(demon.offices.isNotEmpty())
-            listOf(demon.appearance, demon.warning, demon.secret, demon.weakness.name, demon.weakness.line, demon.restlessQuote)
-                .forEach { assertTrue("${demon.id}: blank dossier text", it.isNotBlank()) }
+            assertTrue(enArray(demon.offices).isNotEmpty())
+            val texts = listOf(demon.title, demon.description, demon.quote, demon.restlessQuote, demon.appearance,
+                demon.warning, demon.secret, demon.rank, demon.weakness.name, demon.weakness.line) +
+                demon.abilities.flatMap { listOf(it.name, it.line) }
+            texts.forEach { assertTrue("${demon.id}: blank text", en(it).isNotBlank()) }
             assertTrue(demon.ritualHeading >= 0f && demon.ritualHeading < 360f)
         }
     }
@@ -36,18 +40,18 @@ class DemonCatalogTest {
 
     @Test
     fun asmodeusMatchesProductSpec() {
-        assertEquals("Lord of Arithmetic & Hidden Wealth", asmodeus.title)
+        assertEquals("Lord of Arithmetic & Hidden Wealth", en(asmodeus.title))
         assertEquals(32, asmodeus.number)
-        assertEquals("Great King", asmodeus.rank)
+        assertEquals("Great King", en(asmodeus.rank))
         assertEquals(72, asmodeus.legions)
         assertEquals(House.Sol, asmodeus.house)
-        assertEquals("Amaymon, King of the East", asmodeus.liege)
+        assertEquals("Amaymon, King of the East", en(asmodeus.liege!!))
         assertEquals(Calling.Tutor, asmodeus.calling)
         assertEquals(
             "Teaches arithmetic, astronomy, geometry, and invisibility. Answers all questions—if you can stand the smugness.",
-            asmodeus.description,
+            en(asmodeus.description),
         )
-        assertEquals("I've counted every grain of dust in here. Twice. In three bases.", asmodeus.restlessQuote)
+        assertEquals("I've counted every grain of dust in here. Twice. In three bases.", en(asmodeus.restlessQuote))
         assertEquals(
             listOf(
                 "DAEMONIUM RESIDENTE,",
@@ -61,19 +65,16 @@ class DemonCatalogTest {
 
     @Test
     fun astarothMatchesProductSpec() {
-        assertEquals("Duke of Past, Present & Future", astaroth.title)
+        assertEquals("Duke of Past, Present & Future", en(astaroth.title))
         assertEquals(29, astaroth.number)
-        assertEquals("Mighty Duke", astaroth.rank)
+        assertEquals("Mighty Duke", en(astaroth.rank))
         assertEquals(40, astaroth.legions)
         assertEquals(House.Venus, astaroth.house)
         assertNull(astaroth.liege)
         assertEquals(Calling.Oracle, astaroth.calling)
-        assertEquals("Knows every secret and every tense. Will explain his own fall at length if asked.", astaroth.description)
-        assertEquals(
-            "I know your past, your future, and that you didn't read the terms of service.",
-            astaroth.quote,
-        )
-        assertEquals("I foresaw you'd forget me. I hate being right. No I don't.", astaroth.restlessQuote)
+        assertEquals("Knows every secret and every tense. Will explain his own fall at length if asked.", en(astaroth.description))
+        assertEquals("I know your past, your future, and that you didn't read the terms of service.", en(astaroth.quote))
+        assertEquals("I foresaw you'd forget me. I hate being right. No I don't.", en(astaroth.restlessQuote))
         assertEquals(
             listOf("TUI GRATIA LOVIS", "GRATIA SIT CURA.", "HIC EST ME DIGNUS LEGI", "SINT BENE OBEDIENTES."),
             astaroth.chantPhrases,

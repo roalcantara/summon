@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Demon lore, verbatim from PRODUCT.md (i18n spec §3.3). Keys: demon_<id>_<field>. -->
+<resources>
+    <!-- Asmodeus -->
+    <string name="demon_asmodeus_title">Lord of Arithmetic &amp; Hidden Wealth</string>
+    <string name="demon_asmodeus_description">Teaches arithmetic, astronomy, geometry, and invisibility. Answers all questions—if you can stand the smugness.</string>
+    <string name="demon_asmodeus_quote">Three heads are better than one—especially when two want your soul!</string>
+    <string name="demon_asmodeus_restless_quote">I\'ve counted every grain of dust in here. Twice. In three bases.</string>
+    <string name="demon_asmodeus_rank">Great King</string>
+    <string name="demon_asmodeus_liege">Amaymon, King of the East</string>
+    <string name="demon_asmodeus_appearance">Three heads (bull, man and ram), so every meeting is a committee. He breathes fire, swishes a serpent’s tail and waddles on goose feet. He arrives on a dragon with a lance and a banner, because subtle is for Dukes.</string>
+    <string-array name="demon_asmodeus_offices">
+        <item>Hands out the Ring of Virtues (one per customer).</item>
+        <item>Tutors arithmetic, astronomy, geometry and every handicraft.</item>
+        <item>Answers any question fully, with appendices.</item>
+        <item>Makes you invisible.</item>
+        <item>Knows where treasure lies, and guards it.</item>
+    </string-array>
+    <string name="demon_asmodeus_warning">Summon him outdoors, stand the whole time, and take your hat off. Keep it on and his boss Amaymon pranks your entire ritual.</string>
+    <string name="demon_asmodeus_ability_1_name">Ring of Virtues</string>
+    <string name="demon_asmodeus_ability_1_line">Gives you a ring. The virtues are sold separately.</string>
+    <string name="demon_asmodeus_ability_2_name">Now You Don’t</string>
+    <string name="demon_asmodeus_ability_2_line">Turns you invisible. Great for heists, terrible for selfies.</string>
+    <string name="demon_asmodeus_ability_3_name">Dragon’s Ledger</string>
+    <string name="demon_asmodeus_ability_3_line">Finds buried treasure, counts it, then sits on it.</string>
+    <string name="demon_asmodeus_weakness_name">Name-Drop</string>
+    <string name="demon_asmodeus_weakness_line">Ask “Art thou Asmodeus?” and he must admit it and bow to the floor. Three heads, one ego, zero chill.</string>
+    <string name="demon_asmodeus_secret">In an older tale, the smoke of a fish’s heart and liver sent him fleeing all the way to Egypt. He does not eat seafood. He does not discuss it.</string>
+
+    <!-- Astaroth -->
+    <string name="demon_astaroth_title">Duke of Past, Present &amp; Future</string>
+    <string name="demon_astaroth_description">Knows every secret and every tense. Will explain his own fall at length if asked.</string>
+    <string name="demon_astaroth_quote">I know your past, your future, and that you didn\'t read the terms of service.</string>
+    <string name="demon_astaroth_restless_quote">I foresaw you\'d forget me. I hate being right. No I don\'t.</string>
+    <string name="demon_astaroth_rank">Mighty Duke</string>
+    <string name="demon_astaroth_appearance">An angel with bad intentions on a dragon-ish beast, holding a viper in his right hand like a fancy pen. His breath arrives before he does.</string>
+    <string-array name="demon_astaroth_offices">
+        <item>True answers about past, present and future.</item>
+        <item>Uncovers every secret, including the ones written in pencil.</item>
+        <item>Explains how the spirits fell, and why his own fall wasn’t his fault.</item>
+        <item>Makes you a scholar of all the liberal arts.</item>
+    </string-array>
+    <string name="demon_astaroth_warning">Never let him get close; his breath is a weapon. Hold your magic ring up to your face like a tiny gas mask and nod politely.</string>
+    <string name="demon_astaroth_ability_1_name">All Three Tenses</string>
+    <string name="demon_astaroth_ability_1_line">He’s read ahead and won’t stop hinting.</string>
+    <string name="demon_astaroth_ability_2_name">Open Secret</string>
+    <string name="demon_astaroth_ability_2_line">Every secret you have, now his favourite trivia.</string>
+    <string name="demon_astaroth_ability_3_name">The Fall (Director’s Cut)</string>
+    <string name="demon_astaroth_ability_3_line">A complete, unrequested account. Spoiler: someone else pushed him.</string>
+    <string name="demon_astaroth_weakness_name">Dragon Breath</string>
+    <string name="demon_astaroth_weakness_line">Brave summoners hold a ring to their nose and win. He respects personal space only when it’s enforced with jewellery.</string>
+    <string name="demon_astaroth_secret">Before the dragon and the breath, his name belonged to Astarte, a goddess of love and war. He’d rather you didn’t bring it up.</string>
+</resources>

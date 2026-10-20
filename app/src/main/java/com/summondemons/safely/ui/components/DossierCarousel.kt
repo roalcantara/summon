@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -151,7 +152,7 @@ fun DossierCarousel(
 
 @Composable
 private fun pageTitle(page: Int, demon: Demon, record: DemonRecord): String = when (page) {
-    0 -> if (record.revealed) stringResource(R.string.dossier_weakness_named, demon.weakness.name) else stringResource(R.string.dossier_weakness)
+    0 -> if (record.revealed) stringResource(R.string.dossier_weakness_named, stringResource(demon.weakness.name)) else stringResource(R.string.dossier_weakness)
     1 -> stringResource(R.string.dossier_abilities)
     2 -> stringResource(R.string.dossier_offices)
     3 -> stringResource(R.string.dossier_appearance)
@@ -165,15 +166,15 @@ private fun PageBody(page: Int, demon: Demon, record: DemonRecord, inkCodex: Boo
     val accent = MaterialTheme.demonColors.accent(demon.accent)
     val nameStyle = MaterialTheme.textRoles.name
     val lines: List<String> = when (page) {
-        0 -> listOf(demon.weakness.line)
-        2 -> demon.offices.map { "•  $it" }
-        3 -> listOf(demon.appearance)
-        4 -> listOf(demon.warning)
+        0 -> listOf(stringResource(demon.weakness.line))
+        2 -> stringArrayResource(demon.offices).map { "•  $it" }
+        3 -> listOf(stringResource(demon.appearance))
+        4 -> listOf(stringResource(demon.warning))
         else -> emptyList()
     }
     when (page) {
         SECRET_PAGE -> if (record.flawless) {
-            Text(demon.secret, style = body.copy(fontStyle = FontStyle.Italic)) // no ink-in, as in the prototype
+            Text(stringResource(demon.secret), style = body.copy(fontStyle = FontStyle.Italic)) // no ink-in, as in the prototype
         } else {
             Smudge(lines = 1)
             Text(stringResource(R.string.dossier_secret_locked).upper(), style = MaterialTheme.textRoles.meta)
@@ -182,13 +183,15 @@ private fun PageBody(page: Int, demon: Demon, record: DemonRecord, inkCodex: Boo
             Smudge(lines = 3)
         } else {
             demon.abilities.forEachIndexed { i, ability ->
+                val abilityName = stringResource(ability.name)
+                val abilityLine = stringResource(ability.line)
                 InkLine(inkBattle, i) {
                     Text(
                         buildAnnotatedString {
                             withStyle(SpanStyle(color = accent, fontFamily = nameStyle.fontFamily, fontWeight = nameStyle.fontWeight)) {
-                                append("${ability.name}.")
+                                append("$abilityName.")
                             }
-                            append(" ${ability.line}")
+                            append(" $abilityLine")
                         },
                         style = body,
                     )
