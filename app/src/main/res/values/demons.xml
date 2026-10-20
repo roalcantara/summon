@@ -50,4 +50,20 @@
     <string name="demon_astaroth_weakness_name">Dragon Breath</string>
     <string name="demon_astaroth_weakness_line">Brave summoners hold a ring to their nose and win. He respects personal space only when it’s enforced with jewellery.</string>
     <string name="demon_astaroth_secret">Before the dragon and the breath, his name belonged to Astarte, a goddess of love and war. He’d rather you didn’t bring it up.</string>
+
+    <!-- Houses (ADR-0011) -->
+    <string name="house_sol_tooltip">Kings of Sol hold court 9 to noon and 3 to sunset. Bring sunglasses.</string>
+    <string name="house_venus_tooltip">Dukes of Venus hold court from sunrise to noon, in clear weather only. Very particular.</string>
+
+    <!-- Callings (ADR-0011) -->
+    <string name="calling_warlord_label">Warlord</string>
+    <string name="calling_warlord_tooltip">Summon him for an army.</string>
+    <string name="calling_tutor_label">Tutor</string>
+    <string name="calling_tutor_tooltip">Summon him to learn things.</string>
+    <string name="calling_oracle_label">Oracle</string>
+    <string name="calling_oracle_tooltip">Summon him to know things.</string>
+    <string name="calling_treasurer_label">Treasurer</string>
+    <string name="calling_treasurer_tooltip">Summon him for loot.</string>
+    <string name="calling_menace_label">Menace</string>
+    <string name="calling_menace_tooltip">Summon him at your own risk.</string>
 </resources>

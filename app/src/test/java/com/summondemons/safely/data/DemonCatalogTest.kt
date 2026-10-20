@@ -90,6 +90,20 @@ class DemonCatalogTest {
     }
 
     @Test
+    fun housesAndCallingsHaveEnglishText() {
+        assertEquals("Kings of Sol hold court 9 to noon and 3 to sunset. Bring sunglasses.", en(House.Sol.tooltip))
+        assertEquals(
+            "Dukes of Venus hold court from sunrise to noon, in clear weather only. Very particular.",
+            en(House.Venus.tooltip),
+        )
+        assertEquals(
+            listOf("Warlord", "Tutor", "Oracle", "Treasurer", "Menace"),
+            Calling.entries.map { en(it.label) },
+        )
+        assertEquals("Summon him at your own risk.", en(Calling.Menace.tooltip))
+    }
+
+    @Test
     fun unknownIdIsNull() {
         assertNull(DemonCatalog.byId("baal"))
     }
