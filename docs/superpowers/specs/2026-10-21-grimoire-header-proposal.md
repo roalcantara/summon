@@ -1,8 +1,8 @@
 # Grimoire header: banner instead of the symbols, sigil on the floor circle (proposal)
 
 - **Date:** 2026-10-21
-- **Status:** Proposed. Review after the 1.0 release; nothing decided yet. If accepted, record it in
-  an ADR (amends ADR-0016) and update DESIGN.md.
+- **Status:** Item 1 (banner) accepted and applied before the release: ADR-0032. Items 2 (sigil on
+  the floor circle) and 3 (position dots) still proposed, to review after the release.
 - **Todos:** `TKJp` (banner replaces the symbols), `JwGM` (sigil on the floor circle)
 
 ## Why

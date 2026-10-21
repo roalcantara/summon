@@ -35,7 +35,7 @@
   - **Created**: 2026-10-21 12:30
   - **Tags**: release
 
-- [ ] TKJp **-** Grimoire: title banner replaces the avatar-rail symbols (proposal docs/superpowers/specs/2026-10-21-grimoire-header-proposal.md), review after release
+- [x] TKJp **-** Grimoire: title banner replaces the avatar-rail symbols (proposal docs/superpowers/specs/2026-10-21-grimoire-header-proposal.md), review after release
   - **Priority**: medium
   - **Created**: 2026-10-21 12:30
   - **Tags**: post-release
