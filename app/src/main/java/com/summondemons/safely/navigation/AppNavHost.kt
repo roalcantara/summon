@@ -38,6 +38,7 @@ import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.platform.AndroidHeadingSource
 import com.summondemons.safely.platform.AndroidPcmSource
 import com.summondemons.safely.platform.ClipRecorders
+import com.summondemons.safely.platform.DebugLocale
 import com.summondemons.safely.platform.SessionLogs
 import com.summondemons.safely.platform.DeviceCheck
 import com.summondemons.safely.platform.WhisperTranscriber
@@ -63,6 +64,7 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
     val game: GameViewModel = viewModel(factory = factory) // activity-scoped
     val state by game.uiState.collectAsStateWithLifecycle()
     val appContext = LocalContext.current.applicationContext
+    val activity = LocalActivity.current
     val sounds = remember { GameSounds(appContext) }
     DisposableEffect(sounds) { onDispose { sounds.release() } }
     LifecycleEventEffect(Lifecycle.Event.ON_START) { game.evaluate() }
@@ -132,6 +134,11 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
                 onAdvanceDay = game::advanceDay,
                 onResetDaily = game::resetDaily,
                 onCourt = game::setCourt,
+                language = DebugLocale.get(appContext),
+                onLanguage = { tag ->
+                    DebugLocale.set(appContext, tag)
+                    activity?.recreate()
+                },
                 onBind = game::bind,
                 onUnsummon = game::unsummon,
                 onResetAll = {

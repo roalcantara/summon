@@ -31,4 +31,6 @@
     <string translatable="false" name="debug_status_restless">restless</string>
     <string translatable="false" name="debug_status_flawless">flawless</string>
     <string translatable="false" name="debug_tester_note">Advancing a day while a bound demon is on the Grimoire visits him at once; test restlessness by advancing from Home.</string>
+    <string translatable="false" name="debug_language">Language</string>
+    <string translatable="false" name="debug_language_device">Device</string>
 </resources>
