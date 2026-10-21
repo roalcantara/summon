@@ -52,7 +52,7 @@ first.
    PNG per component and locale under `app/build/outputs/roborazzi/`. They are for reviewing
    wording in context, not for pass/fail; layer 1 decides.
 
-Until then: the Settings sheet (gear on Home) switches the app language on any device
+Until then: the Settings sheet (gear, top right) switches the app language on any device
 ("Phone language" restores the default; English (XA) is in the phone's system language list in
 debug builds), the debug sheet
 reaches every state, and `adb exec-out screencap -p` captures it.

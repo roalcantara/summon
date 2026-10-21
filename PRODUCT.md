@@ -47,7 +47,7 @@ the new summon. One summon per local calendar day across all demons (ADR-0015).
 
 English, Spanish, Brazilian Portuguese, Italian and French (ADR-0031). The phone's language
 picks one (on Android 13+ also the per-app language in system Settings), unless the player picks
-one in Settings (gear on Home); any other language gets English. The chant is Latin in every language. No translation is longer than its English
+one in Settings (the gear at the top right of Home and the Grimoire); any other language gets English. The chant is Latin in every language. No translation is longer than its English
 text. The app name, demon names and planets stay as they are.
 
 ## Demons

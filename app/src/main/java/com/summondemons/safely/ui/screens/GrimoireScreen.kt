@@ -87,7 +87,7 @@ import com.summondemons.safely.progress.Reveal
 import com.summondemons.safely.ui.GameUiState
 import com.summondemons.safely.ui.components.BadgeKey
 import com.summondemons.safely.ui.components.BadgeRow
-import com.summondemons.safely.ui.components.DebugChip
+import com.summondemons.safely.ui.components.MenuButton
 import com.summondemons.safely.ui.components.CUTOUT_ASPECT
 import com.summondemons.safely.ui.components.DemonCutout
 import com.summondemons.safely.ui.components.DossierCarousel
@@ -163,7 +163,7 @@ fun GrimoireScreen(
     onDismissCelebration: () -> Unit,
     onConsumeReveal: (String, Reveal) -> Unit,
     onSecretShown: () -> Unit,
-    onDebug: (() -> Unit)?,
+    onMenu: () -> Unit,
     modifier: Modifier = Modifier,
     demons: List<Demon> = DemonCatalog.all,
 ) {
@@ -268,7 +268,7 @@ fun GrimoireScreen(
 
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
             // Like system back (BackHandler above), the rail's back arrow dismisses the celebration first.
-            AvatarRail(demons, state, demon.id, enabled = party == null, { if (party != null) onDismissCelebration() else onBack() }, onSelect, onDebug)
+            AvatarRail(demons, state, demon.id, enabled = party == null, { if (party != null) onDismissCelebration() else onBack() }, onSelect, onMenu)
             BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
                 var fixedPx by remember { mutableIntStateOf(0) }
                 val navBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -328,7 +328,7 @@ private fun AvatarRail(
     enabled: Boolean,
     onBack: () -> Unit,
     onSelect: (String) -> Unit,
-    onDebug: (() -> Unit)?,
+    onMenu: () -> Unit,
 ) {
     val spacing = MaterialTheme.spacing
     val back = stringResource(R.string.grimoire_back)
@@ -354,7 +354,7 @@ private fun AvatarRail(
                 )
             }
         }
-        if (onDebug != null) DebugChip(onDebug, Modifier.align(Alignment.CenterEnd))
+        MenuButton(onMenu, Modifier.align(Alignment.CenterEnd))
     }
 }
 

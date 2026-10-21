@@ -180,7 +180,7 @@ dark palette carries the RPG feel.
 | Glyphs | `DirectionGlyph`, `HouseGlyph`, `CallingGlyph`, `LegionsGlyph` | vector paths in a 24-unit box; `color`, `size` |
 | `DemonCutout` | Cut-out art with accent rim glow | `art`, `accent`, `silhouette` 0–1, `alignment` |
 | `ParticleField` | Embers / smoke / converging climax sparks | `color`, `style`, `count`, `converge` 0–1 |
-| `DebugChip` | Opens the debug sheet (debug builds only) | `onClick` |
+| `MenuButton` | Gear at the top right of Home and the Grimoire; opens the Settings sheet, whose last entry (debug builds only) opens the debug sheet | `onClick` |
 | `DebugControls` | The chant screen's debug panel (debug builds only) | Simulate heading, Hold to Chant, check mode and Record clip chips plus the last chant-check score, `labelSmall`; shown in a 300 dp popover (surface-container-lowest, outline-variant border, `medium` shape) under "D", never in the layout (ADR-0021) |
 | `HeatShimmer` | Rising heat haze | `color`; AGSL on API 33+, breathing gradient below |
 | `rememberParallax` | Gyro offset for art layers | max offset; `TYPE_GAME_ROTATION_VECTOR`, none if absent |

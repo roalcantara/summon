@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -138,11 +137,6 @@ private fun HoldToChantChip(onHoldToChantChange: (Boolean) -> Unit) {
     }
 }
 
-/** Opens the debug sheet from Home and Grimoire. Debug builds only (caller checks BuildConfig.DEBUG). */
-@Composable
-fun DebugChip(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    AssistChip(onClick = onClick, label = { Text(stringResource(R.string.debug_chip)) }, modifier = modifier)
-}
 
 /** Debug: force the next ritual's check mode, auto → Whisper → lenient → auto (ADR-0028). */
 @Composable
