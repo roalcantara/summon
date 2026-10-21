@@ -20,6 +20,9 @@
     </plurals>
     <string name="home_hint">Tap the grimoire</string>
     <string name="home_open">Open the grimoire</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_device">Phone language</string>
     <string name="escape_banner">Seal broken!</string>
     <string name="escape_one">%1$s slipped his seal while you were away!</string>
     <string name="escape_all">Both spirits slipped their seals while you were away!</string>

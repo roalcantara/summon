@@ -18,6 +18,9 @@
     </plurals>
     <string name="home_hint">Touche le livre</string>
     <string name="home_open">Ouvre le grimoire</string>
+    <string name="settings_title">Réglages</string>
+    <string name="settings_language">Langue</string>
+    <string name="settings_language_device">Du téléphone</string>
     <string name="escape_banner">Évasion !</string>
     <string name="escape_one">%1$s a fui son sceau en ton absence !</string>
     <string name="escape_all">Les deux ont fui leurs sceaux en ton absence !</string>

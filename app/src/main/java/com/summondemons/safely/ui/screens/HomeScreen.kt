@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -112,6 +114,7 @@ fun HomeScreen(
     onOpen: () -> Unit,
     onDismissEscape: () -> Unit,
     onDebug: (() -> Unit)?,
+    onSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
@@ -187,10 +190,23 @@ fun HomeScreen(
             if (showHint) CueChip(stringResource(R.string.home_hint), CueTone.Neutral, Modifier.clickable(onClick = open))
         }
 
+        SettingsButton(onSettings, Modifier.align(Alignment.TopStart).statusBarsPadding().padding(spacing.sm))
         if (onDebug != null) {
             DebugChip(onDebug, Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(spacing.sm))
         }
         if (escaped.isNotEmpty()) EscapeBanner(escaped, onDismissEscape)
+    }
+}
+
+/** Gear opening the Settings sheet (RC, TODO xbYw). */
+@Composable
+private fun SettingsButton(onClick: () -> Unit, modifier: Modifier) {
+    IconButton(onClick = onClick, modifier = modifier) {
+        Icon(
+            painterResource(R.drawable.ic_settings),
+            contentDescription = stringResource(R.string.settings_title),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

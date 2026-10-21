@@ -10,14 +10,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.summondemons.safely.navigation.AppNavHost
-import com.summondemons.safely.platform.DebugLocale
+import com.summondemons.safely.platform.AppLocale
 import com.summondemons.safely.ui.theme.SummonDemonsSafelyTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    // Debug builds: the language picked in the debug sheet (no-op in release)
+    // The language picked in Settings, if any (ADR-0031)
     override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(DebugLocale.wrap(newBase))
+        super.attachBaseContext(AppLocale.wrap(newBase))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
