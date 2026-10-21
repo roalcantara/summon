@@ -105,25 +105,25 @@ Entry format:
 
 ### pt-BR · demon_asmodeus_ability_1_name
 
-- **Status:** open
+- **Status:** changed (owner, 2026-10-21; from Gemini/GPT round, docs/i18n/prompts/)
 - **English (15):** Ring of Virtues
-- **Translation (13):** Anel Virtuoso
+- **Translation (10):** O Precioso
 - **Lost:** "Ring of Virtues" became "Virtuous Ring"; offices[0] still says "Anel das Virtudes".
 - **Alternatives:** Anel das Virtudes (17, needs exception) — matches the offices page.
 
 ### pt-BR · demon_asmodeus_ability_2_name
 
-- **Status:** open
+- **Status:** changed (owner, 2026-10-21; from Gemini/GPT round, docs/i18n/prompts/)
 - **English (13):** Now You Don’t
-- **Translation (12):** Cadê? Sumiu!
+- **Translation (13):** Piscou, Sumiu
 - **Lost:** "Now You Don't" (see me) became "Where'd he go? Gone!".
 - **Alternatives:** Agora Não Vê (12).
 
 ### pt-BR · demon_asmodeus_weakness_name
 
-- **Status:** open
+- **Status:** changed (owner, 2026-10-21; from Gemini/GPT round, docs/i18n/prompts/)
 - **English (9):** Name-Drop
-- **Translation (9):** Pelo Nome
+- **Translation (6):** Crachá
 - **Lost:** "Name-Drop" became "By Name"; the name-dropping pun is lost.
 - **Alternatives:** Carteirada (10, BR for pulling rank; needs exception).
 
@@ -161,15 +161,15 @@ Entry format:
 
 ### pt-BR · demon_astaroth_restless_quote
 
-- **Status:** open
+- **Status:** changed (owner, 2026-10-21; from Gemini/GPT round, docs/i18n/prompts/)
 - **English (58):** I foresaw you'd forget me. I hate being right. No I don't.
-- **Translation (55):** Previ que você me esqueceria. Odeio ter razão. Mentira.
+- **Translation (53):** Previ que me esqueceria. Odeio ter razão. Só que não.
 - **Lost:** "No I don't." became "Lie." ("Mentira.") — same joke, different form.
 - **Alternatives:** Só que não. (11) — BR meme, same length class.
 
 ### pt-BR · calling_warlord_label
 
-- **Status:** open
+- **Status:** accepted (owner, 2026-10-21; both models agree)
 - **English (7):** Warlord
 - **Translation (7):** General
 - **Lost:** "Warlord" became "General"; "Guerreiro" (9) does not fit.
@@ -177,7 +177,7 @@ Entry format:
 
 ### pt-BR · calling_treasurer_label
 
-- **Status:** open
+- **Status:** accepted (owner, 2026-10-21)
 - **English (9):** Treasurer
 - **Translation (9):** Banqueiro
 - **Lost:** "Treasurer" became "Banker" ("Banqueiro"); "Tesoureiro" (10) does not fit.
@@ -185,9 +185,9 @@ Entry format:
 
 ### pt-BR · house_sol_tooltip
 
-- **Status:** open
+- **Status:** changed (owner, 2026-10-21; from Gemini/GPT round, docs/i18n/prompts/)
 - **English (68):** Kings of Sol hold court 9 to noon and 3 to sunset. Bring sunglasses.
-- **Translation (65):** Reis de Sol: corte das 9 às 12 e das 15 ao poente. Óculos de sol!
+- **Translation (58):** Reis de Sol atendem 9h-12h e 15h-poente. Use filtro solar.
 - **Lost:** Hours compressed ("9 às 12 e das 15 ao poente"); gains a pun: "Óculos de sol!" (sunglasses = 'Sol' glasses).
 - **Alternatives:** Reis de Sol: corte das 9 ao meio-dia e das 15h ao pôr do sol. Leve óculos. (needs exception).
 

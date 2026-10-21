@@ -1,0 +1,118 @@
+demon_asmodeus_ability_1_name:
+  - text: 'O Precioso'
+    length: 10
+    back_translation: 'The Precious'
+    reference: "Lord of the Rings ('My Precious')"
+    note: "Widely known reference for a ring, contrasts comically with 'virtues sold separately' in the next line."
+  - text: 'Joia Rara'
+    length: 9
+    back_translation: 'Rare Jewel'
+    reference: 'Common Brazilian idiom / Classic soap opera title'
+    note: "Sounds prestigious, fitting for a demon, but sets up the joke that the 'virtue' part is missing."
+  - text: 'Anel Virtuoso'
+    length: 13
+    back_translation: 'Virtuous Ring'
+    reference: 'none'
+    note: "The current translation. Safe, connects nicely to the 'virtues sold separately' follow-up."
+
+demon_asmodeus_ability_2_name:
+  - text: 'Piscou, Sumiu'
+    length: 13
+    back_translation: 'Blinked, Vanished'
+    reference: 'Piscou, perdeu (common saying)'
+    note: "Fits the 13-char budget perfectly. It's a very natural, playful Brazilian way to say something disappeared instantly."
+  - text: 'Meteu o Pé'
+    length: 10
+    back_translation: 'Stuck the foot in'
+    reference: 'Brazilian slang'
+    note: 'Extremely common informal slang for running away or disappearing suddenly.'
+  - text: 'Cadê? Sumiu!'
+    length: 12
+    back_translation: 'Where is it? It vanished!'
+    reference: 'none'
+    note: 'The current translation. Sounds natural and playful like a magic trick.'
+
+demon_asmodeus_weakness_name:
+  - text: 'Crachá'
+    length: 6
+    back_translation: 'Name badge'
+    reference: 'Corporate culture'
+    note: 'Dry, funny corporate term for a demon being forced to identify himself.'
+  - text: 'Sabe Quem'
+    length: 9
+    back_translation: 'Know Who'
+    reference: "'Você sabe com quem está falando?' (Do you know who you are talking to?)"
+    note: "Plays on the classic Brazilian 'carteirada' catchphrase."
+  - text: 'Pelo Nome'
+    length: 9
+    back_translation: 'By the name'
+    reference: 'none'
+    note: 'The current translation. Direct and functional.'
+
+demon_astaroth_restless_quote:
+  - text: 'Sabia que ia me esquecer. Odeio ter razão. Só que não.'
+    length: 54
+    back_translation: "I knew you'd forget me. I hate being right. Only not."
+    reference: "'Só que não' (SQN) - classic internet slang/meme"
+    note: 'Nails the immediate contradiction joke using a universally known Brazilian meme format.'
+  - text: 'Previ seu esquecimento. Odeio ter razão. Mentira, adoro.'
+    length: 56
+    back_translation: 'I foresaw your forgetting. I hate being right. Lie, I love it.'
+    reference: 'none'
+    note: "Adds a bit of sassy personality with 'Mentira, adoro' (Lie, I love it), very typical of Brazilian dry humor."
+  - text: 'Previ que você me esqueceria. Odeio ter razão. Mentira.'
+    length: 55
+    back_translation: 'I foresaw you would forget me. I hate having reason. Lie.'
+    reference: 'none'
+    note: 'Current translation. Keeps the original structure well.'
+
+calling_warlord_label:
+  - text: 'General'
+    length: 7
+    back_translation: 'General'
+    reference: 'none'
+    note: 'Direct, fits the 7-character budget perfectly. Clear functional label for army summons.'
+  - text: 'Guerra'
+    length: 6
+    back_translation: 'War'
+    reference: 'none'
+    note: "A slightly more conceptual label if 'General' feels too modern. Highly readable."
+  - text: 'Militar'
+    length: 7
+    back_translation: 'Military'
+    reference: 'none'
+    note: 'Alternative clear functional label within budget.'
+
+calling_treasurer_label:
+  - text: 'Banqueiro'
+    length: 9
+    back_translation: 'Banker'
+    reference: 'none'
+    note: 'Current translation. Fits the budget, clearly denotes money/loot.'
+  - text: 'Finanças'
+    length: 8
+    back_translation: 'Finance'
+    reference: 'none'
+    note: 'Corporate/bureaucratic, adding a funny dry tone to a demonic calling.'
+  - text: 'Contador'
+    length: 8
+    back_translation: 'Accountant'
+    reference: 'none'
+    note: 'Even drier, makes the demon sound like a bored office worker handling the loot.'
+
+house_sol_tooltip:
+  - text: 'Reis de Sol: corte das 9h-12h e 15h-pôr do sol. Bota a cara no sol!'
+    length: 67
+    back_translation: 'Kings of Sol: court from 9h-12h and 15h-sunset. Put your face in the sun!'
+    reference: "'Bota a cara no sol' (huge Brazilian internet meme/catchphrase)"
+    note: 'Perfectly fits the 68-char budget. The meme is a very famous, lasting joke about stepping into the light/sun.'
+  - text: 'Reis de Sol atendem 9h-12h e 15h-poente. Use filtro solar.'
+    length: 58
+    back_translation: 'Kings of Sol attend 9h-12h and 15h-sunset. Wear sunscreen.'
+    reference: "'Use filtro solar' (famous Pedro Bial spoken word track)"
+    note: 'Replaces the sunglasses joke with a widely known Brazilian pop culture reference about sun protection.'
+  - text: 'Reis de Sol: corte das 9 às 12 e das 15 ao poente. Óculos de sol!'
+    length: 65
+    back_translation: 'Kings of Sol: court from 9 to 12 and from 15 to sunset. Sunglasses!'
+    reference: 'none'
+    note: 'Current translation. Keeps it literal and functional.'

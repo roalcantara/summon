@@ -16,20 +16,20 @@
         <item>Sabe onde há tesouro, e o guarda.</item>
     </string-array>
     <string name="demon_asmodeus_warning">Invoque-o ao ar livre, fique de pé o tempo todo e tire o chapéu. De chapéu, o chefe dele, Amaymon, zoa o ritual inteiro.</string>
-    <string name="demon_asmodeus_ability_1_name">Anel Virtuoso</string>
+    <string name="demon_asmodeus_ability_1_name">O Precioso</string>
     <string name="demon_asmodeus_ability_1_line">Te dá um anel. As virtudes são vendidas à parte.</string>
-    <string name="demon_asmodeus_ability_2_name">Cadê? Sumiu!</string>
+    <string name="demon_asmodeus_ability_2_name">Piscou, Sumiu</string>
     <string name="demon_asmodeus_ability_2_line">Te deixa invisível. Ótimo em assaltos, péssimo em selfies.</string>
     <string name="demon_asmodeus_ability_3_name">Caixa do Dragão</string>
     <string name="demon_asmodeus_ability_3_line">Acha tesouro enterrado, conta e senta em cima.</string>
-    <string name="demon_asmodeus_weakness_name">Pelo Nome</string>
+    <string name="demon_asmodeus_weakness_name">Crachá</string>
     <string name="demon_asmodeus_weakness_line">Pergunte “És tu Asmodeus?” e ele admite e se curva até o chão. Três cabeças, um ego, zero calma.</string>
     <string name="demon_asmodeus_secret">Num conto antigo, a fumaça de coração e fígado de peixe o fez fugir até o Egito. Ele não come frutos do mar. Nem fala disso.</string>
     <!-- Astaroth -->
     <string name="demon_astaroth_title">Duque de Ontem, Hoje e Amanhã</string>
     <string name="demon_astaroth_description">Sabe todo segredo e todo tempo verbal. Explica a própria queda, longamente.</string>
     <string name="demon_astaroth_quote">Sei seu passado, seu futuro e que você não leu os termos de uso.</string>
-    <string name="demon_astaroth_restless_quote">Previ que você me esqueceria. Odeio ter razão. Mentira.</string>
+    <string name="demon_astaroth_restless_quote">Previ que me esqueceria. Odeio ter razão. Só que não.</string>
     <string name="demon_astaroth_rank">Grão-Duque</string>
     <string name="demon_astaroth_appearance">Um anjo mal-intencionado numa fera meio dragão, com uma víbora na mão direita feito caneta chique. O bafo dele chega antes dele.</string>
     <string-array name="demon_astaroth_offices">
@@ -49,7 +49,7 @@
     <string name="demon_astaroth_weakness_line">Invocadores corajosos põem um anel no nariz e vencem. Ele só respeita espaço pessoal imposto com joias.</string>
     <string name="demon_astaroth_secret">Antes do dragão e do bafo, o nome dele era de Astarte, deusa do amor e da guerra. Ele prefere que você não toque no assunto.</string>
     <!-- Houses (ADR-0011) -->
-    <string name="house_sol_tooltip">Reis de Sol: corte das 9 às 12 e das 15 ao poente. Óculos de sol!</string>
+    <string name="house_sol_tooltip">Reis de Sol atendem 9h-12h e 15h-poente. Use filtro solar.</string>
     <string name="house_venus_tooltip">Duques de Venus: corte do nascer do sol ao meio-dia, só com céu limpo. Muito exigentes.</string>
     <!-- Callings (ADR-0011) -->
     <string name="calling_warlord_label">General</string>
