@@ -26,10 +26,10 @@
     <string name="escape_all">Entrambi gli spiriti sono fuggiti in tua assenza!</string>
     <string name="escape_dismiss">Tocca e chiudi</string>
     <!-- Grimoire (ADR-0016) -->
+    <string name="grimoire_title">Grimorio</string>
     <string name="grimoire_back">Torna alla camera</string>
     <string name="grimoire_previous">Precedente</string>
     <string name="grimoire_next">Successivo</string>
-    <string name="avatar_sealed">%1$s, chiuso</string>
     <string name="celebration_banner">Demone ricevuto!</string>
     <string name="quote_tap_to_summon">Evocalo!</string>
     <string name="quote_cooling">Si raffredda</string>

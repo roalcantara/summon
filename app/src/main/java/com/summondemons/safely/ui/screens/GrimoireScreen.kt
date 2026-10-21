@@ -72,9 +72,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
@@ -98,7 +100,6 @@ import com.summondemons.safely.ui.components.QuoteSlotState
 import com.summondemons.safely.ui.components.RibbonBanner
 import com.summondemons.safely.ui.components.RotatingSunburstBackground
 import com.summondemons.safely.ui.components.SECRET_PAGE
-import com.summondemons.safely.ui.components.SigilAvatar
 import com.summondemons.safely.ui.components.StageBackground
 import com.summondemons.safely.ui.fx.Jitter
 import com.summondemons.safely.ui.fx.LocalReduceMotion
@@ -110,6 +111,7 @@ import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.stage
 import com.summondemons.safely.ui.theme.textRoles
+import com.summondemons.safely.ui.theme.upper
 import kotlinx.coroutines.delay
 import kotlin.math.PI
 import kotlin.math.abs
@@ -141,6 +143,9 @@ private const val STAGE_ARROW_PRESSED = 0.92f
 private val StageArrowWidth = 56.dp
 private val StageArrowHeight = 75.dp
 private val RailHeight = 72.dp
+private val BannerWidth = 220.dp
+private val BannerHeight = 48.dp
+private val BannerTitleSize = 20.sp
 private val FloatAmplitude = 6.dp
 private val SceneBlur = 3.dp
 private val StageSwipe = 60.dp
@@ -268,7 +273,7 @@ fun GrimoireScreen(
 
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
             // Like system back (BackHandler above), the rail's back arrow dismisses the celebration first.
-            AvatarRail(demons, state, demon.id, enabled = party == null, { if (party != null) onDismissCelebration() else onBack() }, onSelect, onMenu)
+            GrimoireHeader({ if (party != null) onDismissCelebration() else onBack() }, onMenu)
             BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
                 var fixedPx by remember { mutableIntStateOf(0) }
                 val navBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -320,39 +325,32 @@ fun GrimoireScreen(
     }
 }
 
+/**
+ * Back arrow, the title banner and the menu gear (RC, TODO TKJp; replaces the avatar rail,
+ * whose symbols players could not read; proposal docs/superpowers/specs/2026-10-21-grimoire-header-proposal.md).
+ */
 @Composable
-private fun AvatarRail(
-    demons: List<Demon>,
-    state: GameUiState,
-    selectedId: String,
-    enabled: Boolean,
-    onBack: () -> Unit,
-    onSelect: (String) -> Unit,
-    onMenu: () -> Unit,
-) {
+private fun GrimoireHeader(onBack: () -> Unit, onMenu: () -> Unit) {
     val spacing = MaterialTheme.spacing
     val back = stringResource(R.string.grimoire_back)
     Box(Modifier.fillMaxWidth().height(RailHeight).padding(horizontal = spacing.sm)) {
         IconButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart).semantics { contentDescription = back }) {
             Text("←", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.clearAndSetSemantics { })
         }
-        Row(
-            Modifier.align(Alignment.Center),
-            horizontalArrangement = Arrangement.spacedBy(spacing.md),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            demons.forEach { d ->
-                val r = state.record(d.id)
-                SigilAvatar(
-                    demon = d,
-                    bound = r.bound,
-                    burn = r.bound && r.revealPending.avatar && d.id == selectedId,
-                    restless = ProgressRules.isRestless(r, state.today),
-                    selected = d.id == selectedId,
-                    enabled = enabled,
-                    onClick = { onSelect(d.id) },
-                )
-            }
+        Box(Modifier.align(Alignment.Center).size(BannerWidth, BannerHeight), contentAlignment = Alignment.Center) {
+            Image(
+                painter = painterResource(R.drawable.grimoire_title_banner),
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier.matchParentSize(),
+            )
+            Text(
+                stringResource(R.string.grimoire_title).upper(),
+                style = MaterialTheme.textRoles.name.copy(fontSize = BannerTitleSize, letterSpacing = 0.08.em),
+                color = MaterialTheme.colorScheme.primary,
+                maxLines = 1,
+                modifier = Modifier.semantics { heading() },
+            )
         }
         MenuButton(onMenu, Modifier.align(Alignment.CenterEnd))
     }

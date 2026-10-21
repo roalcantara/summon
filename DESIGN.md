@@ -146,7 +146,7 @@ dark palette carries the RPG feel.
 - Motion respects `LocalReduceMotion` (system animator scale 0): no particles,
   parallax, floating, jitter, shimmer, sunburst rotation, grimoire bob/hop/peek, dust
   puff, quote-slot and floor-circle pulses, or climax flash. The grimoire opening keeps
-  a 150 ms fade; the avatar burn-away and badge/carousel changes cross-fade. Ink-in,
+  a 150 ms fade; badge/carousel changes cross-fade. Ink-in,
   karaoke and the focus bar still update.
 
 ## Components (contracts)
@@ -172,7 +172,7 @@ dark palette carries the RPG feel.
 | `DossierCarousel` | Six dossier pages | `demon`, `record`, `inkCodex`, `inkBattle`, `page`, `onPage`; ‹ › and swipe, wrapping |
 | `Smudge` / `InkLine` | Sealed page lines / ink-in of revealed lines | `lines`; `ink`, `index` |
 | `QuoteSlot` | Fixed 72 dp slot under the demon | `state` (celebration / bound / ready / cooling), quote, hours, `shake` |
-| `SigilAvatar` | Avatar rail item | `demon`, `bound`, `burn`, `restless`, `selected`, `enabled` |
+| `GrimoireHeader` | Grimoire top bar: back arrow, title banner ("GRIMOIRE", Cinzel, heading), menu gear (ADR-0032) | `onBack`, `onMenu` |
 | `FloorCircle` | Accent ellipse under the demon | `accent`, `pulse` |
 | `StageBackground` | Gradient stage (Home, Sol, Venus) with a scrim | `stage`, `dim` |
 | `CompassRose` | Inlaid rose on the Home floor | — (`primary`) |
@@ -210,6 +210,7 @@ large sources are not density-scaled and the APK stays small.
 | `ic_home_grimoire` | `art/etc/RestlessGrimoire.png` | 1024×1024 opaque square asset, Home grimoire book |
 | `grimoire_arrow_large` | `art/grimoire/grimoire_arrow_large.png` | 384×512, alpha; gilded left chevron with a violet gem, Grimoire stage prev/next (56×75 dp, mirrored for next) |
 | `grimoire_arrow_small` | `art/grimoire/grimoire_arrow_small.png` | 192×256, alpha; simplified chevron, dossier page arrows (24×32 dp, mirrored for next) |
+| `grimoire_title_banner` | `art/grimoire/grimoire_title_banner.png` | 1200×260, alpha; dark slate plaque with gold trim and plum tails, Grimoire title (220×48 dp, title drawn in code) |
 | `ic_launcher_foreground` | `art/icon/cutout-dark.png` via `mise run icon` (`tools/gen_icons.py`) | 1024×1024 opaque on `obsidian`; drawn at 84 of 108 dp, raised 10 dp, margins extend the edge pixels (ADR-0030) |
 | `ic_launcher_background` | `tools/gen_icons.py` | Solid `obsidian`, hidden behind the full-bleed foreground |
 | `ic_launcher_monochrome` | `art/icon/cutout.png` via `tools/gen_icons.py` | Cutout silhouette with the ink lines cut out, themed icon layer |
