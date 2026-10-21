@@ -108,6 +108,7 @@ import com.summondemons.safely.ui.fx.ParticleField
 import com.summondemons.safely.ui.fx.ParticleStyle
 import com.summondemons.safely.ui.fx.SharedDemonArt
 import com.summondemons.safely.ui.fx.rememberFrameTimeMs
+import com.summondemons.safely.ui.fx.rememberSigil
 import com.summondemons.safely.ui.theme.SummonDemonsSafelyTheme
 import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.spacing
@@ -416,6 +417,7 @@ private fun Stage(
                 FloorCircle(
                     accent = accent,
                     pulse = !party && !bound && canSummon,
+                    sigil = rememberSigil(demon.sigil),
                     modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(FLOOR_WIDTH).aspectRatio(FLOOR_ASPECT),
                 )
                 SharedDemonArt(
