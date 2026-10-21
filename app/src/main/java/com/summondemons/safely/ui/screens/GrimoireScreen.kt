@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -68,6 +69,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -135,7 +137,9 @@ private const val FLOAT_PERIOD_S = 4f
 private const val PARTY_POP_FROM = 0.85f
 private const val CARD_ALPHA = 0.95f
 private const val METAL_RING_ALPHA = 0.45f
-private const val STAGE_ARROW_ALPHA = 0.7f
+private const val STAGE_ARROW_PRESSED = 0.92f
+private val StageArrowWidth = 56.dp
+private val StageArrowHeight = 75.dp
 private val RailHeight = 72.dp
 private val FloatAmplitude = 6.dp
 private val SceneBlur = 3.dp
@@ -288,8 +292,8 @@ fun GrimoireScreen(
                         )
                         // Arrows make the stage swipe visible (RC, TODO r62v); hidden while celebrating, like the swipe.
                         if (party == null && demons.size > 1) {
-                            StageArrow("‹", stringResource(R.string.grimoire_previous), Modifier.align(Alignment.CenterStart)) { step(-1) }
-                            StageArrow("›", stringResource(R.string.grimoire_next), Modifier.align(Alignment.CenterEnd)) { step(1) }
+                            StageArrow(next = false, stringResource(R.string.grimoire_previous), Modifier.align(Alignment.CenterStart)) { step(-1) }
+                            StageArrow(next = true, stringResource(R.string.grimoire_next), Modifier.align(Alignment.CenterEnd)) { step(1) }
                         }
                     }
                     DemonCard(
@@ -354,20 +358,24 @@ private fun AvatarRail(
     }
 }
 
-/** Previous / next demon on the stage edge: the dossier's ‹ › glyphs on a translucent disc, readable over the art. */
+/** Previous / next demon on the stage edge: the gilded arrow art, mirrored for "next"; shrinks while pressed. */
 @Composable
-private fun StageArrow(glyph: String, label: String, modifier: Modifier, onClick: () -> Unit) {
-    val colors = MaterialTheme.colorScheme
-    Surface(
-        shape = CircleShape,
-        color = colors.surfaceContainer.copy(alpha = STAGE_ARROW_ALPHA),
-        border = BorderStroke(1.dp, colors.outlineVariant),
-        modifier = modifier.padding(horizontal = MaterialTheme.spacing.sm),
-    ) {
-        IconButton(onClick = onClick, modifier = Modifier.semantics { contentDescription = label }) {
-            Text(glyph, style = MaterialTheme.typography.headlineMedium, color = colors.onSurface, modifier = Modifier.clearAndSetSemantics { })
-        }
-    }
+private fun StageArrow(next: Boolean, label: String, modifier: Modifier, onClick: () -> Unit) {
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val scale = if (pressed && !LocalReduceMotion.current) STAGE_ARROW_PRESSED else 1f
+    Image(
+        painter = painterResource(R.drawable.grimoire_arrow_large),
+        contentDescription = label,
+        modifier = modifier
+            .padding(horizontal = MaterialTheme.spacing.xs)
+            .size(StageArrowWidth, StageArrowHeight)
+            .graphicsLayer {
+                scaleX = if (next) -scale else scale
+                scaleY = scale
+            }
+            .clickable(interaction, indication = null, role = Role.Button, onClick = onClick),
+    )
 }
 
 @Composable

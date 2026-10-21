@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.IconButton
@@ -41,9 +43,9 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
@@ -102,7 +104,7 @@ fun DossierCarousel(
     val step: (Int) -> Unit = { delta -> onPage((page + delta + DOSSIER_PAGES) % DOSSIER_PAGES) }
     val currentStep by rememberUpdatedState(step)
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
-        PageButton("‹", stringResource(R.string.dossier_previous)) { step(-1) }
+        PageButton(next = false, stringResource(R.string.dossier_previous)) { step(-1) }
         Column(
             Modifier
                 .weight(1f)
@@ -146,7 +148,7 @@ fun DossierCarousel(
                 }
             }
         }
-        PageButton("›", stringResource(R.string.dossier_next)) { step(1) }
+        PageButton(next = true, stringResource(R.string.dossier_next)) { step(1) }
     }
 }
 
@@ -208,11 +210,20 @@ private fun PageBody(page: Int, demon: Demon, record: DemonRecord, inkCodex: Boo
 }
 
 @Composable
-private fun PageButton(glyph: String, label: String, onClick: () -> Unit) {
-    IconButton(onClick = onClick, modifier = Modifier.semantics { contentDescription = label }) {
-        Text(glyph, style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.outline, modifier = Modifier.clearAndSetSemantics { })
+private fun PageButton(next: Boolean, label: String, onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
+        Image(
+            painter = painterResource(R.drawable.grimoire_arrow_small),
+            contentDescription = label,
+            modifier = Modifier
+                .size(PageArrowWidth, PageArrowHeight)
+                .graphicsLayer { if (next) scaleX = -1f },
+        )
     }
 }
+
+private val PageArrowWidth = 24.dp
+private val PageArrowHeight = 32.dp
 
 /** Revealed text soaking in once: blur → sharp, staggered 120 ms per line, 900 ms each (§4). */
 @Composable

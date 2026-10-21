@@ -30,7 +30,7 @@
   - **Created**: 2026-10-21 12:20
   - **Tags**: release
 
-- [ ] K0G6 **-** Stitch art: gilded prev/next arrows (large + small) for Grimoire and dossier; drop-in for RC if ready
+- [x] K0G6 **-** Stitch art: gilded prev/next arrows (large + small) for Grimoire and dossier; drop-in for RC if ready
   - **Priority**: medium
   - **Created**: 2026-10-21 12:30
   - **Tags**: release
