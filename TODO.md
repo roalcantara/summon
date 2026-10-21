@@ -35,9 +35,14 @@
   - **Created**: 2026-10-21 12:30
   - **Tags**: release
 
-- [ ] TKJp **-** Grimoire title banner (Stitch art + top-bar layout), after release
-  - **Priority**: low
+- [ ] TKJp **-** Grimoire: title banner replaces the avatar-rail symbols (proposal docs/superpowers/specs/2026-10-21-grimoire-header-proposal.md), review after release
+  - **Priority**: medium
   - **Created**: 2026-10-21 12:30
+  - **Tags**: post-release
+
+- [ ] JwGM **-** Grimoire: demon sigil on the floor circle under him (proposal docs/superpowers/specs/2026-10-21-grimoire-header-proposal.md), review after release
+  - **Priority**: medium
+  - **Created**: 2026-10-21 13:31
   - **Tags**: post-release
 
 # Actors
