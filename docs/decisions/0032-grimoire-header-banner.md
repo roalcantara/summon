@@ -26,7 +26,9 @@ they were on. The RC added gilded prev/next arrows on the stage to switch demons
 ## Consequences
 
 - The avatar "burn" (the sigil burning away into the portrait on the first visit after binding)
-  is gone. `Reveal.Avatar` is still consumed, so no state is left pending. Bringing a reveal moment
-  back, e.g. the sigil on the floor circle under the demon, is the open proposal item (todo `JwGM`).
+  is gone. `Reveal.Avatar` is still consumed, so no state is left pending.
+- Each demon's sigil now lies on the summoning circle under him (`FloorCircle`, todo `JwGM`), so the
+  sigils move from the header to where they mean something. A reveal moment there (e.g. the sigil
+  flaring once after binding) is a possible follow-up.
 - Nothing on screen says which demon of how many is shown; position dots under the banner are the
   open option if testers miss it.

@@ -174,7 +174,7 @@ dark palette carries the RPG feel.
 | `QuoteSlot` | Fixed 72 dp slot under the demon | `state` (celebration / bound / ready / cooling), quote, hours, `shake` |
 | `GrimoireHeader` | Grimoire top bar: back arrow, `TitlePlaque`, menu gear (ADR-0032) | `onBack`, `onMenu` |
 | `TitlePlaque` | Screen title on a chamfered plaque drawn in code: `surfaceContainerHigh` fill, `primary` gold border, inner line and diamonds, Cinzel title, a heading; grows with the title | `title` |
-| `FloorCircle` | Accent ellipse under the demon | `accent`, `pulse` |
+| `FloorCircle` | Accent ellipse under the demon, with his sigil lying flat inside the inner ring (squashed to the floor's perspective, pulses with the circle) | `accent`, `pulse`, `sigil` |
 | `StageBackground` | Gradient stage (Home, Sol, Venus) with a scrim | `stage`, `dim` |
 | `CompassRose` | Inlaid rose on the Home floor | — (`primary`) |
 | `RestlessGrimoire` | Vector placeholder for the Home book | `restless`, `accent`, `opening`, `onOpen` |

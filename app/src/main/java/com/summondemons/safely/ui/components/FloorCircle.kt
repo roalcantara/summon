@@ -12,9 +12,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.summondemons.safely.ui.fx.LoadedSigil
 import com.summondemons.safely.ui.fx.LocalReduceMotion
 
 private const val PULSE_HALF_MS = 800
@@ -26,10 +31,13 @@ private const val GLOW_PASSES = 3
 private const val INNER_ALPHA = 0.6f
 private const val INNER_INSET_X = 0.10f
 private const val INNER_INSET_Y = 0.14f
+private const val SIGIL_VIEWBOX = 100f // sigil paths are in 0..100 units (ADR-0009)
+private const val SIGIL_ALPHA = 0.85f
+private const val SIGIL_STROKE = 1.6f // in viewBox units, before the perspective squash
 
 /** Accent ellipse with a dashed inner ring at the demon's feet; pulses while he can be summoned. */
 @Composable
-fun FloorCircle(accent: Color, pulse: Boolean, modifier: Modifier = Modifier) {
+fun FloorCircle(accent: Color, pulse: Boolean, modifier: Modifier = Modifier, sigil: LoadedSigil? = null) {
     val animate = pulse && !LocalReduceMotion.current
     val phase = if (animate) {
         rememberInfiniteTransition(label = "floorCircle").animateFloat(
@@ -57,5 +65,16 @@ fun FloorCircle(accent: Color, pulse: Boolean, modifier: Modifier = Modifier) {
             size = Size(size.width - 2 * inset.x, size.height - 2 * inset.y),
             style = Stroke(1.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(4.dp.toPx(), 3.dp.toPx()))),
         )
+        // The demon's sigil lies flat inside the inner ring: scaled to the ring, so squashed like the floor (proposal JwGM)
+        if (sigil != null) {
+            val unitX = (size.width - 2 * inset.x) / SIGIL_VIEWBOX
+            val unitY = (size.height - 2 * inset.y) / SIGIL_VIEWBOX
+            translate(inset.x, inset.y) {
+                scale(unitX, unitY, pivot = Offset.Zero) {
+                    val stroke = Stroke(SIGIL_STROKE, cap = StrokeCap.Round, join = StrokeJoin.Round)
+                    sigil.paths.forEach { drawPath(it, accent.copy(alpha = SIGIL_ALPHA), style = stroke) }
+                }
+            }
+        }
     }
 }
