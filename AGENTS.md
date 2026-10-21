@@ -34,6 +34,7 @@ If two sources disagree, the higher one wins. Fix the lower one or note it in an
 | `reference/stitch/` | Stitch mockups, character art, logo, sigil |
 | `reference/src/` | Draft Compose code (input for the port; does not compile as-is) |
 | `tools/` | Small generators (`gen_audio.py` for `res/raw/*.wav`, `sigil_to_raw.py` for sigils, `gen_icons.py` for icons, `gen_fonts.py` for the bundled fonts) |
+| `tools/gen_i18n_prompt.py` | Prompt for other models to suggest alternatives to open entries of `docs/i18n/review.md` (ADR-0031) |
 | `tools/gen_chant_corpus.py`, `tools/pull_sessions.sh` | Chant-check calibration: generated TTS/LibriSpeech corpus and pulling debug session logs from a device (ADR-0025) |
 | `art/sigils/` | Stroke-only sigil sources (SVG), converted by `tools/sigil_to_raw.py` |
 

@@ -1,0 +1,118 @@
+demon_asmodeus_ability_1_name:
+  - text: 'Anel do Mérito'
+    length: 14
+    back_translation: 'Ring of Merit'
+    reference: 'none'
+    note: 'Soa nobre e pomposo, deixando espaço para a piada de que as virtudes custam à parte.'
+  - text: 'Anel da Honra'
+    length: 13
+    back_translation: 'Ring of Honour'
+    reference: 'none'
+    note: 'Mantém a ideia de virtude moral com tom de fantasia.'
+  - text: 'Anel do Bem'
+    length: 11
+    back_translation: 'Ring of Good'
+    reference: 'none'
+    note: 'Mais simples e irônico diante da linha seguinte.'
+
+demon_asmodeus_ability_2_name:
+  - text: 'Cadê? Sumiu!'
+    length: 12
+    back_translation: 'Where is he? Gone!'
+    reference: 'none'
+    note: 'Curto, falado e imediatamente claro como efeito de invisibilidade.'
+  - text: 'Agora não vê'
+    length: 12
+    back_translation: "Now you don't see"
+    reference: "now you see me, now you don't"
+    note: 'Preserva diretamente a segunda metade do jogo de palavras inglês.'
+  - text: 'Sumiu, foi?'
+    length: 11
+    back_translation: 'Gone, was he?'
+    reference: 'none'
+    note: 'Tem uma provocação informal que combina com o demônio.'
+
+demon_asmodeus_weakness_name:
+  - text: 'Dá Nome'
+    length: 7
+    back_translation: 'Gives a name'
+    reference: 'dar nome aos bois'
+    note: 'Evoca o ditado sobre revelar quem é quem; cabe na obrigação de admitir o próprio nome.'
+  - text: 'Vaza Nome'
+    length: 9
+    back_translation: 'Leaks name'
+    reference: 'vazar informação'
+    note: 'Transforma a confissão involuntária em vazamento constrangedor.'
+  - text: 'Diz Nome'
+    length: 8
+    back_translation: 'Says name'
+    reference: 'none'
+    note: 'Direto, claro e seco para uma fraqueza curta.'
+
+demon_astaroth_restless_quote:
+  - text: 'Previ que ia me esquecer. Odeio acertar. Mentira: adoro.'
+    length: 56
+    back_translation: 'I foresaw you would forget me. I hate being right. Lie: I love it.'
+    reference: 'none'
+    note: 'Mantém a autocongratulação e a reversão imediata da última frase.'
+  - text: 'Previ seu esquecimento. Odeio acertar. Mentira, adoro.'
+    length: 57
+    back_translation: 'I foresaw your forgetting. I hate being right. Lie, I love it.'
+    reference: 'none'
+    note: 'Mais formal e teatral, adequado ao tom profético de Astaroth.'
+  - text: 'Sabia que ia esquecer. Odeio acertar. Mentira: adoro.'
+    length: 55
+    back_translation: 'I knew you would forget. I hate being right. Lie: I love it.'
+    reference: 'none'
+    note: 'Sarcástica, curta e natural em balão de fala.'
+
+calling_warlord_label:
+  - text: 'General'
+    length: 7
+    back_translation: 'General'
+    reference: 'none'
+    note: 'É claro, militar e cabe no selo.'
+  - text: 'Comando'
+    length: 7
+    back_translation: 'Command'
+    reference: 'none'
+    note: 'Rótulo funcional que sugere liderança militar.'
+  - text: 'Chefia'
+    length: 6
+    back_translation: 'Leadership'
+    reference: 'none'
+    note: 'Curto e legível no emblema.'
+
+calling_treasurer_label:
+  - text: 'Finanças'
+    length: 8
+    back_translation: 'Finances'
+    reference: 'none'
+    note: 'Rótulo claro para a função ligada a riquezas.'
+  - text: 'Tesouro'
+    length: 7
+    back_translation: 'Treasure'
+    reference: 'none'
+    note: 'Direto e adequado ao objetivo de obter pilhagem.'
+  - text: 'Cofre'
+    length: 5
+    back_translation: 'Vault'
+    reference: 'none'
+    note: 'Extremamente compacto e imediatamente associado a dinheiro.'
+
+house_sol_tooltip:
+  - text: 'Reis de Sol fazem corte: 9–12 e 15–pôr do sol. Óculos são prudentes.'
+    length: 68
+    back_translation: 'Kings of Sol hold court: 9–12 and 15–sunset. Glasses are prudent.'
+    reference: 'none'
+    note: 'Preserva os horários e faz uma piada seca sobre a luz de Sol.'
+  - text: 'Reis de Sol: corte, 9–12 e 15–pôr do sol. Melhor trazer óculos.'
+    length: 63
+    back_translation: 'Kings of Sol: court, 9–12 and 15–sunset. Better bring glasses.'
+    reference: 'none'
+    note: 'Tem tom mais conversado e mantém a dica de óculos.'
+  - text: 'Reis de Sol dão corte das 9 às 12 e das 15 ao poente. Traga óculos.'
+    length: 67
+    back_translation: 'Kings of Sol hold court from 9 to 12 and from 15 to sunset. Bring glasses.'
+    reference: 'none'
+    note: 'Usa uma formulação mais clássica de fantasia, com um toque de alerta bem-humorado.'
