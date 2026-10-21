@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -73,12 +72,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
@@ -93,6 +90,7 @@ import com.summondemons.safely.ui.GameUiState
 import com.summondemons.safely.ui.components.BadgeKey
 import com.summondemons.safely.ui.components.BadgeRow
 import com.summondemons.safely.ui.components.MenuButton
+import com.summondemons.safely.ui.components.TitlePlaque
 import com.summondemons.safely.ui.components.CUTOUT_ASPECT
 import com.summondemons.safely.ui.components.DemonCutout
 import com.summondemons.safely.ui.components.DossierCarousel
@@ -115,7 +113,6 @@ import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.stage
 import com.summondemons.safely.ui.theme.textRoles
-import com.summondemons.safely.ui.theme.upper
 import kotlinx.coroutines.delay
 import java.time.ZonedDateTime
 import kotlin.math.PI
@@ -148,10 +145,6 @@ private const val STAGE_ARROW_PRESSED = 0.92f
 private val StageArrowWidth = 56.dp
 private val StageArrowHeight = 75.dp
 private val RailHeight = 72.dp
-private val BannerWidth = 220.dp
-private val BannerHeight = 48.dp
-private val BannerTitleSize = 20.sp
-private val BannerTitleLift = (-4).dp
 private val FloatAmplitude = 6.dp
 private val SceneBlur = 3.dp
 private val StageSwipe = 60.dp
@@ -332,7 +325,7 @@ fun GrimoireScreen(
 }
 
 /**
- * Back arrow, the title banner and the menu gear (RC, TODO TKJp; replaces the avatar rail,
+ * Back arrow, the title plaque and the menu gear (RC, TODO TKJp; replaces the avatar rail,
  * whose symbols players could not read; proposal docs/superpowers/specs/2026-10-21-grimoire-header-proposal.md).
  */
 @Composable
@@ -343,22 +336,7 @@ private fun GrimoireHeader(onBack: () -> Unit, onMenu: () -> Unit) {
         IconButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart).semantics { contentDescription = back }) {
             Text("←", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.clearAndSetSemantics { })
         }
-        Box(Modifier.align(Alignment.Center).size(BannerWidth, BannerHeight), contentAlignment = Alignment.Center) {
-            Image(
-                painter = painterResource(R.drawable.grimoire_title_banner),
-                contentDescription = null,
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier.matchParentSize(),
-            )
-            Text(
-                stringResource(R.string.grimoire_title).upper(),
-                style = MaterialTheme.textRoles.name.copy(fontSize = BannerTitleSize, letterSpacing = 0.08.em),
-                color = MaterialTheme.colorScheme.primary,
-                maxLines = 1,
-                // The plaque is centred at 42 % of the banner height (the ribbon tails hang below it)
-                modifier = Modifier.offset(y = BannerTitleLift).semantics { heading() },
-            )
-        }
+        TitlePlaque(stringResource(R.string.grimoire_title), Modifier.align(Alignment.Center))
         MenuButton(onMenu, Modifier.align(Alignment.CenterEnd))
     }
 }

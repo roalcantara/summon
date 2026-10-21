@@ -13,9 +13,12 @@ they were on. The RC added gilded prev/next arrows on the stage to switch demons
 
 ## Decision
 
-1. The Grimoire header is: back arrow (left), a title banner with "GRIMOIRE" in Cinzel (centre,
-   translated: GRIMÓRIO, GRIMORIO), the menu gear (right). Art: `grimoire_title_banner`
-   (`art/grimoire/`, Stitch). The title is a heading for screen readers.
+1. The Grimoire header is: back arrow (left), "GRIMOIRE" in Cinzel on a title plaque (centre,
+   translated: GRIMÓRIO, GRIMORIO), the menu gear (right). The title is a heading for screen
+   readers. *Revised the same day:* the Stitch banner art (`art/grimoire/grimoire_title_banner.png`)
+   looked muddy, dark navy on the dark stage arch with noisy tails at 48 dp, so the plaque is drawn
+   in code instead (`TitlePlaque`: chamfered navy plaque, gold border and inner line, gold diamonds
+   beside the title; option B of the header prototype). It stays sharp and grows with the title.
 2. The avatar rail and `SigilAvatar` are removed. Switching demons is the stage swipe and the
    arrows; bound vs sealed shows on the stage (full art vs silhouette); restlessness shows as the
    stage jitter and the restless quote.
