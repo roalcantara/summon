@@ -20,7 +20,7 @@
   - **Created**: 2026-10-21 12:20
   - **Tags**: release
 
-- [ ] r62v **-** Grimoire: prev/next arrows on the stage to switch demons (RC; Tinder-style swipe and rail redesign later)
+- [x] r62v **-** Grimoire: prev/next arrows on the stage to switch demons (RC; Tinder-style swipe and rail redesign later)
   - **Priority**: high
   - **Created**: 2026-10-21 12:20
   - **Tags**: release

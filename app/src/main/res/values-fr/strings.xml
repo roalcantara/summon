@@ -24,6 +24,8 @@
     <string name="escape_dismiss">Fermer</string>
     <!-- Grimoire (ADR-0016) -->
     <string name="grimoire_back">Retour à la salle</string>
+    <string name="grimoire_previous">Précédent</string>
+    <string name="grimoire_next">Suivant</string>
     <string name="avatar_sealed">%1$s, scellé</string>
     <string name="celebration_banner">Démon reçu !</string>
     <string name="quote_tap_to_summon">Invoque-le !</string>
