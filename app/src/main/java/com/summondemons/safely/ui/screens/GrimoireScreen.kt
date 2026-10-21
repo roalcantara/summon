@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -75,6 +76,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -84,6 +86,7 @@ import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.platform.GameSounds
 import com.summondemons.safely.platform.LocalGameSounds
 import com.summondemons.safely.progress.DemonRecord
+import com.summondemons.safely.progress.Progress
 import com.summondemons.safely.progress.ProgressRules
 import com.summondemons.safely.progress.Reveal
 import com.summondemons.safely.ui.GameUiState
@@ -107,12 +110,14 @@ import com.summondemons.safely.ui.fx.ParticleField
 import com.summondemons.safely.ui.fx.ParticleStyle
 import com.summondemons.safely.ui.fx.SharedDemonArt
 import com.summondemons.safely.ui.fx.rememberFrameTimeMs
+import com.summondemons.safely.ui.theme.SummonDemonsSafelyTheme
 import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.stage
 import com.summondemons.safely.ui.theme.textRoles
 import com.summondemons.safely.ui.theme.upper
 import kotlinx.coroutines.delay
+import java.time.ZonedDateTime
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.sin
@@ -146,6 +151,7 @@ private val RailHeight = 72.dp
 private val BannerWidth = 220.dp
 private val BannerHeight = 48.dp
 private val BannerTitleSize = 20.sp
+private val BannerTitleLift = (-4).dp
 private val FloatAmplitude = 6.dp
 private val SceneBlur = 3.dp
 private val StageSwipe = 60.dp
@@ -349,7 +355,8 @@ private fun GrimoireHeader(onBack: () -> Unit, onMenu: () -> Unit) {
                 style = MaterialTheme.textRoles.name.copy(fontSize = BannerTitleSize, letterSpacing = 0.08.em),
                 color = MaterialTheme.colorScheme.primary,
                 maxLines = 1,
-                modifier = Modifier.semantics { heading() },
+                // The plaque is centred at 42 % of the banner height (the ribbon tails hang below it)
+                modifier = Modifier.offset(y = BannerTitleLift).semantics { heading() },
             )
         }
         MenuButton(onMenu, Modifier.align(Alignment.CenterEnd))
@@ -594,4 +601,27 @@ private fun PartyBanner(modifier: Modifier) {
             alpha = 1f - drop.value / -dropPx * 0.9f
         },
     )
+}
+
+@Preview
+@Composable
+private fun GrimoireScreenPreview() {
+    SummonDemonsSafelyTheme {
+        GrimoireScreen(
+            state = GameUiState(
+                loaded = true,
+                progress = Progress(),
+                now = ZonedDateTime.now(),
+                selectedId = DemonCatalog.all.first().id,
+            ),
+            onBack = {},
+            onSelect = {},
+            onSummon = {},
+            onVisit = {},
+            onDismissCelebration = {},
+            onConsumeReveal = { _, _ -> },
+            onSecretShown = {},
+            onMenu = {},
+        )
+    }
 }
