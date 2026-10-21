@@ -3,7 +3,6 @@ package com.summondemons.safely.platform
 import android.content.Context
 import android.content.res.Configuration
 import android.os.LocaleList
-import com.summondemons.safely.BuildConfig
 import java.util.Locale
 
 /**
@@ -14,12 +13,12 @@ object AppLocale {
     private const val PREFS = "app_locale"
     private const val KEY_TAG = "tag"
 
-    /** Shipped languages; debug builds add the en-XA pseudo-locale for layout checks. */
-    val options: List<String?> =
-        listOf(null, "en", "es", "pt-BR", "it", "fr") + if (BuildConfig.DEBUG) listOf("en-XA") else emptyList()
+    /** Shipped languages; null follows the phone. */
+    val options: List<String?> = listOf(null, "en", "es", "pt-BR", "it", "fr")
 
+    /** The saved choice, if it is still offered (a dropped option, e.g. en-XA, falls back to the phone). */
     fun get(context: Context): String? =
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_TAG, null)
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_TAG, null)?.takeIf { it in options }
 
     /** Saves synchronously: the caller recreates the activity right after. */
     fun set(context: Context, tag: String?) {

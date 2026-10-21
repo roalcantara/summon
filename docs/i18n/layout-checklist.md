@@ -53,5 +53,6 @@ first.
    wording in context, not for pass/fail; layer 1 decides.
 
 Until then: the Settings sheet (gear on Home) switches the app language on any device
-("Phone language" restores the default; debug builds also offer English (XA)), the debug sheet
+("Phone language" restores the default; English (XA) is in the phone's system language list in
+debug builds), the debug sheet
 reaches every state, and `adb exec-out screencap -p` captures it.
