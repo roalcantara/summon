@@ -57,31 +57,31 @@ Entry format:
 
 ### pt-BR · chant_face
 
-- **Status:** open
+- **Status:** changed (owner, 2026-10-21)
 - **English (9):** Face %1$s
-- **Translation (9):** Mire %1$s
+- **Translation (9):** Vire %1$s
 - **Lost:** Telegraphic: "Mire Norte" has no article ("Mire o Norte").
 - **Alternatives:** Rumo ao %1$s (12) — "Rumo ao Norte", reads best; needs a length exception.
 
 ### pt-BR · badge_direction_text
 
-- **Status:** open
+- **Status:** changed (owner, 2026-10-21)
 - **English (25):** Face %1$s to summon. %2$s
-- **Translation (25):** Mire %1$s e invoque. %2$s
+- **Translation (25):** Vire %1$s e invoque. %2$s
 - **Lost:** Same telegraphic "Mire Leste" as chant_face.
 - **Alternatives:** Vire ao %1$s e invoque. %2$s (27, needs exception).
 
 ### pt-BR · quote_tap_to_summon
 
-- **Status:** open
+- **Status:** changed (owner, 2026-10-21)
 - **English (13):** Tap to summon
-- **Translation (10):** Invoque-o!
+- **Translation (7):** Invocar
 - **Lost:** "Tap" is gone; it reads "Summon him!".
 - **Alternatives:** Toque e invoque (15, needs exception).
 
 ### pt-BR · intro_summon
 
-- **Status:** open
+- **Status:** accepted (owner, 2026-10-21)
 - **English (6):** Summon
 - **Translation (5):** Bora!
 - **Lost:** Button reads "Let's go!" (BR slang) instead of "Summon".
@@ -89,7 +89,7 @@ Entry format:
 
 ### pt-BR · dossier_secret
 
-- **Status:** open
+- **Status:** accepted (owner, 2026-10-21)
 - **English (6):** Secret
 - **Translation (6):** Sigilo
 - **Lost:** "Segredo" (7) does not fit; "Sigilo" means secrecy. Glossary updated.
@@ -97,7 +97,7 @@ Entry format:
 
 ### pt-BR · demon_asmodeus_title
 
-- **Status:** open
+- **Status:** accepted (owner, 2026-10-21)
 - **English (34):** Lord of Arithmetic & Hidden Wealth
 - **Translation (33):** Senhor da Aritmética e do Tesouro
 - **Lost:** "Hidden Wealth" became "Treasure" ("Tesouro"); "hidden" is lost.
@@ -129,7 +129,7 @@ Entry format:
 
 ### pt-BR · demon_astaroth_title
 
-- **Status:** open
+- **Status:** accepted (owner, 2026-10-21)
 - **English (30):** Duke of Past, Present & Future
 - **Translation (29):** Duque de Ontem, Hoje e Amanhã
 - **Lost:** "Past, Present & Future" became "Yesterday, Today and Tomorrow".
@@ -137,7 +137,7 @@ Entry format:
 
 ### pt-BR · demon_astaroth_ability_2_name
 
-- **Status:** open
+- **Status:** accepted (owner, 2026-10-21)
 - **English (11):** Open Secret
 - **Translation (6):** Fofoca
 - **Lost:** "Open Secret" pun lost; it became "Gossip".
@@ -145,17 +145,17 @@ Entry format:
 
 ### pt-BR · demon_astaroth_ability_3_name
 
-- **Status:** open
+- **Status:** changed (owner, 2026-10-21)
 - **English (25):** The Fall (Director’s Cut)
-- **Translation (25):** A Queda: Versão Estendida
+- **Translation (25):** Tombo (Versão do Diretor)
 - **Lost:** "Director's Cut" became "Extended Version".
 - **Alternatives:** A Queda (Corte do Diretor) (26, needs exception).
 
 ### pt-BR · demon_astaroth_weakness_name
 
-- **Status:** open
+- **Status:** changed (owner, 2026-10-21)
 - **English (13):** Dragon Breath
-- **Translation (10):** Bafo Fatal
+- **Translation (12):** Bafo de Onça
 - **Lost:** "Dragon Breath" became "Fatal Breath".
 - **Alternatives:** Bafo de Dragão (14, needs exception).
 

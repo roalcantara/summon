@@ -31,7 +31,16 @@ humour is dry and silly: demons are smug, petty and over-dramatic.
 5. **Do not translate** demon names (Asmodeus, Astaroth, Amaymon), planets (Sol, Venus) or Latin.
 6. **Fixed terms** (use these words): invocar (summon), selo/selar (seal), preso (bound),
    inquieto (restless), grimório, verso (a chant line), recitar (chant).
-7. Strings marked **direction** take a compass point in `%1$s`. The alternative must read
+7. **Flavour strings** (demon titles, ability and weakness names, quotes, tooltips) should
+   reach for **Brazilian pop culture**: popular sayings, idioms, classic TV, novelas, films,
+   comedy shows, long-lived memes. Example of the target: "Dragon Breath" became "Bafo de
+   Onça" (an everyday idiom for awful breath); "Open Secret" became "Fofoca"; "The Fall
+   (Director's Cut)" became "Tombo (Versão do Diretor)". Limits: the reference must be widely
+   known and lasting (no trend of the month), no song lyrics beyond a short phrase, no real
+   people or brands, and the text must still make sense to a player who misses the reference.
+8. **Functional strings** (buttons, directions, status labels, badge labels) stay plain and
+   clear: no jokes a player has to decode to know what to tap or where to turn.
+9. Strings marked **direction** take a compass point in `%1$s`. The alternative must read
    correctly with **all eight**: Norte, Nordeste, Leste, Sudeste, Sul, Sudoeste, Oeste, Noroeste. Avoid wording that needs an article
    that changes per point.
 
@@ -44,63 +53,14 @@ Reply with YAML only, one block per key, alternatives ordered best first:
   - text: "…"
     length: <characters, each placeholder counted as 4>
     back_translation: "<literal English>"
+    reference: "<the idiom, show or meme it plays on, or none>"
     note: "<why it works, or the pun>"
 ```
 
 ## Strings
 
 
-### `chant_face` (direction)
-
-- **English:** `Face %1$s`
-- **Budget:** 9 characters
-- **Where it shows:** Chant screen, direction pill above the Latin line, upper case. Tells the player which compass point to turn the phone to before chanting.
-- **Current pt-BR:** `Mire %1$s` (9)
-- **Check with:** `Mire Norte`, `Mire Nordeste`, `Mire Leste` …
-
-
-### `badge_direction_text` (direction)
-
-- **English:** `Face %1$s to summon. %2$s`
-- **Budget:** 25 characters
-- **Where it shows:** Demon card, text that appears when the Direction badge is tapped. %2$s is the next sentence (who the demon serves, e.g. "Serve a Amaymon, Rei do Leste."). Must stay consistent with chant_face.
-- **Current pt-BR:** `Mire %1$s e invoque. %2$s` (25)
-- **Check with:** `Mire Norte e invoque. %2$s`, `Mire Nordeste e invoque. %2$s`, `Mire Leste e invoque. %2$s` …
-
-
-### `quote_tap_to_summon`
-
-- **English:** `Tap to summon`
-- **Budget:** 13 characters
-- **Where it shows:** Grimoire stage, cue inside a dashed speech bubble under a demon that is not bound yet, upper case. Tapping starts the ritual.
-- **Current pt-BR:** `Invoque-o!` (10)
-
-
-### `intro_summon`
-
-- **English:** `Summon`
-- **Budget:** 6 characters
-- **Where it shows:** Button on the "How to chant" intro card; pressing it starts the ritual. Short, upper case.
-- **Current pt-BR:** `Bora!` (5)
-
-
-### `dossier_secret`
-
-- **English:** `Secret`
-- **Budget:** 6 characters
-- **Where it shows:** Title of the 6th dossier page, upper case, unlocked only by a flawless summon.
-- **Current pt-BR:** `Sigilo` (6)
-
-
-### `demon_asmodeus_title`
-
-- **English:** `Lord of Arithmetic & Hidden Wealth`
-- **Budget:** 34 characters
-- **Where it shows:** Subtitle under the name ASMODEUS on the demon card; one line, cut with … if too long. He teaches arithmetic and knows where hidden treasure lies.
-- **Current pt-BR:** `Senhor da Aritmética e do Tesouro` (33)
-
-
-### `demon_asmodeus_ability_1_name`
+### `demon_asmodeus_ability_1_name` (flavour)
 
 - **English:** `Ring of Virtues`
 - **Budget:** 15 characters
@@ -108,7 +68,7 @@ Reply with YAML only, one block per key, alternatives ordered best first:
 - **Current pt-BR:** `Anel Virtuoso` (13)
 
 
-### `demon_asmodeus_ability_2_name`
+### `demon_asmodeus_ability_2_name` (flavour)
 
 - **English:** `Now You Don’t`
 - **Budget:** 13 characters
@@ -116,7 +76,7 @@ Reply with YAML only, one block per key, alternatives ordered best first:
 - **Current pt-BR:** `Cadê? Sumiu!` (12)
 
 
-### `demon_asmodeus_weakness_name`
+### `demon_asmodeus_weakness_name` (flavour)
 
 - **English:** `Name-Drop`
 - **Budget:** 9 characters
@@ -124,39 +84,7 @@ Reply with YAML only, one block per key, alternatives ordered best first:
 - **Current pt-BR:** `Pelo Nome` (9)
 
 
-### `demon_astaroth_title`
-
-- **English:** `Duke of Past, Present & Future`
-- **Budget:** 30 characters
-- **Where it shows:** Subtitle under the name ASTAROTH; he knows past, present and future. One line.
-- **Current pt-BR:** `Duque de Ontem, Hoje e Amanhã` (29)
-
-
-### `demon_astaroth_ability_2_name`
-
-- **English:** `Open Secret`
-- **Budget:** 11 characters
-- **Where it shows:** Ability name; he learns all your secrets and treats them as trivia. English "Open Secret" is the idiom.
-- **Current pt-BR:** `Fofoca` (6)
-
-
-### `demon_astaroth_ability_3_name`
-
-- **English:** `The Fall (Director’s Cut)`
-- **Budget:** 25 characters
-- **Where it shows:** Ability name; he tells the long, unrequested story of his fall from heaven. English parodies a film's "Director's Cut".
-- **Current pt-BR:** `A Queda: Versão Estendida` (25)
-
-
-### `demon_astaroth_weakness_name`
-
-- **English:** `Dragon Breath`
-- **Budget:** 13 characters
-- **Where it shows:** Weakness name; his breath is a weapon, beaten by holding a ring to your nose.
-- **Current pt-BR:** `Bafo Fatal` (10)
-
-
-### `demon_astaroth_restless_quote`
+### `demon_astaroth_restless_quote` (flavour)
 
 - **English:** `I foresaw you'd forget me. I hate being right. No I don't.`
 - **Budget:** 58 characters
@@ -164,7 +92,7 @@ Reply with YAML only, one block per key, alternatives ordered best first:
 - **Current pt-BR:** `Previ que você me esqueceria. Odeio ter razão. Mentira.` (55)
 
 
-### `calling_warlord_label`
+### `calling_warlord_label` (functional)
 
 - **English:** `Warlord`
 - **Budget:** 7 characters
@@ -172,7 +100,7 @@ Reply with YAML only, one block per key, alternatives ordered best first:
 - **Current pt-BR:** `General` (7)
 
 
-### `calling_treasurer_label`
+### `calling_treasurer_label` (functional)
 
 - **English:** `Treasurer`
 - **Budget:** 9 characters
@@ -180,7 +108,7 @@ Reply with YAML only, one block per key, alternatives ordered best first:
 - **Current pt-BR:** `Banqueiro` (9)
 
 
-### `house_sol_tooltip`
+### `house_sol_tooltip` (flavour)
 
 - **English:** `Kings of Sol hold court 9 to noon and 3 to sunset. Bring sunglasses.`
 - **Budget:** 68 characters
