@@ -78,7 +78,7 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
     var debugOpen by rememberSaveable { mutableStateOf(false) }
     var settingsOpen by rememberSaveable { mutableStateOf(false) }
     val debugSettings by graph.debugSettings.settings.collectAsStateWithLifecycle()
-    val onDebug: (() -> Unit)? = if (BuildConfig.DEBUG) ({ debugOpen = true }) else null
+    val onMenu = { settingsOpen = true }
 
     CompositionLocalProvider(LocalGameSounds provides sounds) {
         SharedTransitionLayout {
@@ -87,10 +87,10 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
                     composable<Home> {
                         LockPortrait()
                         ProvideDestinationScope {
-                            HomeDestination(state, onDebug, onOpen = dropUnlessResumed {
+                            HomeDestination(state, onMenu, onOpen = dropUnlessResumed {
                                 game.openGrimoireFromHome()
                                 navController.navigate(Grimoire) { launchSingleTop = true }
-                            }, onDismissEscape = game::dismissEscapeBanners, onSettings = { settingsOpen = true })
+                            }, onDismissEscape = game::dismissEscapeBanners)
                         }
                     }
 
@@ -109,7 +109,7 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
                                 onDismissCelebration = game::dismissCelebration,
                                 onConsumeReveal = game::consumeReveal,
                                 onSecretShown = game::secretShown,
-                                onDebug = onDebug,
+                                onMenu = onMenu,
                             )
                         }
                     }
@@ -135,6 +135,7 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
                     activity?.recreate()
                 },
                 onDismiss = { settingsOpen = false },
+                onDebug = if (BuildConfig.DEBUG) ({ settingsOpen = false; debugOpen = true }) else null,
             )
         }
         if (BuildConfig.DEBUG && debugOpen) {
@@ -161,10 +162,9 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
 @Composable
 private fun HomeDestination(
     state: GameUiState,
-    onDebug: (() -> Unit)?,
+    onMenu: () -> Unit,
     onOpen: () -> Unit,
     onDismissEscape: () -> Unit,
-    onSettings: () -> Unit,
 ) {
     val demons = DemonCatalog.all
     val anyRestless = demons.any { ProgressRules.isRestless(state.record(it.id), state.today) }
@@ -180,8 +180,7 @@ private fun HomeDestination(
         escaped = demons.filter { state.record(it.id).escapeBannerPending },
         onOpen = onOpen,
         onDismissEscape = onDismissEscape,
-        onDebug = onDebug,
-        onSettings = onSettings,
+        onMenu = onMenu,
     )
 }
 

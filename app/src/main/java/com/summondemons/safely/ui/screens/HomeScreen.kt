@@ -58,7 +58,7 @@ import com.summondemons.safely.platform.LocalGameSounds
 import com.summondemons.safely.ui.components.CompassRose
 import com.summondemons.safely.ui.components.CueChip
 import com.summondemons.safely.ui.components.CueTone
-import com.summondemons.safely.ui.components.DebugChip
+import com.summondemons.safely.ui.components.MenuButton
 import com.summondemons.safely.ui.components.RestlessGrimoire
 import com.summondemons.safely.ui.components.RibbonBanner
 import com.summondemons.safely.ui.components.StageBackground
@@ -113,8 +113,7 @@ fun HomeScreen(
     escaped: List<Demon>,
     onOpen: () -> Unit,
     onDismissEscape: () -> Unit,
-    onDebug: (() -> Unit)?,
-    onSettings: () -> Unit,
+    onMenu: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
@@ -190,23 +189,8 @@ fun HomeScreen(
             if (showHint) CueChip(stringResource(R.string.home_hint), CueTone.Neutral, Modifier.clickable(onClick = open))
         }
 
-        SettingsButton(onSettings, Modifier.align(Alignment.TopStart).statusBarsPadding().padding(spacing.sm))
-        if (onDebug != null) {
-            DebugChip(onDebug, Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(spacing.sm))
-        }
+        MenuButton(onMenu, Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(spacing.sm))
         if (escaped.isNotEmpty()) EscapeBanner(escaped, onDismissEscape)
-    }
-}
-
-/** Gear opening the Settings sheet (RC, TODO xbYw). */
-@Composable
-private fun SettingsButton(onClick: () -> Unit, modifier: Modifier) {
-    IconButton(onClick = onClick, modifier = modifier) {
-        Icon(
-            painterResource(R.drawable.ic_settings),
-            contentDescription = stringResource(R.string.settings_title),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
     }
 }
 

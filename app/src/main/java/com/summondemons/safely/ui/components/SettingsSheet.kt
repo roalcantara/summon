@@ -11,6 +11,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,10 +22,10 @@ import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.textRoles
 import com.summondemons.safely.ui.theme.upper
 
-/** Settings (RC): the app language only, for now. Languages are named in their own tongue. */
+/** Settings (RC): the app language only, for now, plus Debug in debug builds. Languages are named in their own tongue. */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun SettingsSheet(language: String?, onLanguage: (String?) -> Unit, onDismiss: () -> Unit) {
+fun SettingsSheet(language: String?, onLanguage: (String?) -> Unit, onDismiss: () -> Unit, onDebug: (() -> Unit)? = null) {
     val spacing = MaterialTheme.spacing
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
         Column(
@@ -47,6 +48,10 @@ fun SettingsSheet(language: String?, onLanguage: (String?) -> Unit, onDismiss: (
                         label = { Text(tag?.let(AppLocale::nativeName) ?: stringResource(R.string.settings_language_device)) },
                     )
                 }
+            }
+            // Debug builds only: the debug controls live under the menu (one gear on every screen)
+            if (onDebug != null) {
+                OutlinedButton(onClick = onDebug) { Text(stringResource(R.string.debug_controls)) }
             }
         }
     }
