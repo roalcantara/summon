@@ -52,6 +52,6 @@ first.
    PNG per component and locale under `app/build/outputs/roborazzi/`. They are for reviewing
    wording in context, not for pass/fail; layer 1 decides.
 
-Until then: on the emulator, `adb shell "setprop persist.sys.locale <tag>; setprop ctl.restart
-zygote"` switches the language (Android 7 image, root), the debug panel ("D") reaches every
-state, and `adb exec-out screencap -p` captures it.
+Until then: in a debug build, the debug sheet's Language row switches the app language on any
+device (Device restores the phone's language), the same sheet reaches every state, and
+`adb exec-out screencap -p` captures it.

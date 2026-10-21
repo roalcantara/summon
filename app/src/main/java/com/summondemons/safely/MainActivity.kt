@@ -1,5 +1,6 @@
 package com.summondemons.safely
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,10 +10,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.summondemons.safely.navigation.AppNavHost
+import com.summondemons.safely.platform.DebugLocale
 import com.summondemons.safely.ui.theme.SummonDemonsSafelyTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    // Debug builds: the language picked in the debug sheet (no-op in release)
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(DebugLocale.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splash = installSplashScreen()
         // Dark theme only: light-on-dark system bar icons regardless of system setting.
