@@ -15,6 +15,7 @@ the term. Numbers in brackets are character counts where the English budget is t
 | escaped (slipped his seal) | se escapó | escapou | è fuggito | s’est échappé |
 | Grimoire | Grimorio | Grimório | Grimorio | Grimoire |
 | ritual | ritual | ritual | rituale | rituel |
+| face (turn to a direction) | mirar | virar | mirare | cap |
 | chant (verb) | recitar / cantar | recitar / cantar | cantare | chanter |
 | line (of the chant) | verso | verso | verso | vers |
 | in court | en corte | na corte | a corte | en cour |

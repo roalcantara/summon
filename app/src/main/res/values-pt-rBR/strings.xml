@@ -26,7 +26,7 @@
     <string name="grimoire_back">Voltar à câmara</string>
     <string name="avatar_sealed">%1$s, selado</string>
     <string name="celebration_banner">Demônio recebido!</string>
-    <string name="quote_tap_to_summon">Invoque-o!</string>
+    <string name="quote_tap_to_summon">Invocar</string>
     <string name="quote_cooling">Círculo esfria</string>
     <string name="quote_next_summon">Invoque em %1$d h</string>
     <string name="cd_summon">Chamar %1$s</string>
@@ -35,7 +35,7 @@
         <item quantity="many">Círculo esfriando. Invoque em %1$d horas.</item>
         <item quantity="other">Círculo esfriando. Invoque em %1$d horas.</item>
     </plurals>
-    <string name="badge_direction_text">Mire %1$s e invoque. %2$s</string>
+    <string name="badge_direction_text">Vire %1$s e invoque. %2$s</string>
     <string name="badge_liege">Serve a %1$s.</string>
     <string name="badge_no_liege">Não jura a rei algum.</string>
     <plurals name="badge_legions_label">
@@ -62,9 +62,9 @@
     <string name="dossier_previous">Voltar página</string>
     <string name="dossier_next">Próxima</string>
     <!-- Chant screen (ADR-0019) -->
-    <string name="chant_face">Mire %1$s</string>
+    <string name="chant_face">Vire %1$s</string>
     <string name="chant_paused">Pausa</string>
-    <string name="chant_a11y_paused">Pausa. Volte a mirar %1$s</string>
+    <string name="chant_a11y_paused">Pausa. Vire de novo: %1$s</string>
     <string name="chant_locked">Trava</string>
     <string name="chant_sealed">Selado</string>
     <string name="chant_checking">Checando…</string>
@@ -82,7 +82,7 @@
     <string name="verdict_seal_cracked">Selo trincou</string>
     <string name="chant_help">Como recitar</string>
     <string name="intro_title">Como recitar</string>
-    <string name="intro_direction_title">1. Mire</string>
+    <string name="intro_direction_title">1. Vire</string>
     <string name="intro_direction_body">Gire até a moldura ficar verde.</string>
     <string name="intro_chant_title">2. Cante</string>
     <string name="intro_chant_body">Leia o verso em voz alta até selar.</string>
