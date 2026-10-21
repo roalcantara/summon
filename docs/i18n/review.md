@@ -22,7 +22,7 @@ Entry format:
 
 ### fr · fonts
 
-- **Status:** open
+- **Status:** changed: the six fonts were rebuilt with Latin Extended-A (`tools/gen_fonts.py`); rendering is pixel-identical, œ Œ Ÿ now draw
 - **English:** n/a (font coverage, found by the glyph check in Task 7)
 - **Translation:** French needs œ / Œ (cœur, œuvre, sœur) and rarely Ÿ. The bundled Cinzel and
   Inter files are Latin-1 subsets and lack all three; every letter es, pt-BR and it need is present.
@@ -521,7 +521,7 @@ Entry format:
 
 ### fr · secret wording (œ)
 
-- **Status:** open
+- **Status:** changed: restored « un cœur et un foie de poisson » after the font rebuild
 - **English:** n/a
 - **Translation:** n/a
 - **Lost:** French needs œ (cœur, œuvre, sœur); see the "fr · fonts" entry. The French text avoids it: Asmodeus's secret says "fish offal" (abats) instead of "fish heart and liver" (cœur et foie).

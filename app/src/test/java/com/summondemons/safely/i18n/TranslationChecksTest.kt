@@ -49,9 +49,7 @@ class TranslationChecksTest {
     @Test
     fun glyphsFindsLettersMissingFromAFont() {
         val fonts = File("src/main/res/font").listFiles()!!.filter { it.extension == "ttf" }
-        assertEquals(emptyList<String>(), missingGlyphs("Ação élan ñ", fonts))
-        // The bundled fonts are Latin-1 subsets: no œ, Œ or Ÿ (docs/i18n/review.md, "fr · fonts")
-        assertTrue(missingGlyphs("œ", fonts).isNotEmpty())
+        assertEquals(emptyList<String>(), missingGlyphs("Ação élan ñ cœur ŒUVRE Ÿ", fonts)) // Latin Extended-A (tools/gen_fonts.py)
         assertTrue(missingGlyphs("漢", fonts).isNotEmpty())
     }
 }

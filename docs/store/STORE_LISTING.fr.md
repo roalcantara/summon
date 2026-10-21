@@ -1,6 +1,6 @@
 # Play Store Listing (Français) — Summon Demons Safely
 
-Traduction de `docs/STORE_LISTING.md` (descriptions courte et complète). Le nom de l’app reste « Summon Demons Safely » dans toutes les langues (ADR-0031). Nombres de caractères mesurés. Le texte évite les lettres œ et Œ, absentes des polices de l’app (voir docs/i18n/review.md) ; le Play Store, lui, les affiche, mais le texte reste cohérent avec le jeu.
+Traduction de `docs/STORE_LISTING.md` (descriptions courte et complète). Le nom de l’app reste « Summon Demons Safely » dans toutes les langues (ADR-0031). Nombres de caractères mesurés.
 
 ## Short description (78 / 80)
 

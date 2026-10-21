@@ -110,8 +110,8 @@ Smoke particles use `on-surface-variant`; Home embers and the compass rose use `
 - Inter for body and labels; numbers use tabular figures.
 - Both are bundled in `res/font/` as static, Latin-subset instances generated from the
   Google Fonts variable fonts (SIL OFL 1.1; licences in `app/src/main/assets/licenses/`).
-  The subset covers every letter of es, pt-BR and it, but not œ, Œ or Ÿ (French text avoids
-  them; ADR-0031).
+  The subset is Latin Extended-A plus general punctuation (every letter of es, pt-BR, it and
+  fr, including œ); rebuild with `uv run tools/gen_fonts.py` (ADR-0031).
 
 ### Text roles (ADR-0014)
 
