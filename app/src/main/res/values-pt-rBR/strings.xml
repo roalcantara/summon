@@ -24,6 +24,8 @@
     <string name="escape_dismiss">Toque e pronto</string>
     <!-- Grimoire (ADR-0016) -->
     <string name="grimoire_back">Voltar à câmara</string>
+    <string name="grimoire_previous">Anterior</string>
+    <string name="grimoire_next">Próximo</string>
     <string name="avatar_sealed">%1$s, selado</string>
     <string name="celebration_banner">Demônio recebido!</string>
     <string name="quote_tap_to_summon">Invocar</string>

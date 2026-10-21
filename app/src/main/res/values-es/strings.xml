@@ -24,6 +24,8 @@
     <string name="escape_dismiss">Toca y listo</string>
     <!-- Grimoire (ADR-0016) -->
     <string name="grimoire_back">Volver a la cámara</string>
+    <string name="grimoire_previous">Demonio previo</string>
+    <string name="grimoire_next">Siguiente</string>
     <string name="avatar_sealed">%1$s sellado</string>
     <string name="celebration_banner">¡Demonio recibido!</string>
     <string name="quote_tap_to_summon">Toca e invoca</string>

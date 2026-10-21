@@ -27,6 +27,8 @@
 
     <!-- Grimoire (ADR-0016) -->
     <string name="grimoire_back">Back to the chamber</string>
+    <string name="grimoire_previous">Previous demon</string>
+    <string name="grimoire_next">Next demon</string>
     <string name="avatar_sealed">%1$s, sealed</string>
     <string name="celebration_banner">New Demon Received!</string>
     <string name="quote_tap_to_summon">Tap to summon</string>

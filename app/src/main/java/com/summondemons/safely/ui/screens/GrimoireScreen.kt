@@ -135,6 +135,7 @@ private const val FLOAT_PERIOD_S = 4f
 private const val PARTY_POP_FROM = 0.85f
 private const val CARD_ALPHA = 0.95f
 private const val METAL_RING_ALPHA = 0.45f
+private const val STAGE_ARROW_ALPHA = 0.7f
 private val RailHeight = 72.dp
 private val FloatAmplitude = 6.dp
 private val SceneBlur = 3.dp
@@ -271,19 +272,26 @@ fun GrimoireScreen(
                 val minimum = with(density) { fixedPx.toDp() } + spacing.lg + spacing.md + CarouselTopPadding + CarouselMinHeight + navBottom
                 val cardHeight = maxOf(maxHeight * CARD_HEIGHT_FRACTION, minimum)
                 Column(Modifier.fillMaxSize()) {
-                    Stage(
-                        demon = demon,
-                        bound = bound,
-                        restless = restless,
-                        party = party != null,
-                        canSummon = state.canSummonToday,
-                        quote = stringResource(if (restless) demon.restlessQuote else demon.quote),
-                        hours = state.hoursToNextSummon,
-                        shake = shake,
-                        onPrimary = primary,
-                        onSwipe = step,
-                        modifier = Modifier.weight(1f).fillMaxWidth(),
-                    )
+                    Box(Modifier.weight(1f).fillMaxWidth()) {
+                        Stage(
+                            demon = demon,
+                            bound = bound,
+                            restless = restless,
+                            party = party != null,
+                            canSummon = state.canSummonToday,
+                            quote = stringResource(if (restless) demon.restlessQuote else demon.quote),
+                            hours = state.hoursToNextSummon,
+                            shake = shake,
+                            onPrimary = primary,
+                            onSwipe = step,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                        // Arrows make the stage swipe visible (RC, TODO r62v); hidden while celebrating, like the swipe.
+                        if (party == null && demons.size > 1) {
+                            StageArrow("‹", stringResource(R.string.grimoire_previous), Modifier.align(Alignment.CenterStart)) { step(-1) }
+                            StageArrow("›", stringResource(R.string.grimoire_next), Modifier.align(Alignment.CenterEnd)) { step(1) }
+                        }
+                    }
                     DemonCard(
                         demons = demons,
                         demon = demon,
@@ -343,6 +351,22 @@ private fun AvatarRail(
             }
         }
         if (onDebug != null) DebugChip(onDebug, Modifier.align(Alignment.CenterEnd))
+    }
+}
+
+/** Previous / next demon on the stage edge: the dossier's ‹ › glyphs on a translucent disc, readable over the art. */
+@Composable
+private fun StageArrow(glyph: String, label: String, modifier: Modifier, onClick: () -> Unit) {
+    val colors = MaterialTheme.colorScheme
+    Surface(
+        shape = CircleShape,
+        color = colors.surfaceContainer.copy(alpha = STAGE_ARROW_ALPHA),
+        border = BorderStroke(1.dp, colors.outlineVariant),
+        modifier = modifier.padding(horizontal = MaterialTheme.spacing.sm),
+    ) {
+        IconButton(onClick = onClick, modifier = Modifier.semantics { contentDescription = label }) {
+            Text(glyph, style = MaterialTheme.typography.headlineMedium, color = colors.onSurface, modifier = Modifier.clearAndSetSemantics { })
+        }
     }
 }
 
