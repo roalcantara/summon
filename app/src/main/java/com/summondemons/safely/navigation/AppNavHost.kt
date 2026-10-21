@@ -161,7 +161,9 @@ private fun HomeDestination(state: GameUiState, onDebug: (() -> Unit)?, onOpen: 
         demonCount = demons.size,
         courtHouses = state.courtHouses,
         restlessAccent = if (anyRestless) DemonCatalog.byId(focusId)?.accent else null,
-        showHint = !state.progress.homeHintSeen,
+        // Always on: play-testers who missed it once had no way to learn how to start (RC, TODO BWFm).
+        // homeHintSeen is still recorded, for a smarter hint after the release.
+        showHint = true,
         escaped = demons.filter { state.record(it.id).escapeBannerPending },
         onOpen = onOpen,
         onDismissEscape = onDismissEscape,
