@@ -1,0 +1,305 @@
+chant_face:
+  - text: 'Mira %1$s'
+    length: 9
+    back_translation: 'Face %1$s'
+    reference: 'none'
+    note: 'Imperativo chiaro e valido con tutti gli otto punti cardinali.'
+  - text: 'Mira:%1$s'
+    length: 9
+    back_translation: 'Face: %1$s'
+    reference: 'none'
+    note: 'Variante compatta da etichetta d’interfaccia.'
+  - text: 'Mira—%1$s'
+    length: 9
+    back_translation: 'Face—%1$s'
+    reference: 'none'
+    note: 'Separa visivamente istruzione e direzione senza cambiare verbo.'
+
+escape_banner:
+  - text: 'Evasione!'
+    length: 9
+    back_translation: 'Escape!'
+    reference: 'none'
+    note: 'Annuncio immediato e drammatico dell’avvenuta fuga.'
+  - text: 'Fuga!'
+    length: 5
+    back_translation: 'Escape!'
+    reference: 'none'
+    note: 'Molto breve e urgente per un banner grande.'
+  - text: 'Sigillo KO'
+    length: 10
+    back_translation: 'Seal KO'
+    reference: 'KO'
+    note: 'Tratta la rottura del sigillo come una sconfitta secca e comica.'
+
+avatar_sealed:
+  - text: '%1$s, legato'
+    length: 12
+    back_translation: '%1$s, bound'
+    reference: 'none'
+    note: 'Usa il termine fisso e resta accessibile a uno screen reader.'
+  - text: '%1$s, chiuso'
+    length: 12
+    back_translation: '%1$s, shut away'
+    reference: 'none'
+    note: 'Compatto e facile da comprendere.'
+  - text: '%1$s, fermo'
+    length: 11
+    back_translation: '%1$s, held'
+    reference: 'none'
+    note: 'Formula breve per indicare che il demone non è ancora libero.'
+
+chant_sealed:
+  - text: 'Fatto'
+    length: 5
+    back_translation: 'Done'
+    reference: 'none'
+    note: 'Breve e inequivocabile nel risultato del verso.'
+  - text: 'Fatto!'
+    length: 6
+    back_translation: 'Done!'
+    reference: 'none'
+    note: 'Aggiunge un piccolo senso di trionfo senza superare il limite.'
+  - text: 'Chiuso'
+    length: 6
+    back_translation: 'Closed'
+    reference: 'none'
+    note: 'Comunica che il verso è stato completato e bloccato.'
+
+verdict_seal_cracked:
+  - text: 'Crepato'
+    length: 7
+    back_translation: 'Cracked'
+    reference: 'none'
+    note: 'Diretto e leggibile come verdetto.'
+  - text: 'S’è rotto'
+    length: 9
+    back_translation: 'It broke'
+    reference: 'none'
+    note: 'Formula naturale e immediata.'
+  - text: 'È crepato'
+    length: 9
+    back_translation: 'It cracked'
+    reference: 'none'
+    note: 'Rende esplicito l’evento senza appesantire l’interfaccia.'
+
+home_hint:
+  - text: 'Apri il grimorio'
+    length: 16
+    back_translation: 'Open the grimoire'
+    reference: 'none'
+    note: 'Indica chiaramente l’azione e l’oggetto da toccare.'
+  - text: 'Tocca Grimorio'
+    length: 14
+    back_translation: 'Tap Grimoire'
+    reference: 'none'
+    note: 'Versione corta che conserva il termine fissato.'
+  - text: 'Apri Grimorio'
+    length: 13
+    back_translation: 'Open Grimoire'
+    reference: 'none'
+    note: 'Una variante compatta da chip di aiuto.'
+
+dossier_weakness:
+  - text: 'Tallone'
+    length: 7
+    back_translation: 'Heel'
+    reference: "Achilles' heel"
+    note: 'Richiama subito il punto debole e funziona in un titolo breve.'
+  - text: 'Difetto'
+    length: 7
+    back_translation: 'Flaw'
+    reference: 'none'
+    note: 'Etichetta funzionale e molto chiara.'
+  - text: 'Debole'
+    length: 6
+    back_translation: 'Weak'
+    reference: 'none'
+    note: 'La versione più concisa per la sezione della vulnerabilità.'
+
+dossier_secret:
+  - text: 'Arcano'
+    length: 6
+    back_translation: 'Arcane secret'
+    reference: 'none'
+    note: 'Ha un tono occulto adatto al dossier.'
+  - text: 'Ignoto'
+    length: 6
+    back_translation: 'Unknown'
+    reference: 'none'
+    note: 'Suggerisce un contenuto ancora nascosto.'
+  - text: 'Celato'
+    length: 6
+    back_translation: 'Hidden'
+    reference: 'none'
+    note: 'Chiaro e atmosferico senza superare il limite.'
+
+demon_asmodeus_title:
+  - text: 'Re dei Conti e dell’Oro Nascosto'
+    length: 32
+    back_translation: 'King of Accounts and Hidden Gold'
+    reference: 'none'
+    note: 'Unisce calcoli e tesori con un tono da sovrano avaro.'
+  - text: 'Signore di Numeri e Oro Nascosto'
+    length: 32
+    back_translation: 'Lord of Numbers and Hidden Gold'
+    reference: 'none'
+    note: 'Mantiene l’idea aritmetica in un registro da fantasia.'
+  - text: 'Re di Somme e Oro Nascosto'
+    length: 26
+    back_translation: 'King of Sums and Hidden Gold'
+    reference: 'none'
+    note: 'Somme rende il suo potere matematico più quotidiano e meschino.'
+
+demon_asmodeus_ability_2_name:
+  - text: 'Non ci sono'
+    length: 11
+    back_translation: 'I’m not here'
+    reference: 'none'
+    note: 'Suona come una sparizione sfacciata e colloquiale.'
+  - text: 'Ora non vedi'
+    length: 12
+    back_translation: 'Now you don’t see'
+    reference: "now you see me, now you don't"
+    note: 'Conserva il secondo tempo del gioco di parole inglese.'
+  - text: 'Sparito!'
+    length: 8
+    back_translation: 'Gone!'
+    reference: 'none'
+    note: 'Secco, leggibile e perfetto per l’invisibilità.'
+
+demon_asmodeus_weakness_name:
+  - text: 'Per Nome'
+    length: 8
+    back_translation: 'By name'
+    reference: 'none'
+    note: 'Rimanda direttamente alla domanda che lo costringe a identificarsi.'
+  - text: 'Confessa'
+    length: 8
+    back_translation: 'Confess'
+    reference: 'none'
+    note: 'Trasforma l’ammissione forzata in una piccola umiliazione.'
+  - text: 'Si nomina'
+    length: 9
+    back_translation: 'He names himself'
+    reference: 'none'
+    note: 'Descrive con precisione il modo in cui si tradisce.'
+
+demon_astaroth_title:
+  - text: 'Duca di Ieri, Oggi e Domani'
+    length: 27
+    back_translation: 'Duke of Yesterday, Today and Tomorrow'
+    reference: 'none'
+    note: 'Triade naturale e solenne per i suoi poteri temporali.'
+  - text: 'Duca di Passato, Ora e Futuro'
+    length: 29
+    back_translation: 'Duke of Past, Now and Future'
+    reference: 'none'
+    note: 'Formula più astratta, ma ancora chiara in una sola riga.'
+  - text: 'Duca di Ogni Tempo'
+    length: 18
+    back_translation: 'Duke of Every Time'
+    reference: 'none'
+    note: 'Sintesi molto compatta e grandiosa.'
+
+demon_astaroth_ability_2_name:
+  - text: 'Pettegolo'
+    length: 9
+    back_translation: 'Gossip'
+    reference: 'none'
+    note: 'Rende Astaroth una creatura che non sa tenere un segreto.'
+  - text: 'Gossip'
+    length: 6
+    back_translation: 'Gossip'
+    reference: 'none'
+    note: 'Prestito comunissimo, breve e subito riconoscibile.'
+  - text: 'Diceria'
+    length: 7
+    back_translation: 'Rumour'
+    reference: 'none'
+    note: 'Tratta i segreti come voci da salotto.'
+
+demon_astaroth_ability_3_name:
+  - text: 'La Caduta: Edizione Lunga'
+    length: 25
+    back_translation: 'The Fall: Long Edition'
+    reference: 'extended edition'
+    note: 'Parodia una versione cinematografica inutilmente prolissa.'
+  - text: 'La Caduta: Taglio Finale'
+    length: 24
+    back_translation: 'The Fall: Final Cut'
+    reference: 'film editing terminology'
+    note: 'Mantiene la battuta sul montaggio da film.'
+  - text: 'La Caduta: Versione Extra'
+    length: 25
+    back_translation: 'The Fall: Extra Version'
+    reference: 'bonus edition'
+    note: 'Suggerisce dettagli aggiunti che nessuno aveva chiesto.'
+
+demon_astaroth_offices[3]:
+  - text: 'Ti insegna tutte le arti liberali.'
+    length: 34
+    back_translation: 'He teaches you all the liberal arts.'
+    reference: 'none'
+    note: 'Naturale, chiaro e neutro rispetto al genere del giocatore.'
+  - text: 'Impari tutte le arti liberali.'
+    length: 30
+    back_translation: 'You learn all the liberal arts.'
+    reference: 'none'
+    note: 'Versione diretta e inclusiva.'
+  - text: 'Ti rende esperto nelle arti liberali.'
+    length: 37
+    back_translation: 'He makes you skilled in the liberal arts.'
+    reference: 'none'
+    note: 'Promessa più enfatica, senza attribuire genere al giocatore.'
+
+calling_warlord_label:
+  - text: 'Tiranno'
+    length: 7
+    back_translation: 'Tyrant'
+    reference: 'none'
+    note: 'Breve, autorevole e adatto a un demone chiamato per comandare.'
+  - text: 'Comando'
+    length: 7
+    back_translation: 'Command'
+    reference: 'none'
+    note: 'Etichetta funzionale e leggibile nel distintivo.'
+  - text: 'Milizia'
+    length: 7
+    back_translation: 'Militia'
+    reference: 'none'
+    note: 'Richiama con chiarezza la funzione militare.'
+
+calling_tutor_label:
+  - text: 'Prof'
+    length: 4
+    back_translation: 'Teacher'
+    reference: 'none'
+    note: 'Familiare, breve e leggibile.'
+  - text: 'Guida'
+    length: 5
+    back_translation: 'Guide'
+    reference: 'none'
+    note: 'Etichetta funzionale per chi insegna o orienta.'
+  - text: 'Tutor'
+    length: 5
+    back_translation: 'Tutor'
+    reference: 'none'
+    note: 'Termine già comune in italiano e perfetto per il badge.'
+
+calling_menace_label:
+  - text: 'Peste'
+    length: 5
+    back_translation: 'Plague'
+    reference: 'none'
+    note: 'Minaccioso con un tocco colloquiale.'
+  - text: 'Guai'
+    length: 4
+    back_translation: 'Trouble'
+    reference: 'none'
+    note: 'Avverte subito che evocarlo porta problemi.'
+  - text: 'Nocivo'
+    length: 6
+    back_translation: 'Harmful'
+    reference: 'none'
+    note: 'L’opzione più letterale entro il limite.'

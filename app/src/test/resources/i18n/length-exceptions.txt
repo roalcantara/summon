@@ -12,3 +12,4 @@ it calling_oracle_label same length as ORÁCULO, verified on device to fit its b
 it action_stay dialog button; the button grows with its label
 fr compass_points[6] Ouest is the only word; the pill fits 10-character names
 fr chant_score French typography: narrow no-break space before %
+fr demon_asmodeus_ability_2_name Ni vu ni connu is the exact idiom; ability names run inline in the dossier text and wrap

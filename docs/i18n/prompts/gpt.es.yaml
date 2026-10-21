@@ -1,0 +1,288 @@
+badge_legions_label:
+  - text: '%1$d huestes'
+    length: 12
+    back_translation: '%1$d hosts'
+    reference: 'none'
+    note: 'Claro para tropas demoníacas y cabe en la insignia.'
+  - text: '%1$d fuerzas'
+    length: 12
+    back_translation: '%1$d forces'
+    reference: 'none'
+    note: 'Una alternativa funcional y compacta.'
+  - text: '%1$d tropas'
+    length: 11
+    back_translation: '%1$d troops'
+    reference: 'none'
+    note: 'Muy legible en un distintivo estrecho.'
+
+chant_face:
+  - text: 'Mira %1$s'
+    length: 9
+    back_translation: 'Face %1$s'
+    reference: 'none'
+    note: 'Imperativo claro, consistente con el término fijo y válido para los ocho puntos.'
+  - text: 'Mira:%1$s'
+    length: 9
+    back_translation: 'Face: %1$s'
+    reference: 'none'
+    note: 'Formato compacto de etiqueta para la píldora de dirección.'
+  - text: 'Mira—%1$s'
+    length: 9
+    back_translation: 'Face—%1$s'
+    reference: 'none'
+    note: 'Una separación visual concisa sin alterar el verbo requerido.'
+
+badge_direction_text:
+  - text: 'Mira %1$s e invoca. %2$s'
+    length: 24
+    back_translation: 'Face %1$s and summon. %2$s'
+    reference: 'none'
+    note: 'Natural antes de invoca y válido con cualquier punto cardinal.'
+  - text: 'Mira %1$s. Invoca. %2$s'
+    length: 23
+    back_translation: 'Face %1$s. Summon. %2$s'
+    reference: 'none'
+    note: 'Dos instrucciones muy claras para un texto breve de insignia.'
+  - text: 'Mira %1$s; invoca. %2$s'
+    length: 23
+    back_translation: 'Face %1$s; summon. %2$s'
+    reference: 'none'
+    note: 'Mantiene una sola línea de instrucción con tono directo.'
+
+dossier_weakness:
+  - text: 'Flaqueza'
+    length: 8
+    back_translation: 'Weakness'
+    reference: 'none'
+    note: 'Equivalente directo y adecuado como encabezado.'
+  - text: 'Defecto'
+    length: 7
+    back_translation: 'Flaw'
+    reference: 'none'
+    note: 'Corto, claro y útil para una página de expediente.'
+  - text: 'Fallo'
+    length: 5
+    back_translation: 'Failing'
+    reference: 'none'
+    note: 'La opción más compacta sin perder claridad.'
+
+dossier_secret:
+  - text: 'Sigilo'
+    length: 6
+    back_translation: 'Secret'
+    reference: 'none'
+    note: 'Tiene aire ocultista y cabe exactamente.'
+  - text: 'Arcano'
+    length: 6
+    back_translation: 'Arcane secret'
+    reference: 'none'
+    note: 'Aporta un tono de grimorio sin sacrificar claridad.'
+  - text: 'Oculto'
+    length: 6
+    back_translation: 'Hidden'
+    reference: 'none'
+    note: 'Encabezado breve y directo para contenido desbloqueable.'
+
+demon_asmodeus_title:
+  - text: 'Señor de Sumas y Oro Oculto'
+    length: 27
+    back_translation: 'Lord of Sums and Hidden Gold'
+    reference: 'none'
+    note: 'Las sumas dan un giro más cotidiano y mezquino a su saber aritmético.'
+  - text: 'Señor de Cuentas y Oro Oculto'
+    length: 29
+    back_translation: 'Lord of Accounts and Hidden Gold'
+    reference: 'none'
+    note: 'Une cálculo y riqueza escondida con tono de tesorero siniestro.'
+  - text: 'Señor del Cálculo y el Oro Oculto'
+    length: 33
+    back_translation: 'Lord of Arithmetic and Hidden Gold'
+    reference: 'none'
+    note: 'Versión solemne y fiel al cargo del demonio.'
+
+demon_asmodeus_ability_2_name:
+  - text: 'Ahora no ves'
+    length: 12
+    back_translation: "Now you don't see"
+    reference: "now you see me, now you don't"
+    note: 'Conserva el remate del juego de palabras original.'
+  - text: '¿Dónde está?'
+    length: 12
+    back_translation: 'Where is he?'
+    reference: 'none'
+    note: 'Una pregunta seca que encaja con una desaparición instantánea.'
+  - text: 'Se hizo humo'
+    length: 12
+    back_translation: 'He vanished into smoke'
+    reference: 'none'
+    note: 'Expresión extendida en todo el español para desaparecer.'
+
+demon_asmodeus_ability_3_line:
+  - text: 'Halla tesoros, los cuenta y se sienta encima.'
+    length: 45
+    back_translation: 'Finds treasures, counts them, and sits on them.'
+    reference: 'none'
+    note: 'Describe con claridad el acaparamiento ridículo de un dragón.'
+  - text: 'Encuentra tesoros, los cuenta y se sienta encima.'
+    length: 49
+    back_translation: 'Finds treasures, counts them, and sits on them.'
+    reference: 'none'
+    note: 'Mantiene el gesto absurdo con una formulación muy natural.'
+  - text: 'Halla el tesoro, lo cuenta y se queda encima.'
+    length: 46
+    back_translation: 'Finds the treasure, counts it, and stays on top of it.'
+    reference: 'none'
+    note: 'Hace que su avaricia parezca una ocupación permanente.'
+
+demon_asmodeus_weakness_name:
+  - text: 'Se delata'
+    length: 9
+    back_translation: 'He gives himself away'
+    reference: 'none'
+    note: 'Resume tanto la confesión forzosa como la humillación.'
+  - text: 'Confesión'
+    length: 9
+    back_translation: 'Confession'
+    reference: 'none'
+    note: 'Solemne a propósito, con un matiz cómicamente desproporcionado.'
+  - text: 'Su nombre'
+    length: 9
+    back_translation: 'His name'
+    reference: 'none'
+    note: 'Señala de forma concisa el punto débil exacto.'
+
+demon_asmodeus_weakness_line:
+  - text: 'Pregúntale “¿Sois vos Asmodeus?”: debe admitirlo y postrarse. Tres cabezas, un ego, cero calma.'
+    length: 95
+    back_translation: 'Ask him “Art thou Asmodeus?”: he must admit it and prostrate himself. Three heads, one ego, zero calm.'
+    reference: 'none'
+    note: 'Conserva el tratamiento arcaico, la reverencia obligada y el remate numérico.'
+  - text: 'Pregunta “¿Sois vos Asmodeus?”; debe confesar y postrarse. Tres cabezas, un ego, cero calma.'
+    length: 92
+    back_translation: 'Ask “Art thou Asmodeus?”; he must confess and prostrate himself. Three heads, one ego, zero calm.'
+    reference: 'none'
+    note: 'Más concisa y con un remate seco de comedia.'
+  - text: 'Di “¿Sois vos Asmodeus?” y se delata y se postra. Tres cabezas, un ego, cero calma.'
+    length: 83
+    back_translation: 'Say “Art thou Asmodeus?” and he gives himself away and prostrates himself. Three heads, one ego, zero calm.'
+    reference: 'none'
+    note: 'Rápida, teatral y fácil de leer en una ficha.'
+
+demon_astaroth_title:
+  - text: 'Duque de Ayer, Hoy y Mañana'
+    length: 27
+    back_translation: 'Duke of Yesterday, Today and Tomorrow'
+    reference: 'none'
+    note: 'Tríada natural, clara y ligeramente grandilocuente.'
+  - text: 'Duque de Ayer, Hoy y Siempre'
+    length: 28
+    back_translation: 'Duke of Yesterday, Today and Always'
+    reference: 'none'
+    note: 'Da una amplitud temporal más pomposa y sobrenatural.'
+  - text: 'Duque de Todo Tiempo'
+    length: 20
+    back_translation: 'Duke of All Time'
+    reference: 'none'
+    note: 'La versión más breve para una línea especialmente ajustada.'
+
+demon_astaroth_ability_2_name:
+  - text: 'Chisme'
+    length: 6
+    back_translation: 'Gossip'
+    reference: 'none'
+    note: 'Es inmediato, divertido y ampliamente entendido.'
+  - text: 'Rumor'
+    length: 5
+    back_translation: 'Rumour'
+    reference: 'none'
+    note: 'Breve y claro para información que circula.'
+  - text: 'Soplo'
+    length: 5
+    back_translation: 'Tip-off'
+    reference: 'none'
+    note: 'Sugiere un secreto recibido de forma confidencial.'
+
+demon_astaroth_ability_3_name:
+  - text: 'La Caída: Edición Íntegra'
+    length: 25
+    back_translation: 'The Fall: Complete Edition'
+    reference: "director's cut"
+    note: 'Parodia el montaje completo de una película con toda su historia no solicitada.'
+  - text: 'La Caída: Corte Final'
+    length: 21
+    back_translation: 'The Fall: Final Cut'
+    reference: 'film editing terminology'
+    note: 'Mantiene la broma cinematográfica y el tono de versión definitiva.'
+  - text: 'La Caída: Toma Larga'
+    length: 20
+    back_translation: 'The Fall: Long Take'
+    reference: 'film terminology'
+    note: 'Insinúa que Astaroth convierte su caída en una escena interminable.'
+
+demon_astaroth_appearance:
+  - text: 'Un ángel malintencionado sobre una bestia medio dragón, con una víbora en la diestra como pluma fina. Su aliento llega primero.'
+    length: 127
+    back_translation: 'An ill-intentioned angel on a half-dragon beast, with a viper in his right hand like a fine pen. His breath arrives first.'
+    reference: 'none'
+    note: 'Mantiene la imagen elegante de la víbora y el remate desagradable.'
+  - text: 'Un ángel con malas intenciones, sobre un dragón de saldo, y una víbora a modo de pluma. Su aliento se adelanta.'
+    length: 111
+    back_translation: 'An angel with bad intentions, on a bargain dragon, and a viper as a pen. His breath gets there first.'
+    reference: 'none'
+    note: 'Dragón de saldo rebaja cómicamente su montura sin perder la imagen fantástica.'
+  - text: 'Ángel de malas intenciones, bestia medio dragón y víbora a modo de pluma fina. El aliento llega antes.'
+    length: 102
+    back_translation: 'Angel of bad intentions, half-dragon beast and viper as a fine pen. The breath arrives first.'
+    reference: 'none'
+    note: 'La versión más breve conserva todos los elementos y el chiste final.'
+
+demon_astaroth_offices[3]:
+  - text: 'Te enseña todas las artes liberales.'
+    length: 36
+    back_translation: 'He teaches you all the liberal arts.'
+    reference: 'none'
+    note: 'Natural, claro y sin asignar género al jugador.'
+  - text: 'Te instruye en las artes liberales.'
+    length: 35
+    back_translation: 'He instructs you in the liberal arts.'
+    reference: 'none'
+    note: 'Un poco más formal, apropiado para un dossier demoníaco.'
+  - text: 'Dominarás todas las artes liberales.'
+    length: 36
+    back_translation: 'You will master all the liberal arts.'
+    reference: 'none'
+    note: 'Promesa grandiosa, neutral en cuanto al género.'
+
+calling_warlord_label:
+  - text: 'General'
+    length: 7
+    back_translation: 'General'
+    reference: 'none'
+    note: 'Rango militar inequívoco y perfecto para el espacio disponible.'
+  - text: 'Mando'
+    length: 5
+    back_translation: 'Command'
+    reference: 'none'
+    note: 'Etiqueta funcional y muy compacta.'
+  - text: 'Guerra'
+    length: 6
+    back_translation: 'War'
+    reference: 'none'
+    note: 'Directa y legible en un distintivo pequeño.'
+
+calling_menace_label:
+  - text: 'Plaga'
+    length: 5
+    back_translation: 'Plague'
+    reference: 'none'
+    note: 'Amenazante, coloquial y breve.'
+  - text: 'Riesgo'
+    length: 6
+    back_translation: 'Risk'
+    reference: 'none'
+    note: 'Advierte claramente que invocarlo no es buena idea.'
+  - text: 'Terror'
+    length: 6
+    back_translation: 'Terror'
+    reference: 'none'
+    note: 'Una etiqueta funcional con presencia sin requerir explicación.'

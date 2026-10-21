@@ -1,0 +1,378 @@
+chant_face:
+  - text: 'Face %1$s'
+    length: 9
+    back_translation: 'Face %1$s'
+    reference: 'none'
+    note: "Works seamlessly as a direction command without articles (e.g. 'Face Nord', 'Face Est') and matches the budget perfectly."
+  - text: 'Cap %1$s'
+    length: 8
+    back_translation: 'Heading %1$s'
+    reference: 'none'
+    note: 'Nautical/navigational instruction that sounds direct and uses no article.'
+  - text: 'Vise %1$s'
+    length: 9
+    back_translation: 'Aim %1$s'
+    reference: 'none'
+    note: 'Playful imperative, keeping within the 9-character constraint.'
+
+chant_heard:
+  - text: 'Reçu : %1$s'
+    length: 11
+    back_translation: 'Received: %1$s'
+    reference: 'none'
+    note: 'Fits the short budget, uses the correct narrow no-break space before the colon, and feels like a clear system message.'
+  - text: 'Dit : %1$s'
+    length: 10
+    back_translation: 'Said: %1$s'
+    reference: 'none'
+    note: 'Very compact and immediately tells the player what the microphone picked up.'
+  - text: 'Ouï : %1$s'
+    length: 10
+    back_translation: 'Heard: %1$s'
+    reference: 'none'
+    note: "An archaic and fittingly grimoire-like translation of 'heard', shortened for budget."
+
+escape_banner:
+  - text: 'Échappé !'
+    length: 9
+    back_translation: 'Escaped!'
+    reference: 'none'
+    note: "Punchy, visually distinct with the exclamation mark, and accurately states the demon's status."
+  - text: 'Fugitif !'
+    length: 9
+    back_translation: 'Fugitive!'
+    reference: 'none'
+    note: 'Adds a humorous criminal tone to a demon slipping out of his seal.'
+  - text: 'Évasion !'
+    length: 9
+    back_translation: 'Prison break!'
+    reference: 'none'
+    note: 'Current translation. Sounds like a jailbreak.'
+
+escape_dismiss:
+  - text: 'Compris'
+    length: 7
+    back_translation: 'Understood'
+    reference: 'none'
+    note: 'A standard, very clear mobile UI interaction acknowledgment.'
+  - text: 'Masquer'
+    length: 7
+    back_translation: 'Hide'
+    reference: 'none'
+    note: 'Direct instruction about what tapping will do.'
+  - text: 'Fermer'
+    length: 6
+    back_translation: 'Close'
+    reference: 'none'
+    note: 'The most standard UI term for dismissing a banner.'
+
+home_hint:
+  - text: 'Ouvre le livre'
+    length: 14
+    back_translation: 'Open the book'
+    reference: 'none'
+    note: "Natural, direct, and slightly more atmospheric than 'tap'."
+  - text: 'Lis le Grimoire'
+    length: 15
+    back_translation: 'Read the Grimoire'
+    reference: 'none'
+    note: "Fits the budget and explicitly uses the required 'Grimoire' term in a clear command."
+  - text: 'Touche le livre'
+    length: 15
+    back_translation: 'Touch the book'
+    reference: 'none'
+    note: 'The current functional equivalent.'
+
+action_stay:
+  - text: 'Ici'
+    length: 3
+    back_translation: 'Here'
+    reference: 'none'
+    note: "A short, distinct alternative to 'Non' that means 'stay here/stay put'."
+  - text: 'Non'
+    length: 3
+    back_translation: 'No'
+    reference: 'none'
+    note: "The standard opposite of 'Quitter' in this context."
+  - text: 'Rien'
+    length: 4
+    back_translation: 'Nothing'
+    reference: 'none'
+    note: "Short for 'do nothing', cancelling the abandon."
+
+intro_summon:
+  - text: 'Viens'
+    length: 5
+    back_translation: 'Come'
+    reference: 'none'
+    note: "A slightly arrogant, commanding way to start a summoning, fitting the game's tone."
+  - text: 'Hop !'
+    length: 5
+    back_translation: "Let's go!"
+    reference: 'none'
+    note: 'Playful and very colloquial French interjection.'
+  - text: 'Go !'
+    length: 4
+    back_translation: 'Go!'
+    reference: 'none'
+    note: 'Extremely common Franglish usage for starting an action.'
+
+abandon_body:
+  - text: 'Sceaux perdus.'
+    length: 14
+    back_translation: 'Seals lost.'
+    reference: 'none'
+    note: 'Direct, slightly ominous, and extremely clear.'
+  - text: 'Adieu tes sceaux.'
+    length: 17
+    back_translation: 'Farewell your seals.'
+    reference: 'none'
+    note: 'Playfully dismissive, matching the petty tone of the demons.'
+  - text: 'Tes sceaux fuiront.'
+    length: 19
+    back_translation: 'Your seals will flee.'
+    reference: 'none'
+    note: 'Gives a bit of agency to the magic dissipating.'
+
+dossier_weakness:
+  - text: 'Faille'
+    length: 6
+    back_translation: 'Flaw / Rift'
+    reference: 'none'
+    note: 'A great RPG term for weakness, short and evocative.'
+  - text: 'Défaut'
+    length: 6
+    back_translation: 'Defect / Fault'
+    reference: 'none'
+    note: 'Simple and clear.'
+  - text: 'Talon'
+    length: 5
+    back_translation: 'Heel'
+    reference: "Talon d'Achille (Achilles' heel)"
+    note: 'Clever shorthand for a weakness.'
+
+chant_help:
+  - text: 'Le Chant'
+    length: 8
+    back_translation: 'The Chant'
+    reference: 'none'
+    note: 'Short and descriptive for a help button title.'
+  - text: 'Comment lire'
+    length: 12
+    back_translation: 'How to read'
+    reference: 'none'
+    note: 'Clear and fits the budget exactly.'
+  - text: 'Bien chanter'
+    length: 12
+    back_translation: 'Chanting well'
+    reference: 'none'
+    note: 'Current translation, straightforward.'
+
+demon_asmodeus_appearance:
+  - text: 'Trois têtes (taureau, humain, bélier) : chaque réunion est un comité. Il crache du feu, a des pattes d’oie et ondule une queue de serpent. Il déboule sur un dragon avec une lance : la subtilité, c’est pour les Ducs.'
+    length: 213
+    back_translation: 'Three heads (bull, human, ram): each meeting is a committee. He spits fire, has goose feet and wiggles a snake tail. He drops in on a dragon with a lance: subtlety is for Dukes.'
+    reference: 'none'
+    note: "Flows well, uses 'déboule' for a comical contrast to his grand entrance, and keeps the punchline intact."
+  - text: 'Trois têtes (taureau, homme, bélier) pour des comités constants. Souffle du feu, marche en pattes d’oie, fouette sa queue de serpent. Arrive sur un dragon avec une lance : la finesse, on laisse ça aux Ducs.'
+    length: 210
+    back_translation: 'Three heads (bull, man, ram) for constant committees. Breathes fire, walks on goose feet, whips his snake tail. Arrives on a dragon with a lance: finesse, we leave that to Dukes.'
+    reference: 'none'
+    note: "Slightly punchier phrasing using 'finesse' for subtle."
+  - text: 'Trois têtes (taureau, homme, bélier) : chaque réunion est un comité. Crache du feu, fouette d’une queue de serpent, marche en pattes d’oie. Arrive sur un dragon, lance au poing : la discrétion, c’est pour les Ducs.'
+    length: 214
+    back_translation: 'Three heads (bull, man, ram): each meeting is a committee. Spits fire, whips a snake tail, walks on goose feet. Arrives on a dragon, lance in hand: discretion is for Dukes.'
+    reference: 'none'
+    note: 'Current translation. Maximizes the budget effectively.'
+
+demon_asmodeus_restless_quote:
+  - text: 'J’ai compté chaque grain de poussière. Deux fois. En base 3, 8 et 10.'
+    length: 64
+    back_translation: 'I counted every speck of dust. Twice. In base 3, 8 and 10.'
+    reference: 'none'
+    note: 'Fits perfectly. Specifying the bases makes his obsessive boredom even funnier and more concrete.'
+  - text: 'J’ai compté chaque grain de poussière. Deux fois. Trois bases.'
+    length: 62
+    back_translation: 'I counted every speck of dust. Twice. Three bases.'
+    reference: 'none'
+    note: 'The current translation. Literal and retains the dry humor.'
+  - text: 'J’ai compté la poussière d’ici. Deux fois. En trois bases.'
+    length: 58
+    back_translation: 'I counted the dust in here. Twice. In three bases.'
+    reference: 'none'
+    note: 'Slightly tighter version.'
+
+demon_asmodeus_ability_2_name:
+  - text: 'Ni Vu Ni Connu'
+    length: 13
+    back_translation: 'Neither seen nor known'
+    reference: 'Ni vu, ni connu (Classic French idiom and film)'
+    note: 'Exactly 13 characters! A very famous French phrase for getting away unseen, perfect for invisibility.'
+  - text: 'Pouf, Disparu'
+    length: 13
+    back_translation: 'Poof, gone'
+    reference: 'none'
+    note: 'Comic-book style invisibility.'
+  - text: 'Disparu !'
+    length: 9
+    back_translation: 'Vanished!'
+    reference: 'none'
+    note: 'Simple and functional.'
+
+demon_asmodeus_weakness_name:
+  - text: 'Tu Sais Qui'
+    length: 11
+    back_translation: 'You Know Who'
+    reference: 'Harry Potter / Arrogant trope'
+    note: "Wait, budget is 9. Let's use 'C’est Qui' (9) or 'Démasqué' (8)."
+  - text: 'Son Petit Nom'
+    length: 13
+    back_translation: 'His pet name'
+    reference: 'none'
+    note: "Too long. Let's use 'Le Blase' (8) - French slang for name."
+  - text: 'Ton Nom ?'
+    length: 9
+    back_translation: 'Your Name?'
+    reference: 'none'
+    note: 'Fits 9 chars (T,o,n, ,N,o,m, ,?).'
+  - text: 'Démasqué'
+    length: 8
+    back_translation: 'Unmasked'
+    reference: 'none'
+    note: 'Current translation, works well for a weakness where he has to reveal himself.'
+
+demon_astaroth_quote:
+  - text: 'Je connais ton passé, ton futur, et que tu n’as pas lu les petits caractères.'
+    length: 77
+    back_translation: "I know your past, your future, and that you didn't read the fine print."
+    reference: 'Les petits caractères (The fine print)'
+    note: "Exactly 77 characters. Uses the common idiom for terms and conditions ('les petits caractères'), which sounds much more naturally mischievous than 'CGU'."
+  - text: 'Je sais ton passé, ton avenir, et que tu as cliqué sur « Lu et approuvé » sans lire.'
+    length: 77
+    back_translation: "I know your past, your future, and that you clicked on 'Read and approved' without reading."
+    reference: 'Lu et approuvé'
+    note: 'Wait, length: J,e, ,s,a,i,s, ,t,o,n, ,p,a,s,s,é,,, ,t,o,n, ,a,v,e,n,i,r,,, ,e,t, ,q,u,e, ,t,u, ,a,s, ,c,l,i,q,u,é, ,s,u,r, ,«, ,L,u, ,e,t, ,a,p,p,r,o,u,v,é, ,», ,s,a,n,s, ,l,i,r,e,. = 85. Too long.'
+  - text: 'Je sais ton passé, ton futur, et que tu n’as pas lu les CGU.'
+    length: 60
+    back_translation: "I know your past, your future, and that you didn't read the TOS."
+    reference: 'CGU'
+    note: "Current translation. CGU (Conditions Générales d'Utilisation) is standard, though less flavourful."
+
+demon_astaroth_restless_quote:
+  - text: 'J’avais prévu cet oubli. Je hais avoir raison. Ou pas.'
+    length: 54
+    back_translation: 'I had foreseen this oversight. I hate being right. Or not.'
+    reference: 'Ou pas (Internet slang/sarcasm)'
+    note: "'Ou pas' is the perfect French equivalent to a dry 'No I don't' punchline at the end of a sentence."
+  - text: 'Je savais que tu m’oublierais. Je hais avoir raison. Faux.'
+    length: 58
+    back_translation: 'I knew you would forget me. I hate being right. False.'
+    reference: 'none'
+    note: "Current translation. 'Faux' is a bit abrupt like Dwight Schrute."
+  - text: 'Oublié, je l’avais prévu. Je déteste avoir raison. Quoique.'
+    length: 58
+    back_translation: 'Forgotten, I had foreseen it. I hate being right. Actually...'
+    reference: 'none'
+    note: "'Quoique' gives it a fun, reconsidering sass."
+
+demon_astaroth_ability_2_name:
+  - text: 'Radio Ragot'
+    length: 11
+    back_translation: 'Gossip Radio'
+    reference: 'Radio Moquette / Ragots'
+    note: 'Very playful French idiom for workplace gossip or rumours spreading. Perfect Munchkin vibe.'
+  - text: 'Secret Polichinelle'
+    length: 19
+    back_translation: "Polichinelle's secret"
+    reference: 'Secret de Polichinelle'
+    note: "Too long (budget 11). Let's use 'Fouineur' (8)."
+  - text: 'Commère'
+    length: 7
+    back_translation: 'Gossip'
+    reference: 'none'
+    note: 'Current translation. Simple and gets the idea across.'
+
+demon_astaroth_secret:
+  - text: 'Avant le dragon et l’haleine fétide, son nom fut Astarte, déesse de l’amour et de la guerre. Il préfère qu’on l’oublie.'
+    length: 119
+    back_translation: 'Before the dragon and the foul breath, his name was Astarte, goddess of love and war. He prefers we forget it.'
+    reference: 'none'
+    note: "Adds 'fétide' to emphasize the dragon breath joke, and finishes with a dry remark about him wanting it forgotten."
+  - text: 'Avant le dragon et son haleine, son nom appartenait à Astarte, déesse d’amour et de guerre. Ne lance pas le sujet.'
+    length: 114
+    back_translation: "Before the dragon and his breath, his name belonged to Astarte, goddess of love and war. Don't start the subject."
+    reference: 'none'
+    note: 'Clear and casual.'
+  - text: 'Avant le dragon et l’haleine, son nom était à Astarte, déesse de l’amour et de la guerre. Évite le sujet.'
+    length: 105
+    back_translation: "Before the dragon and the breath, his name was Astarte's, goddess of love and war. Avoid the subject."
+    reference: 'none'
+    note: 'Current translation.'
+
+demon_astaroth_offices[3]:
+  - text: 'T’apprend tous les arts libéraux sur le bout des doigts.'
+    length: 57
+    back_translation: 'Teaches you all the liberal arts on the tips of your fingers.'
+    reference: 'none'
+    note: "Too long. Let's try: 'T’enseigne tous les arts libéraux.'"
+  - text: 'Fait de toi un as des arts libéraux.'
+    length: 37
+    back_translation: 'Makes you an ace of liberal arts.'
+    reference: 'Être un as (To be a whiz)'
+    note: "'Un as' conveys scholarly mastery playfully while dodging gender constraints perfectly."
+  - text: 'T’apprend tous les arts libéraux.'
+    length: 33
+    back_translation: 'Teaches you all the liberal arts.'
+    reference: 'none'
+    note: 'Current translation. Functional and short.'
+
+house_sol_tooltip:
+  - text: 'Rois de Sol : cour de 9h à 12h, puis de 15h au crépuscule. Lunettes !'
+    length: 68
+    back_translation: 'Kings of Sol: court from 9h to 12h, then 15h to dusk. Glasses!'
+    reference: 'none'
+    note: "Hits exactly 68 characters, using 'crépuscule' for a better dark-fantasy tone than 'le soir'."
+  - text: 'Rois de Sol : cour de 9 h à midi et 15 h au poing du jour. Crème d’indice 50 !'
+    length: 75
+    back_translation: 'Kings of Sol: court from 9 to noon and 15 to daybreak. SPF 50 cream!'
+    reference: 'Indice 50'
+    note: "Too long. Let's use: 'Rois de Sol : cour 9h-midi, 15h-coucher. N’oublie pas ta crème !'"
+  - text: 'Rois de Sol : cour 9h-midi, 15h-coucher. N’oublie pas ta crème !'
+    length: 64
+    back_translation: "Kings of Sol: court 9h-noon, 15h-sunset. Don't forget your cream!"
+    reference: 'Crème solaire (sunscreen)'
+    note: 'Replaces the sunglasses joke with sunscreen, common in French summer humour.'
+
+calling_warlord_label:
+  - text: 'Général'
+    length: 7
+    back_translation: 'General'
+    reference: 'none'
+    note: 'Exactly 7 characters and perfectly conveys the army aspect.'
+  - text: 'Armée'
+    length: 5
+    back_translation: 'Army'
+    reference: 'none'
+    note: 'Slightly more literal but very clear.'
+  - text: 'Chef'
+    length: 4
+    back_translation: 'Chief'
+    reference: 'none'
+    note: 'Simple and fits the budget.'
+
+calling_tutor_label:
+  - text: 'Prof'
+    length: 4
+    back_translation: 'Teacher'
+    reference: 'none'
+    note: 'Casual and fits the playful tone perfectly within the 5-character limit.'
+  - text: 'Gourou'
+    length: 6
+    back_translation: 'Guru'
+    reference: 'none'
+    note: 'Too long.'
+  - text: 'Sage'
+    length: 4
+    back_translation: 'Wise'
+    reference: 'none'
+    note: "A bit more fantasy-oriented if 'Prof' feels too modern."

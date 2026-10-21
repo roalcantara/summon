@@ -93,7 +93,7 @@
     <string name="intro_summon">Hop !</string>
     <string name="intro_close">Fermer et lancer le chant</string>
     <string name="abandon_title">Quitter le rituel ?</string>
-    <string name="abandon_body">Adieu tes sceaux.</string>
+    <string name="abandon_body">Tes sceaux pâliront.</string>
     <string name="action_abandon">Quitter</string>
     <string name="action_stay">Non</string>
     <!-- Compass points, in compassIndex order (HeadingMath.kt) -->

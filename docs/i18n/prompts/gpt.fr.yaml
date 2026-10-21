@@ -1,0 +1,373 @@
+chant_face:
+  - text: 'Cap %1$s'
+    length: 8
+    back_translation: 'Heading %1$s'
+    reference: 'none'
+    note: 'Clair, compact et valable avec les huit points cardinaux.'
+  - text: 'Cap:%1$s'
+    length: 8
+    back_translation: 'Heading: %1$s'
+    reference: 'none'
+    note: 'Une variante très compacte de libellé d’interface.'
+  - text: 'Cap—%1$s'
+    length: 8
+    back_translation: 'Heading—%1$s'
+    reference: 'none'
+    note: 'Sépare visuellement l’instruction et la direction sans ajouter de mots.'
+
+chant_heard:
+  - text: 'ouï « %1$s »'
+    length: 12
+    back_translation: 'heard “%1$s”'
+    reference: 'none'
+    note: 'Formulation concise et typographiquement française.'
+  - text: 'Ouï : %1$s'
+    length: 10
+    back_translation: 'Heard: %1$s'
+    reference: 'none'
+    note: 'Très lisible dans le retour de reconnaissance vocale.'
+  - text: 'Reçu : %1$s'
+    length: 11
+    back_translation: 'Received: %1$s'
+    reference: 'none'
+    note: 'Libellé court pour le texte détecté.'
+
+escape_banner:
+  - text: 'Sceau brisé'
+    length: 11
+    back_translation: 'Seal broken'
+    reference: 'none'
+    note: 'Annonce directe et dramatique de l’évasion.'
+  - text: 'Sceau cassé'
+    length: 11
+    back_translation: 'Seal broken'
+    reference: 'none'
+    note: 'Très clair dans une grande bannière d’alerte.'
+  - text: 'Fuite !'
+    length: 7
+    back_translation: 'Escape!'
+    reference: 'none'
+    note: 'Plus urgent et très compact.'
+
+escape_dismiss:
+  - text: 'Touche ici'
+    length: 10
+    back_translation: 'Tap here'
+    reference: 'none'
+    note: 'Indique clairement l’action à effectuer.'
+  - text: 'Touche fermer'
+    length: 13
+    back_translation: 'Tap to close'
+    reference: 'none'
+    note: 'Explicite tout en restant dans le budget.'
+  - text: 'Ferme ici'
+    length: 9
+    back_translation: 'Close here'
+    reference: 'none'
+    note: 'Instruction courte sous une bannière.'
+
+home_hint:
+  - text: 'Touche Grimoire'
+    length: 15
+    back_translation: 'Tap Grimoire'
+    reference: 'none'
+    note: 'Utilise le terme fixé et pointe directement vers l’objet.'
+  - text: 'Ouvre Grimoire'
+    length: 14
+    back_translation: 'Open Grimoire'
+    reference: 'none'
+    note: 'Exprime clairement le résultat attendu du geste.'
+  - text: 'Tape Grimoire'
+    length: 13
+    back_translation: 'Tap Grimoire'
+    reference: 'none'
+    note: 'Version très courte, adaptée à une puce d’aide.'
+
+action_stay:
+  - text: 'Non'
+    length: 3
+    back_translation: 'No'
+    reference: 'none'
+    note: 'Réponse naturelle à la question d’abandonner le rituel.'
+  - text: 'Ici'
+    length: 3
+    back_translation: 'Here'
+    reference: 'none'
+    note: 'Suggère de rester dans le rituel en cours.'
+  - text: 'Stop'
+    length: 4
+    back_translation: 'Stop'
+    reference: 'none'
+    note: 'Arrête l’abandon avec un libellé très bref.'
+
+intro_summon:
+  - text: 'Hop !'
+    length: 5
+    back_translation: 'Here we go!'
+    reference: 'none'
+    note: 'Enjoué, immédiat et adapté au lancement du rituel.'
+  - text: 'Appel'
+    length: 5
+    back_translation: 'Call'
+    reference: 'none'
+    note: 'Évoque directement l’invocation en peu de place.'
+  - text: 'Rituel'
+    length: 6
+    back_translation: 'Ritual'
+    reference: 'none'
+    note: 'Sobre et lisible pour le bouton qui le commence.'
+
+abandon_body:
+  - text: 'Tes sceaux pâliront.'
+    length: 20
+    back_translation: 'Your seals will fade.'
+    reference: 'none'
+    note: 'Garde l’idée de disparition progressive avec un ton de présage.'
+  - text: 'Tes sceaux pâlissent.'
+    length: 21
+    back_translation: 'Your seals are fading.'
+    reference: 'none'
+    note: 'Rend la perte imminente et concrète.'
+  - text: 'Adieu tes sceaux.'
+    length: 17
+    back_translation: 'Goodbye to your seals.'
+    reference: 'none'
+    note: 'Plus sec et légèrement moqueur.'
+
+dossier_weakness:
+  - text: 'Talon'
+    length: 5
+    back_translation: 'Heel'
+    reference: "Achilles' heel"
+    note: 'Évoque immédiatement le point faible dans un titre compact.'
+  - text: 'Défaut'
+    length: 6
+    back_translation: 'Flaw'
+    reference: 'none'
+    note: 'Fonctionnel, court et compréhensible.'
+  - text: 'Faille'
+    length: 6
+    back_translation: 'Weak point'
+    reference: 'none'
+    note: 'Convient bien à une page de dossier démoniaque.'
+
+chant_help:
+  - text: 'Bien chanter'
+    length: 12
+    back_translation: 'Chant well'
+    reference: 'none'
+    note: 'Formulation claire pour l’aide au chant.'
+  - text: 'Mode chant'
+    length: 10
+    back_translation: 'Chant mode'
+    reference: 'none'
+    note: 'Très court pour une carte ou un bouton d’aide.'
+  - text: 'Chanter'
+    length: 7
+    back_translation: 'To chant'
+    reference: 'none'
+    note: 'La version la plus simple et directe.'
+
+demon_asmodeus_appearance:
+  - text: 'Trois têtes (taureau, homme, bélier) : chaque réunion tourne au comité. Il crache du feu, a une queue de serpent et des pattes d’oie. Dragon, lance, bannière : la discrétion est pour les Ducs.'
+    length: 192
+    back_translation: 'Three heads (bull, man, ram): every meeting becomes a committee. He breathes fire, has a serpent tail and goose feet. Dragon, lance, banner: subtlety is for Dukes.'
+    reference: 'none'
+    note: 'Conserve tous les traits visuels et le trait final sur les Ducs.'
+  - text: 'Trois têtes, donc trois avis. Feu, queue de serpent, pattes d’oie ; il parade sur dragon, lance et bannière. La discrétion ? Affaire de Ducs.'
+    length: 141
+    back_translation: "Three heads, therefore three opinions. Fire, serpent tail, goose feet; he parades on a dragon with lance and banner. Subtlety? A Dukes' affair."
+    reference: 'none'
+    note: 'Transforme la réunion en désaccord permanent, puis garde sa parade ridicule.'
+  - text: 'Taureau, homme, bélier : trois têtes, zéro accord. Feu, queue de serpent, pattes d’oie, dragon, lance et bannière. Les Ducs font dans la finesse.'
+    length: 145
+    back_translation: 'Bull, man, ram: three heads, zero agreement. Fire, serpent tail, goose feet, dragon, lance and banner. Dukes do subtlety.'
+    reference: 'none'
+    note: 'Le contraste entre son arsenal voyant et la finesse des Ducs porte la blague.'
+
+demon_asmodeus_restless_quote:
+  - text: 'J’ai compté chaque grain de poussière. Deux fois. Trois bases.'
+    length: 62
+    back_translation: 'I counted every grain of dust. Twice. Three bases.'
+    reference: 'none'
+    note: 'La chute absurde sur les bases numériques reste intacte.'
+  - text: 'J’ai recompté la poussière. Deux fois. En trois bases.'
+    length: 54
+    back_translation: 'I recounted the dust. Twice. In three bases.'
+    reference: 'none'
+    note: 'Plus compact, tout aussi maniaque et suffisant.'
+  - text: 'La poussière est comptée. Deux fois. En trois bases.'
+    length: 52
+    back_translation: 'The dust is counted. Twice. In three bases.'
+    reference: 'none'
+    note: 'Ton pompeux et sec, digne d’un démon qui s’ennuie.'
+
+demon_asmodeus_ability_2_name:
+  - text: 'Disparu !'
+    length: 9
+    back_translation: 'Gone!'
+    reference: 'none'
+    note: 'Très clair pour l’invisibilité et vif comme un tour de magie.'
+  - text: 'Plus là !'
+    length: 9
+    back_translation: 'Not here anymore!'
+    reference: 'none'
+    note: 'Oral, taquin et immédiatement compréhensible.'
+  - text: 'Paf, parti !'
+    length: 12
+    back_translation: 'Poof, gone!'
+    reference: 'none'
+    note: 'Donne un rythme de gag à la disparition.'
+
+demon_asmodeus_weakness_name:
+  - text: 'Démasqué'
+    length: 8
+    back_translation: 'Unmasked'
+    reference: 'none'
+    note: 'Fait comprendre qu’il est forcé de révéler qui il est.'
+  - text: 'Son nom'
+    length: 7
+    back_translation: 'His name'
+    reference: 'none'
+    note: 'Désigne directement l’élément qui le piège.'
+  - text: 'Balance'
+    length: 7
+    back_translation: 'Snitch'
+    reference: 'none'
+    note: 'Tourne son aveu forcé en petite humiliation familière.'
+
+demon_astaroth_quote:
+  - text: 'Je sais ton passé, ton futur, et tes CGU jamais lues.'
+    length: 53
+    back_translation: 'I know your past, your future, and your terms of service never read.'
+    reference: 'terms of service'
+    note: 'La mention des CGU rend la prophétie mesquine et moderne.'
+  - text: 'Je connais ton passé, ton futur, et tes CGU ignorées.'
+    length: 53
+    back_translation: 'I know your past, your future, and your ignored terms of service.'
+    reference: 'terms of service'
+    note: 'Formulation fluide qui garde la moquerie administrative.'
+  - text: 'Passé, futur, et CGU non lues : je sais tout.'
+    length: 45
+    back_translation: 'Past, future, and unread terms of service: I know everything.'
+    reference: 'terms of service'
+    note: 'Plus sèche et plus vantarde, comme une annonce de devin.'
+
+demon_astaroth_restless_quote:
+  - text: 'J’avais prévu l’oubli. J’adore avoir raison. Hélas.'
+    length: 51
+    back_translation: 'I foresaw the forgetting. I love being right. Alas.'
+    reference: 'none'
+    note: 'Le faux regret final rend sa satisfaction encore plus agaçante.'
+  - text: 'Tu m’oublierais, je le savais. Quelle joie d’avoir raison.'
+    length: 58
+    back_translation: 'You would forget me, I knew it. What joy to be right.'
+    reference: 'none'
+    note: 'Conserve le narcissisme prophétique avec une ironie sèche.'
+  - text: 'Je savais l’oubli. J’adore avoir raison. Évidemment.'
+    length: 52
+    back_translation: 'I knew the forgetting. I love being right. Obviously.'
+    reference: 'none'
+    note: 'Évidemment sert de contradiction goguenarde au prétendu regret.'
+
+demon_astaroth_ability_2_name:
+  - text: 'Commère'
+    length: 7
+    back_translation: 'Gossip'
+    reference: 'none'
+    note: 'Le nom d’une personne qui colporte tout, parfait pour son pouvoir.'
+  - text: 'Ragots'
+    length: 6
+    back_translation: 'Gossip'
+    reference: 'none'
+    note: 'Court et immédiatement intelligible.'
+  - text: 'Potins'
+    length: 6
+    back_translation: 'Gossip'
+    reference: 'none'
+    note: 'Familier, léger et adapté à des secrets traités comme des anecdotes.'
+
+demon_astaroth_secret:
+  - text: 'Avant dragon et haleine, son nom fut celui d’Astarte, déesse d’amour et de guerre. Évite le sujet.'
+    length: 98
+    back_translation: "Before dragon and breath, his name was Astarte's, goddess of love and war. Avoid the subject."
+    reference: 'none'
+    note: 'Garde le contraste entre son passé divin et son irritation actuelle.'
+  - text: 'Avant le dragon, Astarte portait ce nom. Déesse d’amour et de guerre ; il préfère oublier.'
+    length: 90
+    back_translation: 'Before the dragon, Astarte bore that name. Goddess of love and war; he prefers to forget.'
+    reference: 'none'
+    note: 'Le dernier segment suggère discrètement son embarras.'
+  - text: 'Ce nom fut celui d’Astarte, déesse d’amour et de guerre. Avec l’haleine, il préfère changer de sujet.'
+    length: 101
+    back_translation: "That name was Astarte's, goddess of love and war. With the breath, he prefers to change the subject."
+    reference: 'none'
+    note: 'Ajoute une pointe sur son haleine tout en préservant le secret.'
+
+demon_astaroth_offices[3]:
+  - text: 'T’apprend tous les arts libéraux.'
+    length: 33
+    back_translation: 'Teaches you all the liberal arts.'
+    reference: 'none'
+    note: 'Naturel, clair et sans attribuer de genre au joueur.'
+  - text: 'T’enseigne tous les arts libéraux.'
+    length: 34
+    back_translation: 'Teaches you all the liberal arts.'
+    reference: 'none'
+    note: 'Variante un peu plus soutenue, convenant à un dossier.'
+  - text: 'Tu sauras tous les arts libéraux.'
+    length: 33
+    back_translation: 'You will know all the liberal arts.'
+    reference: 'none'
+    note: 'Promesse grandiose qui reste neutre.'
+
+house_sol_tooltip:
+  - text: 'Rois de Sol : cour de 9 h à midi, puis de 15 h au soir. Lunettes !'
+    length: 66
+    back_translation: 'Kings of Sol: court from 9 a.m. to noon, then from 3 p.m. to evening. Sunglasses!'
+    reference: 'none'
+    note: 'Garde les horaires et le clin d’œil aux lunettes de soleil.'
+  - text: 'Rois de Sol : 9 h-midi, 15 h-coucher. Lunettes !'
+    length: 48
+    back_translation: 'Kings of Sol: 9 a.m.–noon, 3 p.m.–sunset. Sunglasses!'
+    reference: 'none'
+    note: 'Version très compacte pour une infobulle étroite.'
+  - text: 'Sol : cour de 9 h à midi, puis de 15 h au soir. Lunettes !'
+    length: 58
+    back_translation: 'Sol: court from 9 a.m. to noon, then from 3 p.m. to evening. Sunglasses!'
+    reference: 'none'
+    note: 'Formulation courte qui garde l’avertissement solaire.'
+
+calling_warlord_label:
+  - text: 'Général'
+    length: 7
+    back_translation: 'General'
+    reference: 'none'
+    note: 'Grade militaire évident et parfaitement adapté au badge.'
+  - text: 'Meneur'
+    length: 6
+    back_translation: 'Leader'
+    reference: 'none'
+    note: 'Étiquette simple pour celui qui commande une armée.'
+  - text: 'Armées'
+    length: 6
+    back_translation: 'Armies'
+    reference: 'none'
+    note: 'Direct et lisible dans un espace réduit.'
+
+calling_tutor_label:
+  - text: 'Prof'
+    length: 4
+    back_translation: 'Teacher'
+    reference: 'none'
+    note: 'Familier, bref et immédiatement lisible.'
+  - text: 'Tuteur'
+    length: 6
+    back_translation: 'Tutor'
+    reference: 'none'
+    note: 'Dépasse le budget, à utiliser uniquement si la largeur du badge est revue.'
+  - text: 'Maître'
+    length: 6
+    back_translation: 'Master'
+    reference: 'none'
+    note: 'Dépasse le budget, à utiliser uniquement si la largeur du badge est revue.'
