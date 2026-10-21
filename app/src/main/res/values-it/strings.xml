@@ -79,7 +79,7 @@
     <string name="chant_a11y_facing">Verso %1$s</string>
     <string name="chant_a11y_turn_left">Gira a sinistra: %1$s</string>
     <string name="chant_a11y_turn_right">Gira a destra: %1$s</string>
-    <string name="verdict_seal_cracked">Si è crepato</string>
+    <string name="verdict_seal_cracked">Crepato</string>
     <string name="chant_help">Come cantare</string>
     <string name="intro_title">Come cantare</string>
     <string name="intro_direction_title">1. Mira</string>

@@ -18,12 +18,12 @@
     <string name="demon_asmodeus_warning">Invócalo al aire libre, de pie todo el rato y sin sombrero. Con sombrero, su jefe Amaymon te arruina el ritual entero.</string>
     <string name="demon_asmodeus_ability_1_name">Anillo Virtuoso</string>
     <string name="demon_asmodeus_ability_1_line">Te da un anillo. Las virtudes se venden aparte.</string>
-    <string name="demon_asmodeus_ability_2_name">Ya No Estoy</string>
+    <string name="demon_asmodeus_ability_2_name">Bomba de Humo</string>
     <string name="demon_asmodeus_ability_2_line">Te vuelve invisible. Genial para atracos, fatal para selfis.</string>
     <string name="demon_asmodeus_ability_3_name">Caja del Dragón</string>
-    <string name="demon_asmodeus_ability_3_line">Halla tesoros, los cuenta y se sienta encima.</string>
-    <string name="demon_asmodeus_weakness_name">El Nombre</string>
-    <string name="demon_asmodeus_weakness_line">Pregunta “¿Sois vos Asmodeus?” y debe admitirlo y postrarse. Tres cabezas, un ego, cero calma.</string>
+    <string name="demon_asmodeus_ability_3_line">Halla tesoros, los cuenta y los empolla.</string>
+    <string name="demon_asmodeus_weakness_name">Se Delata</string>
+    <string name="demon_asmodeus_weakness_line">Pregunta “¿Sois vos Asmodeus?” y debe admitirlo y postrarse. Tres cabezas, un ego, la mecha corta.</string>
     <string name="demon_asmodeus_secret">En un relato antiguo, el humo del corazón y el hígado de un pez lo hizo huir hasta Egipto. No come marisco. No habla de ello.</string>
     <!-- Astaroth -->
     <string name="demon_astaroth_title">Duque de Ayer, Hoy y Mañana</string>
@@ -31,19 +31,19 @@
     <string name="demon_astaroth_quote">Sé tu pasado, tu futuro y que no leíste los términos del servicio.</string>
     <string name="demon_astaroth_restless_quote">Preví que me olvidarías. Odio tener razón. Mentira.</string>
     <string name="demon_astaroth_rank">Gran Duque</string>
-    <string name="demon_astaroth_appearance">Un ángel con mala intención sobre una bestia medio dragón, con una víbora en la diestra como pluma elegante. Su aliento llega primero.</string>
+    <string name="demon_astaroth_appearance">Un ángel malintencionado sobre una bestia medio dragón, con una víbora en la diestra como pluma fina. Su aliento llega antes que él.</string>
     <string-array name="demon_astaroth_offices">
         <item>Verdades sobre el pasado, presente y futuro.</item>
         <item>Desvela todo secreto, incluso los escritos a lápiz.</item>
         <item>Explica la caída de los espíritus, y por qué la suya no fue su culpa.</item>
-        <item>Te enseña todas las artes liberales.</item>
+        <item>Te vuelve un hacha en las artes liberales.</item>
     </string-array>
     <string name="demon_astaroth_warning">No lo dejes acercarse; su aliento es un arma. Alza el anillo mágico a la cara como mini máscara de gas y sonríe.</string>
     <string name="demon_astaroth_ability_1_name">Los Tres Tiempos</string>
     <string name="demon_astaroth_ability_1_line">Ya leyó el final y no para de insinuar.</string>
-    <string name="demon_astaroth_ability_2_name">Chisme</string>
+    <string name="demon_astaroth_ability_2_name">Puro Chisme</string>
     <string name="demon_astaroth_ability_2_line">Tus secretos, ahora su tema favorito.</string>
-    <string name="demon_astaroth_ability_3_name">La Caída: Edición Íntegra</string>
+    <string name="demon_astaroth_ability_3_name">La Caída (Sin Censura)</string>
     <string name="demon_astaroth_ability_3_line">Un relato completo que nadie pidió. Spoiler: a él lo empujaron.</string>
     <string name="demon_astaroth_weakness_name">Aliento Letal</string>
     <string name="demon_astaroth_weakness_line">Los valientes se ponen un anillo en la nariz y ganan. Solo respeta el espacio personal impuesto con joyas.</string>

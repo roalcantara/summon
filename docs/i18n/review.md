@@ -209,7 +209,7 @@ Entry format:
 
 ### es · badge_legions_label
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (12):** %1$d legions
 - **Translation (12):** %1$d huestes
 - **Lost:** "legiones" (13) was first logged as an exception, but on the device "72 LEGIONES" wrapped out of the badge, leaving only "72". The badge has no spare room, so the label became "huestes" (hosts); the badge explanation still says "legiones".
@@ -225,7 +225,7 @@ Entry format:
 
 ### es · chant_face
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (9):** Face %1$s
 - **Translation (9):** Mira %1$s
 - **Lost:** Telegraphic: "Mira Norte" has no article ("Mira al Norte").
@@ -233,7 +233,7 @@ Entry format:
 
 ### es · badge_direction_text
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (25):** Face %1$s to summon. %2$s
 - **Translation (24):** Mira %1$s e invoca. %2$s
 - **Lost:** Same telegraphic "Mira Este" as chant_face.
@@ -241,7 +241,7 @@ Entry format:
 
 ### es · dossier_weakness
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (8):** Weakness
 - **Translation (8):** Flaqueza
 - **Lost:** Glossary changed from "Debilidad" (9) to "Flaqueza" (8).
@@ -249,7 +249,7 @@ Entry format:
 
 ### es · dossier_secret
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (6):** Secret
 - **Translation (6):** Sigilo
 - **Lost:** "Secreto" (7) does not fit; "Sigilo" means secrecy. Glossary updated.
@@ -257,7 +257,7 @@ Entry format:
 
 ### es · demon_asmodeus_title
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (34):** Lord of Arithmetic & Hidden Wealth
 - **Translation (33):** Señor del Cálculo y el Oro Oculto
 - **Lost:** "Arithmetic" became "Calculation" and "Hidden Wealth" became "Hidden Gold".
@@ -265,39 +265,39 @@ Entry format:
 
 ### es · demon_asmodeus_ability_2_name
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (13):** Now You Don’t
-- **Translation (11):** Ya No Estoy
+- **Translation (13):** Bomba de Humo
 - **Lost:** "Now You Don't" became "I'm Not Here Anymore".
 - **Alternatives:** Ahora No Me Ves (15, needs exception).
 
 ### es · demon_asmodeus_ability_3_line
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (50):** Finds buried treasure, counts it, then sits on it.
-- **Translation (45):** Halla tesoros, los cuenta y se sienta encima.
+- **Translation (40):** Halla tesoros, los cuenta y los empolla.
 - **Lost:** "buried" dropped.
 - **Alternatives:** Halla tesoros enterrados, los cuenta y se sienta encima. (56, needs exception).
 
 ### es · demon_asmodeus_weakness_name
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (9):** Name-Drop
-- **Translation (9):** El Nombre
+- **Translation (9):** Se Delata
 - **Lost:** "Name-Drop" became "The Name"; the pun is lost.
 - **Alternatives:** Por Nombre (10, needs exception).
 
 ### es · demon_asmodeus_weakness_line
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (101):** Ask “Art thou Asmodeus?” and he must admit it and bow to the floor. Three heads, one ego, zero chill.
-- **Translation (94):** Pregunta “¿Sois vos Asmodeus?” y debe admitirlo y postrarse. Tres cabezas, un ego, cero calma.
+- **Translation (98):** Pregunta “¿Sois vos Asmodeus?” y debe admitirlo y postrarse. Tres cabezas, un ego, la mecha corta.
 - **Lost:** "Art thou" became archaic "¿Sois vos…?" (kept); "bow to the floor" became "prostrate himself".
 - **Alternatives:** …y debe admitirlo y hacer una reverencia hasta el suelo. (over budget)
 
 ### es · demon_astaroth_title
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (30):** Duke of Past, Present & Future
 - **Translation (27):** Duque de Ayer, Hoy y Mañana
 - **Lost:** "Past, Present & Future" became "Yesterday, Today and Tomorrow".
@@ -305,39 +305,39 @@ Entry format:
 
 ### es · demon_astaroth_ability_2_name
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (11):** Open Secret
-- **Translation (6):** Chisme
+- **Translation (11):** Puro Chisme
 - **Lost:** "Open Secret" became "Gossip"; Spanish has the exact idiom "Secreto a Voces" (15).
 - **Alternatives:** Secreto a Voces (15, needs exception) — the best fit, recommended.
 
 ### es · demon_astaroth_ability_3_name
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (25):** The Fall (Director’s Cut)
-- **Translation (25):** La Caída: Edición Íntegra
+- **Translation (22):** La Caída (Sin Censura)
 - **Lost:** "Director's Cut" became "Uncut Edition".
 - **Alternatives:** La Caída (Versión Extendida) (28, needs exception).
 
 ### es · demon_astaroth_appearance
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (138):** An angel with bad intentions on a dragon-ish beast, holding a viper in his right hand like a fancy pen. His breath arrives before he does.
-- **Translation (134):** Un ángel con mala intención sobre una bestia medio dragón, con una víbora en la diestra como pluma elegante. Su aliento llega primero.
+- **Translation (132):** Un ángel malintencionado sobre una bestia medio dragón, con una víbora en la diestra como pluma fina. Su aliento llega antes que él.
 - **Lost:** "His breath arrives before he does" became "His breath arrives first".
 - **Alternatives:** …Su aliento llega antes que él. (142, needs exception).
 
 ### es · demon_astaroth_offices[3]
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (44):** Makes you a scholar of all the liberal arts.
-- **Translation (36):** Te enseña todas las artes liberales.
+- **Translation (42):** Te vuelve un hacha en las artes liberales.
 - **Lost:** "Makes you a scholar" became "Teaches you": "erudito" would give the player a gender.
 - **Alternatives:** Te vuelve una eminencia en las artes liberales. (47, needs exception).
 
 ### es · calling_warlord_label
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (7):** Warlord
 - **Translation (7):** General
 - **Lost:** "Warlord" became "General"; "Caudillo" (8) does not fit and has political baggage.
@@ -345,7 +345,7 @@ Entry format:
 
 ### es · calling_menace_label
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (6):** Menace
 - **Translation (5):** Plaga
 - **Lost:** "Menace" became "Plague" (Plaga): "Amenaza" (7) does not fit.
@@ -377,7 +377,7 @@ Entry format:
 
 ### it · chant_face
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (9):** Face %1$s
 - **Translation (9):** Mira %1$s
 - **Lost:** Telegraphic: "Mira Nord" has no preposition ("Mira a Nord").
@@ -385,7 +385,7 @@ Entry format:
 
 ### it · escape_banner
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (12):** Seal broken!
 - **Translation (9):** Evasione!
 - **Lost:** "Seal broken!" became "Jailbreak!" (Evasione!): "Sigillo rotto!" (14) does not fit.
@@ -393,7 +393,7 @@ Entry format:
 
 ### it · avatar_sealed
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (12):** %1$s, sealed
 - **Translation (12):** %1$s, chiuso
 - **Lost:** "sealed" became "closed" (chiuso): "sigillato" does not fit (a11y label).
@@ -401,7 +401,7 @@ Entry format:
 
 ### it · chant_sealed
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (6):** Sealed
 - **Translation (5):** Fatto
 - **Lost:** "Sealed" became "Done" (Fatto) in the result chip.
@@ -409,15 +409,15 @@ Entry format:
 
 ### it · verdict_seal_cracked
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (12):** Seal cracked
-- **Translation (12):** Si è crepato
+- **Translation (7):** Crepato
 - **Lost:** "Seal cracked" became "It cracked".
 - **Alternatives:** Sigillo rotto (13, needs exception).
 
 ### it · home_hint
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (16):** Tap the grimoire
 - **Translation (16):** Apri il grimorio
 - **Lost:** "Tap the grimoire" became "Open the grimoire" (same as home_open).
@@ -425,7 +425,7 @@ Entry format:
 
 ### it · dossier_weakness
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (8):** Weakness
 - **Translation (7):** Tallone
 - **Lost:** "Weakness" became "Heel" (Tallone, as in Achilles' heel): "Debolezza" (9) does not fit.
@@ -433,7 +433,7 @@ Entry format:
 
 ### it · dossier_secret
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (6):** Secret
 - **Translation (6):** Arcano
 - **Lost:** "Secret" became "Arcane" (Arcano): "Segreto" (7) does not fit.
@@ -441,7 +441,7 @@ Entry format:
 
 ### it · demon_asmodeus_title
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (34):** Lord of Arithmetic & Hidden Wealth
 - **Translation (32):** Re dei Conti e dell’Oro Nascosto
 - **Lost:** "Lord of Arithmetic & Hidden Wealth" became "King of Accounts and Hidden Gold".
@@ -449,7 +449,7 @@ Entry format:
 
 ### it · demon_asmodeus_ability_2_name
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (13):** Now You Don’t
 - **Translation (11):** Non Ci Sono
 - **Lost:** "Now You Don't" became "I'm Not Here".
@@ -457,15 +457,15 @@ Entry format:
 
 ### it · demon_asmodeus_weakness_name
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (9):** Name-Drop
-- **Translation (8):** Per Nome
+- **Translation (9):** Chi Sono?
 - **Lost:** "Name-Drop" became "By Name"; the pun is lost.
 - **Alternatives:** none found.
 
 ### it · demon_astaroth_title
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (30):** Duke of Past, Present & Future
 - **Translation (27):** Duca di Ieri, Oggi e Domani
 - **Lost:** "Past, Present & Future" became "Yesterday, Today and Tomorrow".
@@ -473,15 +473,15 @@ Entry format:
 
 ### it · demon_astaroth_ability_2_name
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (11):** Open Secret
-- **Translation (9):** Pettegolo
+- **Translation (11):** Radio Serva
 - **Lost:** "Open Secret" became "Gossip"; Italian has the exact idiom "Segreto di Pulcinella" (21).
 - **Alternatives:** Segreto di Pulcinella (21, needs exception) — the best fit.
 
 ### it · demon_astaroth_ability_3_name
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (25):** The Fall (Director’s Cut)
 - **Translation (25):** La Caduta: Edizione Lunga
 - **Lost:** "Director's Cut" became "Long Edition".
@@ -489,15 +489,15 @@ Entry format:
 
 ### it · demon_astaroth_offices[3]
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (44):** Makes you a scholar of all the liberal arts.
-- **Translation (34):** Ti insegna tutte le arti liberali.
+- **Translation (38):** Ti rende un drago nelle arti liberali.
 - **Lost:** "Makes you a scholar" became "Teaches you": "erudito" would give the player a gender.
 - **Alternatives:** Ti fa sapiente in ogni arte liberale. (37) — "sapiente" is invariant; a valid alternative.
 
 ### it · calling_warlord_label
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (7):** Warlord
 - **Translation (7):** Tiranno
 - **Lost:** "Warlord" became "Tyrant" (Tiranno): "Condottiero" (11) does not fit.
@@ -505,7 +505,7 @@ Entry format:
 
 ### it · calling_tutor_label
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (5):** Tutor
 - **Translation (4):** Prof
 - **Lost:** "Tutor" became "Prof": "Tutore" (6) does not fit.
@@ -513,7 +513,7 @@ Entry format:
 
 ### it · calling_menace_label
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (6):** Menace
 - **Translation (5):** Peste
 - **Lost:** "Menace" became "Pest" (Peste, also "brat"): "Minaccia" (8) does not fit.
@@ -545,7 +545,7 @@ Entry format:
 
 ### fr · chant_face
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (9):** Face %1$s
 - **Translation (8):** Cap %1$s
 - **Lost:** Nautical: "Cap Nord" (heading North) instead of an article-dependent "Face au Nord / à l’Est".
@@ -553,7 +553,7 @@ Entry format:
 
 ### fr · chant_heard
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (13):** heard: “%1$s”
 - **Translation (12):** ouï « %1$s »
 - **Lost:** "heard" became archaic "ouï"; no colon, to fit with « ».
@@ -561,7 +561,7 @@ Entry format:
 
 ### fr · escape_banner
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (12):** Seal broken!
 - **Translation (9):** Évasion !
 - **Lost:** "Seal broken!" became "Jailbreak!" (Évasion !): "Sceau brisé !" (13) does not fit.
@@ -569,7 +569,7 @@ Entry format:
 
 ### fr · escape_dismiss
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (14):** Tap to dismiss
 - **Translation (6):** Fermer
 - **Lost:** "Tap to dismiss" became "Close".
@@ -577,7 +577,7 @@ Entry format:
 
 ### fr · home_hint
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (16):** Tap the grimoire
 - **Translation (15):** Touche le livre
 - **Lost:** "Tap the grimoire" became "Tap the book".
@@ -585,7 +585,7 @@ Entry format:
 
 ### fr · action_stay
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (4):** Stay
 - **Translation (3):** Non
 - **Lost:** "Stay" became "No" (answer to "Quitter le rituel ?").
@@ -593,7 +593,7 @@ Entry format:
 
 ### fr · intro_summon
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (6):** Summon
 - **Translation (5):** Hop !
 - **Lost:** "Summon" became "Hop!" ("Here we go!").
@@ -601,15 +601,15 @@ Entry format:
 
 ### fr · abandon_body
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (21):** Your seals will fade.
-- **Translation (17):** Adieu tes sceaux.
+- **Translation (20):** Tes sceaux pâliront.
 - **Lost:** "Your seals will fade." became "Farewell, your seals."
 - **Alternatives:** Tes sceaux vont s’effacer. (26, needs exception).
 
 ### fr · dossier_weakness
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (8):** Weakness
 - **Translation (5):** Talon
 - **Lost:** "Weakness" became "Heel" (Talon, as in talon d’Achille): "Faiblesse" (9) does not fit.
@@ -617,7 +617,7 @@ Entry format:
 
 ### fr · chant_help
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (12):** How to chant
 - **Translation (12):** Bien chanter
 - **Lost:** "How to chant" became "Chanting well".
@@ -625,31 +625,31 @@ Entry format:
 
 ### fr · demon_asmodeus_appearance
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (214):** Three heads (bull, man and ram), so every meeting is a committee. He breathes fire, swishes a serpent’s tail and waddles on goose feet. He arrives on a dragon with a lance and a banner, because subtle is for Dukes.
-- **Translation (214):** Trois têtes (taureau, homme, bélier) : chaque réunion est un comité. Crache du feu, fouette d’une queue de serpent, marche en pattes d’oie. Arrive sur un dragon, lance au poing : la discrétion, c’est pour les Ducs.
+- **Translation (213):** Trois têtes (taureau, homme, bélier) : chaque réunion tourne au comité. Crache du feu, fouette d’une queue de serpent, se dandine sur des pattes d’oie. Dragon, lance, bannière : la discrétion, c’est pour les Ducs.
 - **Lost:** The banner and the waddle are gone; "waddles on goose feet" became "walks on goose feet".
 - **Alternatives:** Restore "se dandine sur des pattes d’oie" and "lance et bannière au poing" (233, needs exception).
 
 ### fr · demon_asmodeus_restless_quote
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (64):** I've counted every grain of dust in here. Twice. In three bases.
-- **Translation (62):** J’ai compté chaque grain de poussière. Deux fois. Trois bases.
+- **Translation (58):** J’ai compté la poussière d’ici. Deux fois. En trois bases.
 - **Lost:** "In three bases." became "Three bases."
 - **Alternatives:** En trois bases. (65 total, needs exception).
 
 ### fr · demon_asmodeus_ability_2_name
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (13):** Now You Don’t
-- **Translation (9):** Disparu !
+- **Translation (14):** Ni Vu Ni Connu
 - **Lost:** "Now You Don't" became "Vanished!"; French has the perfect idiom "Ni vu ni connu" (14).
 - **Alternatives:** Ni Vu Ni Connu (14, needs exception) — the best fit.
 
 ### fr · demon_asmodeus_weakness_name
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (9):** Name-Drop
 - **Translation (8):** Démasqué
 - **Lost:** "Name-Drop" became "Unmasked".
@@ -657,7 +657,7 @@ Entry format:
 
 ### fr · demon_astaroth_quote
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (77):** I know your past, your future, and that you didn't read the terms of service.
 - **Translation (60):** Je sais ton passé, ton futur, et que tu n’as pas lu les CGU.
 - **Lost:** "terms of service" became "CGU" (the French acronym everyone ignores).
@@ -665,15 +665,15 @@ Entry format:
 
 ### fr · demon_astaroth_restless_quote
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (58):** I foresaw you'd forget me. I hate being right. No I don't.
-- **Translation (58):** Je savais que tu m’oublierais. Je hais avoir raison. Faux.
+- **Translation (54):** J’avais prévu cet oubli. Je hais avoir raison. Ou pas.
 - **Lost:** "No I don't." became "False."
 - **Alternatives:** Mensonge. (+4, needs exception).
 
 ### fr · demon_astaroth_ability_2_name
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (11):** Open Secret
 - **Translation (7):** Commère
 - **Lost:** "Open Secret" became "Gossip" (Commère); French has "secret de Polichinelle".
@@ -681,31 +681,31 @@ Entry format:
 
 ### fr · demon_astaroth_secret
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (126):** Before the dragon and the breath, his name belonged to Astarte, a goddess of love and war. He’d rather you didn’t bring it up.
-- **Translation (105):** Avant le dragon et l’haleine, son nom était à Astarte, déesse de l’amour et de la guerre. Évite le sujet.
+- **Translation (122):** Avant le dragon et l’haleine, son nom était celui d’Astarte, déesse de l’amour et de la guerre. Il préfère qu’on l’oublie.
 - **Lost:** "He'd rather you didn't bring it up" became "Avoid the subject."
 - **Alternatives:** Il préfère qu’on n’en parle pas. (needs exception).
 
 ### fr · demon_astaroth_offices[3]
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (44):** Makes you a scholar of all the liberal arts.
-- **Translation (33):** T’apprend tous les arts libéraux.
+- **Translation (36):** Fait de toi un as des arts libéraux.
 - **Lost:** "Makes you a scholar" became "Teaches you": "savant" would give the player a gender.
 - **Alternatives:** none that stay neutral.
 
 ### fr · house_sol_tooltip
 
-- **Status:** open
+- **Status:** changed (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (68):** Kings of Sol hold court 9 to noon and 3 to sunset. Bring sunglasses.
-- **Translation (66):** Rois de Sol : cour de 9 h à midi, puis de 15 h au soir. Lunettes !
+- **Translation (68):** Rois de Sol : cour de 9 h à midi, de 15 h au soir. Lunettes noires !
 - **Lost:** "Bring sunglasses" became "Glasses!" (Lunettes !); "to sunset" became "to evening".
 - **Alternatives:** …Lunettes de soleil ! (needs exception).
 
 ### fr · calling_warlord_label
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (7):** Warlord
 - **Translation (7):** Général
 - **Lost:** "Warlord" became "General": "Chef de guerre" (14) does not fit.
@@ -713,7 +713,7 @@ Entry format:
 
 ### fr · calling_tutor_label
 
-- **Status:** open
+- **Status:** accepted (Claude for the owner, 2026-10-21; Gemini/GPT round, docs/i18n/prompts/)
 - **English (5):** Tutor
 - **Translation (4):** Prof
 - **Lost:** "Tutor" became "Prof": "Tuteur" (6) does not fit.

@@ -22,7 +22,7 @@
     <string name="demon_asmodeus_ability_2_line">Ti rende invisibile. Ottimo per furti, pessimo per selfie.</string>
     <string name="demon_asmodeus_ability_3_name">Cassa del Drago</string>
     <string name="demon_asmodeus_ability_3_line">Scova tesori sepolti, li conta, ci si siede sopra.</string>
-    <string name="demon_asmodeus_weakness_name">Per Nome</string>
+    <string name="demon_asmodeus_weakness_name">Chi Sono?</string>
     <string name="demon_asmodeus_weakness_line">Chiedi “Sei tu Asmodeus?” e deve ammetterlo e inchinarsi a terra. Tre teste, un ego, zero calma.</string>
     <string name="demon_asmodeus_secret">In un racconto antico, il fumo di cuore e fegato di pesce lo fece fuggire fino in Egitto. Non mangia pesce. Non ne parla.</string>
     <!-- Astaroth -->
@@ -36,12 +36,12 @@
         <item>Risposte vere su passato, presente e futuro.</item>
         <item>Svela ogni segreto, anche quelli scritti a matita.</item>
         <item>Spiega la caduta degli spiriti, e perché la sua non fu colpa sua.</item>
-        <item>Ti insegna tutte le arti liberali.</item>
+        <item>Ti rende un drago nelle arti liberali.</item>
     </string-array>
     <string name="demon_astaroth_warning">Non farlo avvicinare: l’alito è un’arma. Alza l’anello magico al viso come mini maschera antigas e sorridi.</string>
     <string name="demon_astaroth_ability_1_name">I Tre Tempi</string>
     <string name="demon_astaroth_ability_1_line">Sa il finale e non smette di alludere.</string>
-    <string name="demon_astaroth_ability_2_name">Pettegolo</string>
+    <string name="demon_astaroth_ability_2_name">Radio Serva</string>
     <string name="demon_astaroth_ability_2_line">I tuoi segreti: ora il suo argomento preferito.</string>
     <string name="demon_astaroth_ability_3_name">La Caduta: Edizione Lunga</string>
     <string name="demon_astaroth_ability_3_line">Un resoconto completo e non richiesto. Spoiler: l’hanno spinto.</string>

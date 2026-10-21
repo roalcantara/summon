@@ -1,0 +1,305 @@
+chant_face:
+  - text: 'Mira %1$s'
+    length: 9
+    back_translation: 'Aim %1$s'
+    reference: 'none'
+    note: "Uses the required fixed term 'mirar/mira' and fits seamlessly with all direction strings without needing changing prepositions (e.g., Mira Nord, Mira Ovest)."
+  - text: 'Punta %1$s'
+    length: 10
+    back_translation: 'Point %1$s'
+    reference: 'none'
+    note: 'Too long (budget is 9 characters). Will not use.'
+  - text: 'Verso %1$s'
+    length: 10
+    back_translation: 'Towards %1$s'
+    reference: 'none'
+    note: "Too long. The current translation 'Mira %1$s' is the optimal and only viable fit under 9 characters."
+
+escape_banner:
+  - text: 'Evaso!'
+    length: 6
+    back_translation: 'Escaped!'
+    reference: 'none'
+    note: 'Short, punchy, implies breaking out of prison, fitting the demon escaping the seal.'
+  - text: 'Fuggito!'
+    length: 8
+    back_translation: 'Fled!'
+    reference: 'none'
+    note: 'Simple and clear action of escape.'
+  - text: 'Evasione!'
+    length: 9
+    back_translation: 'Prison break!'
+    reference: 'none'
+    note: 'The current translation, works perfectly.'
+
+avatar_sealed:
+  - text: '%1$s sigillo'
+    length: 12
+    back_translation: '%1$s seal'
+    reference: 'none'
+    note: 'Fits the required budget (12 chars: 4 + 8). Avoids gendered adjectives completely.'
+  - text: '%1$s, chiuso'
+    length: 12
+    back_translation: '%1$s, closed'
+    reference: 'none'
+    note: "Current translation, but 'chiuso' is technically gendered (masculine), though it refers to the male demon."
+  - text: '%1$s nel box'
+    length: 12
+    back_translation: '%1$s in the box'
+    reference: 'none'
+    note: 'A bit more informal, treating the seal like a container.'
+
+chant_sealed:
+  - text: 'Preso'
+    length: 5
+    back_translation: 'Caught/Taken'
+    reference: 'none'
+    note: 'Short and clear confirmation of sealing.'
+  - text: 'Fatto'
+    length: 5
+    back_translation: 'Done'
+    reference: 'none'
+    note: 'Current translation, straightforward.'
+  - text: 'Ok'
+    length: 2
+    back_translation: 'Ok'
+    reference: 'none'
+    note: 'The most basic confirmation.'
+
+verdict_seal_cracked:
+  - text: 'Infranto'
+    length: 8
+    back_translation: 'Shattered'
+    reference: 'none'
+    note: "Dramatic and clear, avoiding the slightly awkward phrasing of 'Si è crepato'."
+  - text: 'Crepato'
+    length: 7
+    back_translation: 'Cracked'
+    reference: 'none'
+    note: 'Direct translation, short and punchy.'
+  - text: 'Rotto'
+    length: 5
+    back_translation: 'Broken'
+    reference: 'none'
+    note: 'Simplest functional term.'
+
+home_hint:
+  - text: 'Tocca il libro'
+    length: 14
+    back_translation: 'Touch the book'
+    reference: 'none'
+    note: 'Clear and direct UI instruction.'
+  - text: 'Apri il grimorio'
+    length: 16
+    back_translation: 'Open the grimoire'
+    reference: 'none'
+    note: "Current translation, fits exactly, uses the required term 'Grimorio'."
+  - text: 'Premi il libro'
+    length: 14
+    back_translation: 'Press the book'
+    reference: 'none'
+    note: 'Alternative verb for tapping.'
+
+dossier_weakness:
+  - text: 'Tallone'
+    length: 7
+    back_translation: 'Heel'
+    reference: "Tallone d'Achille (Achilles' heel)"
+    note: 'Clever shorthand for weakness, very common in Italian.'
+  - text: 'Difetto'
+    length: 7
+    back_translation: 'Flaw'
+    reference: 'none'
+    note: 'Simple and clear.'
+  - text: 'Pecca'
+    length: 5
+    back_translation: 'Fault'
+    reference: 'none'
+    note: 'Short and slightly archaic term for a flaw.'
+
+dossier_secret:
+  - text: 'Arcano'
+    length: 6
+    back_translation: 'Arcane / Secret'
+    reference: 'none'
+    note: 'Fits perfectly, sounds very magical and mysterious.'
+  - text: 'Dietro'
+    length: 6
+    back_translation: 'Behind'
+    reference: 'none'
+    note: 'Suggests looking behind the curtain.'
+  - text: 'Ignoto'
+    length: 6
+    back_translation: 'Unknown'
+    reference: 'none'
+    note: 'Another good dark-fantasy term fitting the budget.'
+
+demon_asmodeus_title:
+  - text: 'Re dei Conti e dell’Oro Nascosto'
+    length: 32
+    back_translation: 'King of Bills and Hidden Gold'
+    reference: 'none'
+    note: "'Conti' means both math calculations and financial bills, fitting his dual nature."
+  - text: 'Signore di Matematica e Tesori'
+    length: 30
+    back_translation: 'Lord of Mathematics and Treasures'
+    reference: 'none'
+    note: 'Direct and grand.'
+  - text: "Re dell'Aritmetica e dell'Oro"
+    length: 30
+    back_translation: 'King of Arithmetic and Gold'
+    reference: 'none'
+    note: 'A classic translation.'
+
+demon_asmodeus_ability_2_name:
+  - text: 'Fumo e Cenere'
+    length: 13
+    back_translation: 'Smoke and Ashes'
+    reference: 'none'
+    note: 'Evokes the ninja smoke bomb trope in a dark fantasy way.'
+  - text: 'Sparito!'
+    length: 8
+    back_translation: 'Vanished!'
+    reference: 'none'
+    note: 'Like a magic trick.'
+  - text: 'Non Ci Sono'
+    length: 11
+    back_translation: 'I am not here'
+    reference: 'none'
+    note: 'Current translation, simple and silly.'
+
+demon_asmodeus_weakness_name:
+  - text: 'Chi Sono?'
+    length: 9
+    back_translation: 'Who Am I?'
+    reference: 'Lei non sa chi sono io! (Classic Italian catchphrase of the arrogant)'
+    note: 'Plays on the classic Italian arrogant phrase demanding recognition.'
+  - text: 'Il Nome'
+    length: 7
+    back_translation: 'The Name'
+    reference: 'none'
+    note: 'Direct and functional.'
+  - text: 'Per Nome'
+    length: 8
+    back_translation: 'By Name'
+    reference: 'none'
+    note: 'Current translation.'
+
+demon_astaroth_title:
+  - text: 'Duca di Ieri, Oggi e Domani'
+    length: 27
+    back_translation: 'Duke of Yesterday, Today and Tomorrow'
+    reference: 'Ieri, oggi, domani (Famous De Sica film)'
+    note: 'Sounds grand but also subtly references a classic piece of Italian cinema.'
+  - text: 'Duca del Tempo e del Destino'
+    length: 28
+    back_translation: 'Duke of Time and Destiny'
+    reference: 'none'
+    note: 'More epic fantasy sounding.'
+  - text: 'Duca di Passato e Futuro'
+    length: 24
+    back_translation: 'Duke of Past and Future'
+    reference: 'none'
+    note: 'Simple and direct.'
+
+demon_astaroth_ability_2_name:
+  - text: 'Radio Serva'
+    length: 11
+    back_translation: 'Maid Radio'
+    reference: 'Radio Serva (Italian idiom for gossip)'
+    note: "Perfect fit. 'Radio Serva' is the classic Italian term for workplace or town gossip spreading out of control."
+  - text: 'Portinaio'
+    length: 9
+    back_translation: 'Concierge / Doorman'
+    reference: 'Il portinaio (Stereotype of the gossiping building concierge)'
+    note: 'Reduces his grand demon status to a gossiping doorman.'
+  - text: 'Pettegolo'
+    length: 9
+    back_translation: 'Gossiper'
+    reference: 'none'
+    note: 'Current translation, clear but less flavourful.'
+
+demon_astaroth_ability_3_name:
+  - text: "La Caduta (Director's)"
+    length: 22
+    back_translation: "The Fall (Director's)"
+    reference: "Director's Cut"
+    note: "Uses the English term directly as it's heavily used in Italian cinema culture for extended cuts."
+  - text: 'La Caduta: Versione Integrale'
+    length: 29
+    back_translation: 'The Fall: Unabridged Version'
+    reference: 'none'
+    note: 'Too long for the 25-char budget.'
+  - text: 'La Caduta: Edizione Lunga'
+    length: 25
+    back_translation: 'The Fall: Long Edition'
+    reference: 'none'
+    note: 'Current translation, fits exactly but slightly clunky.'
+
+demon_astaroth_offices[3]:
+  - text: 'Ti rende un drago nelle arti liberali.'
+    length: 39
+    back_translation: 'Makes you a dragon (expert) in the liberal arts.'
+    reference: 'Essere un drago (To be highly skilled/a whiz at something)'
+    note: "Uses a very common Italian idiom ('essere un drago') that avoids gender completely and fits the dark fantasy setting hilariously."
+  - text: 'Ti fa prendere 30 e lode in arti.'
+    length: 33
+    back_translation: 'Makes you get a 30 cum laude in arts.'
+    reference: '30 e lode (Top university grade in Italy)'
+    note: 'References Italian university grading, very colloquial and clear.'
+  - text: 'Ti insegna tutte le arti liberali.'
+    length: 34
+    back_translation: 'Teaches you all the liberal arts.'
+    reference: 'none'
+    note: 'Current translation, functional and safe.'
+
+calling_warlord_label:
+  - text: 'Generale'
+    length: 8
+    back_translation: 'General'
+    reference: 'none'
+    note: "Too long (budget is 7). Let's use 'Tiranno' (7) or 'Armata' (6)."
+  - text: 'Tiranno'
+    length: 7
+    back_translation: 'Tyrant'
+    reference: 'none'
+    note: 'Current translation. Fits the budget and tone.'
+  - text: 'Armata'
+    length: 6
+    back_translation: 'Army'
+    reference: 'none'
+    note: 'Refers directly to what he brings.'
+
+calling_tutor_label:
+  - text: 'Prof'
+    length: 4
+    back_translation: 'Prof'
+    reference: 'none'
+    note: 'Universal school slang, silly and perfectly fits the budget.'
+  - text: 'Guida'
+    length: 5
+    back_translation: 'Guide'
+    reference: 'none'
+    note: 'A bit more serious, but fits.'
+  - text: 'Saggio'
+    length: 6
+    back_translation: 'Wise'
+    reference: 'none'
+    note: 'Too long (budget 5).'
+
+calling_menace_label:
+  - text: 'Peste'
+    length: 5
+    back_translation: 'Plague / Brat'
+    reference: 'Peste (double meaning: plague and annoying child)'
+    note: 'Perfect double meaning in Italian: a biblical plague, but also how you refer to a very annoying, mischievous child.'
+  - text: 'Guai'
+    length: 4
+    back_translation: 'Trouble'
+    reference: 'none'
+    note: 'Very direct.'
+  - text: 'Caos'
+    length: 4
+    back_translation: 'Chaos'
+    reference: 'none'
+    note: 'Standard fantasy term.'

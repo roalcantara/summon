@@ -26,6 +26,7 @@ hand on a device.
 | 11 | fr | `chant_score` | 85 % | Score in the result chip ("85 % · SCELLÉ ✓") and in a missed line ("40 % · ouï « … »") | Ritual: seal a line; miss a line | [ ] |
 | 12 | es | `badge_legions_label` | 72 huestes | Legions badge (the narrowest badge: "72 LEGIONES" wrapped here) | Grimoire → Asmodeus | [x] (emulator, 2026-10-20) |
 | 13 | all | `compass_points[*]` | Longest point per locale: Nordeste/Noroeste (pt-BR, es), Nord-Ovest (it), Nord-Ouest (fr) | Chant direction pill and Direction badge | Heading 45°/315° (test) | [ ] |
+| 14 | fr | `demon_asmodeus_ability_2_name` | Ni Vu Ni Connu | Abilities dossier page, bold name inline before its line; wraps freely | Grimoire → Asmodeus (bound) → dossier page 2 | [ ] |
 
 ## Automation
 

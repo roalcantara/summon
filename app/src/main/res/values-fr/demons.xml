@@ -4,10 +4,10 @@
     <string name="demon_asmodeus_title">Roi des Calculs et de l’Or Caché</string>
     <string name="demon_asmodeus_description">Enseigne arithmétique, astronomie, géométrie et invisibilité. Répond à tout—si tu supportes sa suffisance.</string>
     <string name="demon_asmodeus_quote">Trois têtes valent mieux qu’une—surtout si deux veulent ton âme !</string>
-    <string name="demon_asmodeus_restless_quote">J’ai compté chaque grain de poussière. Deux fois. Trois bases.</string>
+    <string name="demon_asmodeus_restless_quote">J’ai compté la poussière d’ici. Deux fois. En trois bases.</string>
     <string name="demon_asmodeus_rank">Grand Roi</string>
     <string name="demon_asmodeus_liege">Amaymon, Roi de l’Est</string>
-    <string name="demon_asmodeus_appearance">Trois têtes (taureau, homme, bélier) : chaque réunion est un comité. Crache du feu, fouette d’une queue de serpent, marche en pattes d’oie. Arrive sur un dragon, lance au poing : la discrétion, c’est pour les Ducs.</string>
+    <string name="demon_asmodeus_appearance">Trois têtes (taureau, homme, bélier) : chaque réunion tourne au comité. Crache du feu, fouette d’une queue de serpent, se dandine sur des pattes d’oie. Dragon, lance, bannière : la discrétion, c’est pour les Ducs.</string>
     <string-array name="demon_asmodeus_offices">
         <item>Distribue l’Anneau des Vertus (un par client).</item>
         <item>Enseigne arithmétique, astronomie, géométrie et artisanat.</item>
@@ -18,7 +18,7 @@
     <string name="demon_asmodeus_warning">Invoque-le dehors, reste debout et enlève ton chapeau. Garde-le et son patron Amaymon sabote tout ton rituel.</string>
     <string name="demon_asmodeus_ability_1_name">Anneau Vertueux</string>
     <string name="demon_asmodeus_ability_1_line">Te donne un anneau. Vertus vendues à part.</string>
-    <string name="demon_asmodeus_ability_2_name">Disparu !</string>
+    <string name="demon_asmodeus_ability_2_name">Ni Vu Ni Connu</string>
     <string name="demon_asmodeus_ability_2_line">Te rend invisible. Top pour un casse, nul pour un selfie.</string>
     <string name="demon_asmodeus_ability_3_name">Magot du Dragon</string>
     <string name="demon_asmodeus_ability_3_line">Déterre le trésor, le compte, s’assoit dessus.</string>
@@ -29,14 +29,14 @@
     <string name="demon_astaroth_title">Duc du Passé, Présent et Futur</string>
     <string name="demon_astaroth_description">Connaît tout secret et tout temps verbal. Raconte sa chute, longuement.</string>
     <string name="demon_astaroth_quote">Je sais ton passé, ton futur, et que tu n’as pas lu les CGU.</string>
-    <string name="demon_astaroth_restless_quote">Je savais que tu m’oublierais. Je hais avoir raison. Faux.</string>
+    <string name="demon_astaroth_restless_quote">J’avais prévu cet oubli. Je hais avoir raison. Ou pas.</string>
     <string name="demon_astaroth_rank">Grand-Duc</string>
     <string name="demon_astaroth_appearance">Un ange mal intentionné sur une bête mi-dragon, une vipère dans la main droite comme un stylo chic. Son haleine arrive avant lui.</string>
     <string-array name="demon_astaroth_offices">
         <item>Vérités sur passé, présent et futur.</item>
         <item>Dévoile tout secret, même ceux écrits au crayon.</item>
         <item>Explique la chute des esprits ; la sienne ? Pas sa faute.</item>
-        <item>T’apprend tous les arts libéraux.</item>
+        <item>Fait de toi un as des arts libéraux.</item>
     </string-array>
     <string name="demon_astaroth_warning">Ne le laisse pas approcher : son haleine est une arme. Tiens ton anneau sous le nez comme un mini masque à gaz et souris.</string>
     <string name="demon_astaroth_ability_1_name">Les Trois Temps</string>
@@ -47,9 +47,9 @@
     <string name="demon_astaroth_ability_3_line">Un récit complet, non sollicité. Spoiler : on l’a poussé.</string>
     <string name="demon_astaroth_weakness_name">Souffle Fatal</string>
     <string name="demon_astaroth_weakness_line">Les braves se mettent un anneau sous le nez et gagnent. Il ne respecte l’espace perso que sous la menace d’un bijou.</string>
-    <string name="demon_astaroth_secret">Avant le dragon et l’haleine, son nom était à Astarte, déesse de l’amour et de la guerre. Évite le sujet.</string>
+    <string name="demon_astaroth_secret">Avant le dragon et l’haleine, son nom était celui d’Astarte, déesse de l’amour et de la guerre. Il préfère qu’on l’oublie.</string>
     <!-- Houses (ADR-0011) -->
-    <string name="house_sol_tooltip">Rois de Sol : cour de 9 h à midi, puis de 15 h au soir. Lunettes !</string>
+    <string name="house_sol_tooltip">Rois de Sol : cour de 9 h à midi, de 15 h au soir. Lunettes noires !</string>
     <string name="house_venus_tooltip">Ducs de Venus : cour de l’aube à midi, par beau temps seulement. Très exigeants.</string>
     <!-- Callings (ADR-0011) -->
     <string name="calling_warlord_label">Général</string>

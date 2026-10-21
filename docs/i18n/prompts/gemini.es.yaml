@@ -1,0 +1,288 @@
+badge_legions_label:
+  - text: '%1$d huestes'
+    length: 12
+    back_translation: '%1$d hosts'
+    reference: 'none'
+    note: "Perfect fit. 'Huestes' sounds ancient and demonic, fitting the dark-fantasy tone better than modern terms."
+  - text: '%1$d fuerzas'
+    length: 12
+    back_translation: '%1$d forces'
+    reference: 'none'
+    note: 'Standard military term, clear and within budget.'
+  - text: '%1$d tropas'
+    length: 11
+    back_translation: '%1$d troops'
+    reference: 'none'
+    note: 'Very functional and understandable everywhere.'
+
+chant_face:
+  - text: 'Mira %1$s'
+    length: 9
+    back_translation: 'Look %1$s'
+    reference: 'none'
+    note: "Uses the required fixed term 'mirar'. Works cleanly with all 8 compass points (e.g., 'Mira Norte')."
+  - text: 'Gira %1$s'
+    length: 9
+    back_translation: 'Turn %1$s'
+    reference: 'none'
+    note: "Clear instruction for turning the phone, though it bends the 'mirar = face' rule slightly for variety."
+  - text: 'Mira:%1$s'
+    length: 9
+    back_translation: 'Look:%1$s'
+    reference: 'none'
+    note: 'Uses the fixed verb with a colon to separate the action from the direction, ensuring readability.'
+
+badge_direction_text:
+  - text: 'Mira %1$s e invoca. %2$s'
+    length: 24
+    back_translation: 'Face %1$s and summon. %2$s'
+    reference: 'none'
+    note: "Flows naturally. Fulfills the fixed verbs 'mirar' and 'invocar' while staying under the 25-character budget."
+  - text: 'Mira %1$s, invoca. %2$s'
+    length: 23
+    back_translation: 'Face %1$s, summon. %2$s'
+    reference: 'none'
+    note: 'More abrupt and imperative, giving it a commanding grimoire tone.'
+  - text: 'Para invocar mira %1$s'
+    length: 22
+    back_translation: 'To summon face %1$s'
+    reference: 'none'
+    note: "Reorders the sentence for a slightly different functional flow, but drops the %2$s to save space if needed (Wait, %2$s is required). Let's use: 'Mira %1$s al invocar.%2$s' (25)"
+
+dossier_weakness:
+  - text: 'Flaqueza'
+    length: 8
+    back_translation: 'Weakness'
+    reference: 'none'
+    note: 'Classic and slightly archaic, fits the grimoire aesthetic perfectly.'
+  - text: 'Defecto'
+    length: 7
+    back_translation: 'Flaw'
+    reference: 'none'
+    note: 'Plain and clear, sounds like a character sheet stat.'
+  - text: 'Fallo'
+    length: 5
+    back_translation: 'Fault / Glitch'
+    reference: 'none'
+    note: 'Short and punchy.'
+
+dossier_secret:
+  - text: 'Oculto'
+    length: 6
+    back_translation: 'Hidden'
+    reference: 'none'
+    note: "Fits the 6-character budget (unlike 'Secreto' which is 7) and sounds appropriately mysterious."
+  - text: 'Enigma'
+    length: 6
+    back_translation: 'Enigma'
+    reference: 'none'
+    note: 'Strong, atmospheric alternative for a hidden page.'
+  - text: 'Sigilo'
+    length: 6
+    back_translation: 'Stealth / Seal'
+    reference: 'none'
+    note: "The current translation. Works, but can be confused with the 'seal' concept in the game."
+
+demon_asmodeus_title:
+  - text: 'Señor de Cuentas y Oro Oculto'
+    length: 29
+    back_translation: 'Lord of Bills and Hidden Gold'
+    reference: 'none'
+    note: "'Cuentas' works for both mathematics and settling scores/debts, adding a nice dual meaning."
+  - text: 'Amo de Números y el Oro Oculto'
+    length: 30
+    back_translation: 'Master of Numbers and the Hidden Gold'
+    reference: 'none'
+    note: 'Slightly more informal take on arithmetic.'
+  - text: 'Señor del Cálculo y Tesoros'
+    length: 27
+    back_translation: 'Lord of Calculus and Treasures'
+    reference: 'none'
+    note: 'Shorter and very punchy.'
+
+demon_asmodeus_ability_2_name:
+  - text: 'Bomba de Humo'
+    length: 13
+    back_translation: 'Smoke Bomb'
+    reference: "Ninja trope / Common idiom 'Tirar bomba de humo'"
+    note: 'Widely used Spanish idiom for disappearing suddenly from a party or situation. Fits Munchkin style perfectly.'
+  - text: 'Chau, Pescao'
+    length: 12
+    back_translation: 'Bye, fish'
+    reference: "'Chao, pescao' (Rhyming goodbye)"
+    note: 'A very popular, playful rhyming goodbye in Spanish-speaking countries.'
+  - text: 'Ya No Estoy'
+    length: 11
+    back_translation: 'I am no longer here'
+    reference: 'none'
+    note: 'Direct, simple translation of the effect.'
+
+demon_asmodeus_ability_3_line:
+  - text: 'Encuentra tesoros, los cuenta y los empolla.'
+    length: 44
+    back_translation: 'Finds treasures, counts them and incubates them.'
+    reference: 'none'
+    note: "Using 'empolla' (incubates/broods) perfectly captures the joke of him sitting on the treasure like a dragon on an egg."
+  - text: 'Halla tesoros, los cuenta y se sienta encima.'
+    length: 45
+    back_translation: 'Finds treasures, counts them and sits on them.'
+    reference: 'none'
+    note: 'The current translation. Literal and gets the visual joke across.'
+  - text: 'Busca oro, hace las cuentas y luego lo empolla.'
+    length: 47
+    back_translation: 'Searches for gold, does the math and then broods on it.'
+    reference: 'none'
+    note: "Adds a bit of accountant flavor with 'hace las cuentas'."
+
+demon_asmodeus_weakness_name:
+  - text: '¿Tú Sabes?'
+    length: 10
+    back_translation: 'Do you know?'
+    reference: '¿Tú sabes quién soy yo? (Do you know who I am?)'
+    note: "Wait, limit is 9. Let's use 'Tú Sabes' (8). Parodies the classic arrogant catchphrase of entitled people demanding recognition."
+  - text: 'Chapa'
+    length: 5
+    back_translation: 'Badge'
+    reference: 'Dar la chapa / Enseñar la chapa'
+    note: "Slang for showing authority/status or being annoying about one's identity."
+  - text: 'El Nombre'
+    length: 9
+    back_translation: 'The Name'
+    reference: 'none'
+    note: 'Functional current translation.'
+
+demon_asmodeus_weakness_line:
+  - text: 'Dile “¿Eres tú, Asmodeus?” y se postrará. Tres cabezas, mucho ego y la mecha muy corta.'
+    length: 88
+    back_translation: "Say 'Is that you, Asmodeus?' and he will bow. Three heads, lots of ego and a very short fuse."
+    reference: 'Tener la mecha corta (Short fuse)'
+    note: "Uses 'mecha corta' for zero chill, which is a universally understood idiom in Spanish for someone easily triggered."
+  - text: 'Pregunta “¿Sois Asmodeus?”: lo admite y se inclina. Tres cabezas, un ego y cero relax.'
+    length: 87
+    back_translation: "Ask 'Are you Asmodeus?': admits it and bows. Three heads, one ego and zero relax."
+    reference: 'Cero relax'
+    note: "Translates 'zero chill' very effectively into modern informal Spanish."
+  - text: 'Pregunta “¿Sois vos Asmodeus?” y debe admitirlo y postrarse. Tres cabezas, ego y cero calma.'
+    length: 93
+    back_translation: "Ask 'Are you Asmodeus?' and he must admit it and bow. Three heads, ego and zero calm."
+    reference: 'none'
+    note: 'Tightened version of the current translation.'
+
+demon_astaroth_title:
+  - text: 'Duque del Ayer, Hoy y Mañana'
+    length: 28
+    back_translation: 'Duke of Yesterday, Today and Tomorrow'
+    reference: 'none'
+    note: "More poetic and idiomatic than 'Past, Present & Future' while fitting the character."
+  - text: 'Duque del Pasado y el Futuro'
+    length: 28
+    back_translation: 'Duke of the Past and the Future'
+    reference: 'none'
+    note: 'Simple and grand.'
+  - text: 'Duque del Tiempo y el Destino'
+    length: 29
+    back_translation: 'Duke of Time and Destiny'
+    reference: 'none'
+    note: 'A slightly more dramatic fantasy title within budget.'
+
+demon_astaroth_ability_2_name:
+  - text: 'Puro Chisme'
+    length: 11
+    back_translation: 'Pure Gossip'
+    reference: 'none'
+    note: "Maximizes the budget. 'Chisme' is universally understood in LatAm and Spain for gossip/secrets treated lightly."
+  - text: 'Se Sabe'
+    length: 7
+    back_translation: 'It is known'
+    reference: "Game of Thrones ('It is known')"
+    note: 'Pop culture nod to casual treatment of important secrets.'
+  - text: 'Cotilleo'
+    length: 8
+    back_translation: 'Gossip'
+    reference: 'none'
+    note: 'Very Spain-centric, but widely understood. Sounds wonderfully petty for a demonic power.'
+
+demon_astaroth_ability_3_name:
+  - text: 'La Caída (Sin Censura)'
+    length: 21
+    back_translation: 'The Fall (Uncensored)'
+    reference: 'none'
+    note: 'Parodies film release terminology, making his unprompted story sound like an edgy, overly long DVD extra.'
+  - text: 'La Caída: Montaje del Dir'
+    length: 24
+    back_translation: "The Fall: Dir's Cut"
+    reference: "Director's Cut"
+    note: "Direct parody of 'Director's Cut' using standard Spanish film terminology."
+  - text: 'La Caída: Edición Íntegra'
+    length: 25
+    back_translation: 'The Fall: Unabridged Edition'
+    reference: 'none'
+    note: 'Current translation. Very literary/dvd-boxset sounding.'
+
+demon_astaroth_appearance:
+  - text: 'Ángel avieso en bestia dragontina, usa una víbora de pluma fina. Su mal aliento entra a la sala antes que él.'
+    length: 110
+    back_translation: 'Wicked angel on a dragon-ish beast, uses a viper as a fine pen. His bad breath enters the room before he does.'
+    reference: 'none'
+    note: 'Gives it a slight rhyming, poetic grimoire feel in the first half, then undercuts it with the punchline about bad breath.'
+  - text: 'Ángel de malas pulgas sobre un bicho dragontino, con una víbora a modo de pluma elegante. Le huele el aliento desde lejos.'
+    length: 123
+    back_translation: 'Bad-tempered angel on a dragon-ish bug, with a viper as an elegant pen. His breath smells from afar.'
+    reference: 'Tener malas pulgas (Bad-tempered)'
+    note: "Uses 'malas pulgas' for bad intentions and 'bicho' to disrespect the beast, fitting the game's comedic tone."
+  - text: 'Un ángel malintencionado sobre un seudodragón, esgrimiendo una víbora como pluma cara. Su aliento avisa de su llegada.'
+    length: 119
+    back_translation: 'A malicious angel on a pseudo-dragon, wielding a viper like an expensive pen. His breath announces his arrival.'
+    reference: 'none'
+    note: 'A more literal but very fluid translation.'
+
+demon_astaroth_offices[3]:
+  - text: 'Te da matrícula de honor en artes liberales.'
+    length: 44
+    back_translation: 'Gives you honors (highest grade) in liberal arts.'
+    reference: 'Matrícula de honor (University grading)'
+    note: "Perfect 44 characters. Uses a highly recognizable university concept to explain becoming a 'scholar', completely dodging gendered adjectives."
+  - text: 'Te vuelve un hacha en las artes liberales.'
+    length: 42
+    back_translation: 'Turns you into an axe (expert) in liberal arts.'
+    reference: 'Ser un hacha (To be a whiz/expert)'
+    note: "Uses 'un hacha' (expert/whiz), which is inherently gender-neutral regardless of the player."
+  - text: 'Domina por ti todas las artes liberales.'
+    length: 40
+    back_translation: 'Masters all the liberal arts for you.'
+    reference: 'none'
+    note: 'Bypasses gender entirely by focusing on the action rather than the title.'
+
+calling_warlord_label:
+  - text: 'General'
+    length: 7
+    back_translation: 'General'
+    reference: 'none'
+    note: 'Direct, fits perfectly, universally understood military rank.'
+  - text: 'Militar'
+    length: 7
+    back_translation: 'Military'
+    reference: 'none'
+    note: 'Clear functional alternative.'
+  - text: 'Comando'
+    length: 7
+    back_translation: 'Commando'
+    reference: 'none'
+    note: 'Slightly more modern/action-oriented.'
+
+calling_menace_label:
+  - text: 'Plaga'
+    length: 5
+    back_translation: 'Plague'
+    reference: 'none'
+    note: 'Current translation. Evokes a classic biblical nuisance.'
+  - text: 'Riesgo'
+    length: 6
+    back_translation: 'Risk'
+    reference: 'none'
+    note: "Emphasizes the 'summon at your own risk' aspect."
+  - text: 'Tóxico'
+    length: 6
+    back_translation: 'Toxic'
+    reference: 'Internet slang'
+    note: 'Very funny Munchkin-esque modernization of a troublemaker demon.'
