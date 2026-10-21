@@ -184,7 +184,7 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(spacing.md),
         ) {
             Text(pluralStringResource(R.plurals.home_bound, demonCount, boundCount, demonCount).upper(), style = MaterialTheme.textRoles.meta)
-            if (showHint) CueChip(stringResource(R.string.home_hint), CueTone.Neutral)
+            if (showHint) CueChip(stringResource(R.string.home_hint), CueTone.Neutral, Modifier.clickable(onClick = open))
         }
 
         if (onDebug != null) {
