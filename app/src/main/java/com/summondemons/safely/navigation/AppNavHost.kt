@@ -38,7 +38,7 @@ import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.platform.AndroidHeadingSource
 import com.summondemons.safely.platform.AndroidPcmSource
 import com.summondemons.safely.platform.ClipRecorders
-import com.summondemons.safely.platform.DebugLocale
+import com.summondemons.safely.platform.AppLocale
 import com.summondemons.safely.platform.SessionLogs
 import com.summondemons.safely.platform.DeviceCheck
 import com.summondemons.safely.platform.WhisperTranscriber
@@ -53,6 +53,7 @@ import com.summondemons.safely.ui.GameViewModel
 import com.summondemons.safely.ui.fx.LocalNavAnimatedVisibilityScope
 import com.summondemons.safely.ui.fx.LocalSharedTransitionScope
 import com.summondemons.safely.ui.screens.GrimoireScreen
+import com.summondemons.safely.ui.components.SettingsSheet
 import com.summondemons.safely.ui.screens.DebugSheet
 import com.summondemons.safely.ui.screens.HomeScreen
 import com.summondemons.safely.ui.screens.RitualScreen
@@ -75,6 +76,7 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
         return
     }
     var debugOpen by rememberSaveable { mutableStateOf(false) }
+    var settingsOpen by rememberSaveable { mutableStateOf(false) }
     val debugSettings by graph.debugSettings.settings.collectAsStateWithLifecycle()
     val onDebug: (() -> Unit)? = if (BuildConfig.DEBUG) ({ debugOpen = true }) else null
 
@@ -88,7 +90,7 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
                             HomeDestination(state, onDebug, onOpen = dropUnlessResumed {
                                 game.openGrimoireFromHome()
                                 navController.navigate(Grimoire) { launchSingleTop = true }
-                            }, onDismissEscape = game::dismissEscapeBanners)
+                            }, onDismissEscape = game::dismissEscapeBanners, onSettings = { settingsOpen = true })
                         }
                     }
 
@@ -125,6 +127,16 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
                 }
             }
         }
+        if (settingsOpen) {
+            SettingsSheet(
+                language = AppLocale.get(appContext),
+                onLanguage = { tag ->
+                    AppLocale.set(appContext, tag)
+                    activity?.recreate()
+                },
+                onDismiss = { settingsOpen = false },
+            )
+        }
         if (BuildConfig.DEBUG && debugOpen) {
             DebugSheet(
                 state = state,
@@ -134,11 +146,6 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
                 onAdvanceDay = game::advanceDay,
                 onResetDaily = game::resetDaily,
                 onCourt = game::setCourt,
-                language = DebugLocale.get(appContext),
-                onLanguage = { tag ->
-                    DebugLocale.set(appContext, tag)
-                    activity?.recreate()
-                },
                 onBind = game::bind,
                 onUnsummon = game::unsummon,
                 onResetAll = {
@@ -152,7 +159,13 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
 }
 
 @Composable
-private fun HomeDestination(state: GameUiState, onDebug: (() -> Unit)?, onOpen: () -> Unit, onDismissEscape: () -> Unit) {
+private fun HomeDestination(
+    state: GameUiState,
+    onDebug: (() -> Unit)?,
+    onOpen: () -> Unit,
+    onDismissEscape: () -> Unit,
+    onSettings: () -> Unit,
+) {
     val demons = DemonCatalog.all
     val anyRestless = demons.any { ProgressRules.isRestless(state.record(it.id), state.today) }
     val focusId = ProgressRules.focusDemon(state.progress, DemonCatalog.ids, state.today)
@@ -168,6 +181,7 @@ private fun HomeDestination(state: GameUiState, onDebug: (() -> Unit)?, onOpen: 
         onOpen = onOpen,
         onDismissEscape = onDismissEscape,
         onDebug = onDebug,
+        onSettings = onSettings,
     )
 }
 

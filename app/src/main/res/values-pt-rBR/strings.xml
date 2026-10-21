@@ -18,6 +18,9 @@
     </plurals>
     <string name="home_hint">Toque o grimório</string>
     <string name="home_open">Abrir o grimório</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_device">Do celular</string>
     <string name="escape_banner">Selo rompeu!</string>
     <string name="escape_one">%1$s escapou do selo enquanto você saiu!</string>
     <string name="escape_all">Os dois espíritos fugiram dos selos na sua ausência!</string>

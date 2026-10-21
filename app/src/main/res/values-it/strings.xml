@@ -18,6 +18,9 @@
     </plurals>
     <string name="home_hint">Apri il grimorio</string>
     <string name="home_open">Apri il grimorio</string>
+    <string name="settings_title">Opzioni</string>
+    <string name="settings_language">Lingua</string>
+    <string name="settings_language_device">Del telefono</string>
     <string name="escape_banner">Evasione!</string>
     <string name="escape_one">%1$s è sfuggito al sigillo in tua assenza!</string>
     <string name="escape_all">Entrambi gli spiriti sono fuggiti in tua assenza!</string>

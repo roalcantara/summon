@@ -25,7 +25,7 @@
   - **Created**: 2026-10-21 12:20
   - **Tags**: release
 
-- [ ] xbYw **-** Settings sheet with language picker only, gear on Home (RC; amends ADR-0031)
+- [x] xbYw **-** Settings sheet with language picker only, gear on Home (RC; amends ADR-0031)
   - **Priority**: high
   - **Created**: 2026-10-21 12:20
   - **Tags**: release

@@ -1,8 +1,6 @@
 package com.summondemons.safely.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +22,6 @@ import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
 import com.summondemons.safely.progress.DemonRecord
 import com.summondemons.safely.progress.ProgressRules
-import com.summondemons.safely.platform.DebugLocale
 import com.summondemons.safely.time.CourtOverride
 import com.summondemons.safely.ui.GameUiState
 import com.summondemons.safely.ui.theme.spacing
@@ -32,7 +29,7 @@ import com.summondemons.safely.ui.theme.textRoles
 import com.summondemons.safely.ui.theme.upper
 
 /** Debug builds only (§7): move time, override court, bind / unsummon, reset. */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DebugSheet(
     state: GameUiState,
@@ -42,8 +39,6 @@ fun DebugSheet(
     onAdvanceDay: () -> Unit,
     onResetDaily: () -> Unit,
     onCourt: (CourtOverride) -> Unit,
-    language: String?,
-    onLanguage: (String?) -> Unit,
     onBind: (id: String, flawless: Boolean) -> Unit,
     onUnsummon: (String) -> Unit,
     onResetAll: () -> Unit,
@@ -67,16 +62,6 @@ fun DebugSheet(
             Row(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
                 CourtOverride.entries.forEach { option ->
                     FilterChip(selected = court == option, onClick = { onCourt(option) }, label = { Text(courtLabel(option)) })
-                }
-            }
-            Text(stringResource(R.string.debug_language).upper(), style = MaterialTheme.textRoles.meta)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
-                DebugLocale.options.forEach { tag ->
-                    FilterChip(
-                        selected = language == tag,
-                        onClick = { if (language != tag) onLanguage(tag) },
-                        label = { Text(tag?.uppercase() ?: stringResource(R.string.debug_language_device)) },
-                    )
                 }
             }
             demons.forEach { demon ->
