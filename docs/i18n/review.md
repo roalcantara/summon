@@ -718,3 +718,38 @@ Entry format:
 - **Translation (4):** Prof
 - **Lost:** "Tutor" became "Prof": "Tuteur" (6) does not fit.
 - **Alternatives:** Tuteur (6, needs exception).
+
+### en/es/pt-BR/it/fr · intro_title
+
+- **Status:** new (2026-10-22)
+- **English:** How to\nchant
+- **Translations:** es: "Cómo\nrecitar" · pt-BR: "Como\nrecitar" · it: "Come\ncantare" · fr: "Bien\nchanter"
+- **Lost:** Explicit line break added for the narrow parchment ribbon slab.
+
+### en/es/pt-BR/it/fr · intro_direction_title
+
+- **Status:** new (2026-10-22)
+- **English:** Face
+- **Translations:** es: "Mira" · pt-BR: "Vire" · it: "Mira" · fr: "Vise"
+- **Lost:** Dropped "1." prefix since step number medallion now displays it.
+
+### en/es/pt-BR/it/fr · intro_chant_title
+
+- **Status:** new (2026-10-22)
+- **English:** Chant
+- **Translations:** es: "Canta" · pt-BR: "Cante" · it: "Canta" · fr: "Chant"
+- **Lost:** Dropped "2." prefix since step number medallion now displays it.
+
+### en/es/pt-BR/it/fr · intro_lines_title
+
+- **Status:** new (2026-10-22)
+- **English:** Watch the words
+- **Translations:** es: "Sigue el verso" · pt-BR: "Siga o verso" · it: "Segui i versi" · fr: "Suis les mots"
+- **Lost:** Reworded to verb phrase for consistency with steps 1 and 2.
+
+### en/es/pt-BR/it/fr · intro_focus_title
+
+- **Status:** new (2026-10-22)
+- **English:** Beat the clock
+- **Translations:** es: "Gana al reloj" · pt-BR: "Ganhe do tempo" · it: "Batti il tempo" · fr: "Bats l’horloge"
+- **Lost:** Reworded to verb phrase for consistency with steps 1, 2, and 3.
