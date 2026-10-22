@@ -30,6 +30,8 @@
     <string name="grimoire_back">Voltar à câmara</string>
     <string name="grimoire_previous">Anterior</string>
     <string name="grimoire_next">Próximo</string>
+    <string name="grimoire_show_dossier">Ver dossiê</string>
+    <string name="grimoire_show_profile">Ver perfil</string>
     <string name="celebration_banner">Demônio recebido!</string>
     <string name="quote_tap_to_summon">Invocar</string>
     <string name="quote_cooling">Círculo esfria</string>

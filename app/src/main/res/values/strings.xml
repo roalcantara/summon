@@ -33,6 +33,8 @@
     <string name="grimoire_back">Back to the chamber</string>
     <string name="grimoire_previous">Previous demon</string>
     <string name="grimoire_next">Next demon</string>
+    <string name="grimoire_show_dossier">Show dossier</string>
+    <string name="grimoire_show_profile">Show profile</string>
     <string name="celebration_banner">New Demon Received!</string>
     <string name="quote_tap_to_summon">Tap to summon</string>
     <string name="quote_cooling">Circle cooling</string>

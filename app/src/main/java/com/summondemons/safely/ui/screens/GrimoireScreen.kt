@@ -93,14 +93,14 @@ import com.summondemons.safely.ui.components.MenuButton
 import com.summondemons.safely.ui.components.TitlePlaque
 import com.summondemons.safely.ui.components.CUTOUT_ASPECT
 import com.summondemons.safely.ui.components.DemonCutout
-import com.summondemons.safely.ui.components.DossierCarousel
+import com.summondemons.safely.ui.components.CardSide
+import com.summondemons.safely.ui.components.DemonCard
 import com.summondemons.safely.ui.components.FloorCircle
 import com.summondemons.safely.ui.components.InfoBand
 import com.summondemons.safely.ui.components.QuoteSlot
 import com.summondemons.safely.ui.components.QuoteSlotState
 import com.summondemons.safely.ui.components.RibbonBanner
 import com.summondemons.safely.ui.components.RotatingSunburstBackground
-import com.summondemons.safely.ui.components.SECRET_PAGE
 import com.summondemons.safely.ui.components.StageBackground
 import com.summondemons.safely.ui.fx.Jitter
 import com.summondemons.safely.ui.fx.LocalReduceMotion
@@ -121,7 +121,7 @@ import kotlin.math.abs
 import kotlin.math.sin
 
 /** Share of the area below the avatar rail taken by the card; raise for more text, lower for bigger art. */
-private const val CARD_HEIGHT_FRACTION = 0.5f
+private const val CARD_HEIGHT_FRACTION = 0.36f
 private const val BADGE_INFO_MS = 5_000L
 private const val AVATAR_BURN_CONSUME_MS = 2_200L
 private const val STAGE_CROSSFADE_MS = 500
@@ -149,15 +149,9 @@ private val RailHeight = 72.dp
 private val FloatAmplitude = 6.dp
 private val SceneBlur = 3.dp
 private val StageSwipe = 60.dp
-private val CarouselMinHeight = 88.dp
-private val CarouselTopPadding = 12.dp
-private val MedallionSize = 48.dp
 private val BannerDrop = 30.dp
-private val NameSize = 26.sp
-private val NumberSize = 18.sp
-private val TitleSize = 12.sp
 
-/** The Grimoire (ADR-0016): avatar rail, a stage over a static demon card, and the new-summon party. */
+/** The Grimoire (ADR-0016): a stage over the demon card, a tarot card whose back is the dossier (ADR-0016 amended, spec §2). */
 @Composable
 fun GrimoireScreen(
     state: GameUiState,
@@ -189,7 +183,22 @@ fun GrimoireScreen(
     // Ink flags are read once per viewing and consumed at once; the saved values keep the animation alive.
     val inkCodex = rememberSaveable(demon.id) { record.revealed && record.revealPending.codex }
     val inkBattle = rememberSaveable(demon.id) { record.revealed && record.revealPending.battle }
-    var page by remember(demon.id) { mutableIntStateOf(0) }
+    // The card's face (spec §2): kept when switching demon; back turns it over before leaving.
+    var side by rememberSaveable { mutableStateOf(CardSide.Front) }
+    var scrollToSecret by remember(demon.id) { mutableStateOf(false) }
+    // Ink plays where it can be seen: the reveals are consumed when the back is shown.
+    LaunchedEffect(demon.id, side) {
+        if (side == CardSide.Back) {
+            if (inkCodex) onConsumeReveal(demon.id, Reveal.Codex)
+            if (inkBattle) onConsumeReveal(demon.id, Reveal.Battle)
+        }
+    }
+    // Awesome! (or back) ends the celebration and turns the card to the newly revealed dossier.
+    var wasParty by remember { mutableStateOf(party != null) }
+    LaunchedEffect(party != null) {
+        if (wasParty && party == null) side = CardSide.Back
+        wasParty = party != null
+    }
     var badge by remember(demon.id) { mutableStateOf<BadgeKey?>(null) }
     var badgeTaps by remember { mutableIntStateOf(0) }
     var shake by remember { mutableIntStateOf(0) }
@@ -198,10 +207,6 @@ fun GrimoireScreen(
     var tadaFor by rememberSaveable { mutableStateOf<String?>(null) }
 
     LaunchedEffect(demon.id, bound, state.today) { if (bound) onVisit(demon.id) }
-    LaunchedEffect(demon.id) {
-        if (inkCodex) onConsumeReveal(demon.id, Reveal.Codex)
-        if (inkBattle) onConsumeReveal(demon.id, Reveal.Battle)
-    }
     LaunchedEffect(demon.id, bound, record.revealPending.avatar) {
         if (bound && record.revealPending.avatar) {
             delay(AVATAR_BURN_CONSUME_MS)
@@ -210,7 +215,8 @@ fun GrimoireScreen(
     }
     LaunchedEffect(state.openSecret) {
         if (state.openSecret) {
-            page = SECRET_PAGE
+            side = CardSide.Back
+            scrollToSecret = true
             onSecretShown()
         }
     }
@@ -229,6 +235,7 @@ fun GrimoireScreen(
         }
     }
     BackHandler(enabled = party != null) { onDismissCelebration() }
+    BackHandler(enabled = party == null && side == CardSide.Back) { side = CardSide.Front }
 
     val primary: () -> Unit = {
         when {
@@ -277,8 +284,8 @@ fun GrimoireScreen(
             BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
                 var fixedPx by remember { mutableIntStateOf(0) }
                 val navBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-                // Fixed at the default font scale; grows only if header + band + badges + 88 dp don't fit.
-                val minimum = with(density) { fixedPx.toDp() } + spacing.lg + spacing.md + CarouselTopPadding + CarouselMinHeight + navBottom
+                // The front's natural height (header + band + badges), kept for both faces; never below the fraction.
+                val minimum = with(density) { fixedPx.toDp() } + spacing.lg + spacing.md + navBottom
                 val cardHeight = maxOf(maxHeight * CARD_HEIGHT_FRACTION, minimum)
                 Column(Modifier.fillMaxSize()) {
                     Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -305,15 +312,17 @@ fun GrimoireScreen(
                         demons = demons,
                         demon = demon,
                         record = record,
+                        side = side,
+                        onFlip = { side = if (side == CardSide.Front) CardSide.Back else CardSide.Front },
+                        glowFlip = ProgressRules.dossierUnread(record),
                         badge = badge,
                         onBadge = {
                             badge = it
                             badgeTaps++
                         },
-                        page = page,
-                        onPage = { page = it },
                         inkCodex = inkCodex,
                         inkBattle = inkBattle,
+                        scrollToSecret = scrollToSecret,
                         onFixedHeight = { fixedPx = it },
                         onBadgeRowBounds = { badgeRowBounds = it },
                         modifier = Modifier.fillMaxWidth().height(cardHeight),
@@ -474,98 +483,6 @@ private fun SceneBackdrop(@DrawableRes art: Int, modifier: Modifier) {
     }
 }
 
-@Composable
-private fun DemonCard(
-    demons: List<Demon>,
-    demon: Demon,
-    record: DemonRecord,
-    badge: BadgeKey?,
-    onBadge: (BadgeKey?) -> Unit,
-    page: Int,
-    onPage: (Int) -> Unit,
-    inkCodex: Boolean,
-    inkBattle: Boolean,
-    onFixedHeight: (Int) -> Unit,
-    onBadgeRowBounds: (Rect) -> Unit,
-    modifier: Modifier,
-) {
-    val colors = MaterialTheme.colorScheme
-    val spacing = MaterialTheme.spacing
-    Surface(
-        modifier = modifier,
-        shape = MaterialTheme.shapes.large.copy(bottomStart = CornerSize(0.dp), bottomEnd = CornerSize(0.dp)),
-        color = colors.surfaceContainerLow.copy(alpha = CARD_ALPHA),
-        border = BorderStroke(1.dp, colors.outlineVariant),
-    ) {
-        Column(Modifier.navigationBarsPadding().padding(top = spacing.lg, bottom = spacing.md)) {
-            Column(Modifier.onSizeChanged { onFixedHeight(it.height) }) {
-                CardHeader(demon, record.bound, Modifier.padding(horizontal = spacing.lg))
-                InfoBand(demons, demon, badge, Modifier.padding(horizontal = spacing.lg).padding(top = spacing.lg))
-                BadgeRow(
-                    demon = demon,
-                    selected = badge,
-                    onSelect = onBadge,
-                    modifier = Modifier
-                        .padding(horizontal = spacing.lg)
-                        .padding(top = spacing.lg)
-                        .onGloballyPositioned { onBadgeRowBounds(it.boundsInRoot()) },
-                )
-            }
-            DossierCarousel(
-                demon = demon,
-                record = record,
-                inkCodex = inkCodex,
-                inkBattle = inkBattle,
-                page = page,
-                onPage = onPage,
-                modifier = Modifier.weight(1f).fillMaxWidth().padding(top = CarouselTopPadding).padding(horizontal = spacing.xs),
-            )
-        }
-    }
-}
-
-/** Tarot-style header: number medallion in the House metal, name, title. */
-@Composable
-private fun CardHeader(demon: Demon, bound: Boolean, modifier: Modifier) {
-    val colors = MaterialTheme.colorScheme
-    val metal = MaterialTheme.demonColors.metal(demon.house)
-    val accent = MaterialTheme.demonColors.accent(demon.accent)
-    val roles = MaterialTheme.textRoles
-    Row(modifier, horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md), verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            Modifier
-                .size(MedallionSize)
-                .background(colors.surfaceContainerLow, CircleShape)
-                .clip(CircleShape)
-                .background(metal.copy(alpha = METAL_RING_ALPHA), CircleShape)
-                .padding(1.dp)
-                .background(colors.surfaceContainerLow, CircleShape)
-                .padding(2.dp)
-                .background(metal, CircleShape)
-                .padding(1.5.dp)
-                .background(colors.surfaceContainerLow, CircleShape),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(demon.number.toString(), style = roles.name.copy(fontSize = NumberSize), color = metal)
-        }
-        Column(Modifier.weight(1f)) {
-            Text(
-                demon.name,
-                style = roles.name.copy(fontSize = NameSize),
-                color = if (bound) accent else colors.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                stringResource(demon.title),
-                style = roles.body.copy(fontSize = TitleSize),
-                color = colors.outline,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-    }
-}
 
 /** "New Demon Received!" drops in at the top of the stage. */
 @Composable

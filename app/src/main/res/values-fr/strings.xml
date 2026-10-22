@@ -30,6 +30,8 @@
     <string name="grimoire_back">Retour à la salle</string>
     <string name="grimoire_previous">Précédent</string>
     <string name="grimoire_next">Suivant</string>
+    <string name="grimoire_show_dossier">Voir dossier</string>
+    <string name="grimoire_show_profile">Voir profil</string>
     <string name="celebration_banner">Démon reçu !</string>
     <string name="quote_tap_to_summon">Invoque-le !</string>
     <string name="quote_cooling">Ça refroidit</string>

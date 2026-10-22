@@ -30,6 +30,8 @@
     <string name="grimoire_back">Torna alla camera</string>
     <string name="grimoire_previous">Precedente</string>
     <string name="grimoire_next">Successivo</string>
+    <string name="grimoire_show_dossier">Vedi dossier</string>
+    <string name="grimoire_show_profile">Vedi profilo</string>
     <string name="celebration_banner">Demone ricevuto!</string>
     <string name="quote_tap_to_summon">Evocalo!</string>
     <string name="quote_cooling">Si raffredda</string>
