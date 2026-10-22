@@ -35,7 +35,7 @@ in `ui/fx/`, draws it (`fast` = 0.8 s period, used for wavering). Used by:
 |---|---|
 | Grimoire dossier button (⟲) | the shown demon's dossier has unread text: `record.revealPending.codex || record.revealPending.battle` |
 | Intro Summon button | the player has never completed a summon: `progress.lastSummonDay == null` |
-| Chant sigil ring | seeking (accent) and wavering (error colour, `fast`) |
+| Chant sigil ring | seeking (accent) and wavering (the paused amber, `colors.primary`, `fast`) |
 | Chant phrase (halo behind the current line) | chanting |
 
 ## 2. Grimoire: tarot flip (amends ADR-0016)
@@ -106,7 +106,7 @@ Landscape (the only orientation the Ritual uses):
 | Seeking | breathing glow, accent | dim, slot shows LOCKED | "FACE EAST →", neutral |
 | Locking | no breathing; ring fills green (today) | dim | "FACING EAST ✓", green |
 | Chanting | quiet (focus clock only) | soft halo behind the current line | ✓ |
-| Wavering | breathing glow, error colour, `fast` | dimmed further | "← FACE EAST", red, blinking (today) |
+| Wavering | breathing glow, paused amber (`colors.primary`, as today), `fast` | dimmed further | paused, amber, blinking (today) |
 | Climax / error panel | no glow | — | — |
 
 The direction pill is always one line in every state and language (§1.1).
