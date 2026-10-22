@@ -41,11 +41,11 @@ import com.summondemons.safely.platform.ClipRecorders
 import com.summondemons.safely.platform.AppLocale
 import com.summondemons.safely.platform.SessionLogs
 import com.summondemons.safely.platform.DeviceCheck
+import com.summondemons.safely.progress.ProgressRules
 import com.summondemons.safely.platform.WhisperTranscriber
 import com.summondemons.safely.ritual.CheckMode
 import com.summondemons.safely.platform.GameSounds
 import com.summondemons.safely.platform.LocalGameSounds
-import com.summondemons.safely.progress.ProgressRules
 import com.summondemons.safely.ritual.RitualPhase
 import com.summondemons.safely.ritual.RitualViewModel
 import com.summondemons.safely.ui.GameUiState
@@ -237,6 +237,7 @@ private fun RitualDestination(
     }
     RitualScreen(
         viewModel = ritual,
+        firstSummon = ProgressRules.neverSummoned(state.progress),
         onSummoned = {
             game.celebrate(demon.id, ritual.uiState.value.ritual.flawless)
             navController.popBackStack<Grimoire>(inclusive = false)

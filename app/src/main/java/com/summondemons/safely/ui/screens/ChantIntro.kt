@@ -2,6 +2,7 @@ package com.summondemons.safely.ui.screens
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -48,6 +50,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
+import com.summondemons.safely.ui.components.ParchmentRibbon
+import com.summondemons.safely.ui.fx.attentionGlow
+import com.summondemons.safely.ui.fx.rememberAttention
 import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.fontScaleCapped
 import com.summondemons.safely.ui.theme.spacing
@@ -55,31 +60,26 @@ import com.summondemons.safely.ui.theme.stage
 import com.summondemons.safely.ui.theme.textRoles
 import com.summondemons.safely.ui.theme.upper
 
-private const val INTRO_SLAB_WEIGHT = 0.25f
+private const val INTRO_SLAB_WEIGHT = 0.27f
 private const val INTRO_SLAB_ALPHA = 0.7f
-private const val ART_FRACTION = 0.8f
-private val BannerTitleColor = Color(0xFF3A2400)
-private val BannerHeight = 56.dp
-private val BannerTitleSize = 24.sp
-/** Clears the ribbon's folded tails, so the title sits on its flat middle band. */
-private val BannerTitleInset = 48.dp
 private val SummonButtonHeight = 56.dp
 private val SummonLabelSize = 20.sp
-/** The banner and button art are fixed-height: large font sizes shrink their words back to fit. */
+/** The button art is fixed-height: large font sizes shrink its word back to fit. */
 private val ArtLabelMinSize = 8.sp
 private val RuleTitleSize = 18.sp
 private val RuleBodySize = 16.sp
 private val RuleIcon = 40.dp
-private val BandHeight = 112.dp
+private val StepSize = 28.dp
+private val StepBorder = 1.5.dp
+private val StepNumberSize = 14.sp
 
 /**
- * The intro card (ADR-0019): shown before every ritual, and from the chant screen's "?"
- * (ADR-0021). Mirrors the chant screen: art where the sigil goes, the rules where the
- * words go. Generic: nothing in it names a demon or a direction. The microphone is ignored
- * while it is up (RitualViewModel); **Summon** and ✕ start the chant.
- *
- * Art: `chant_intro_singer.webp` on the slab, `chant_intro_banner.webp` for the header,
- * and `chant_summon_button.webp` / `_pressed.webp` for the action (DESIGN.md, ADR-0019).
+ * The intro card (ADR-0019, ADR-0021, layout B of ADR-0033): shown before every ritual and
+ * from the chant screen's "?". The left slab holds the title ribbon, the singer and **Summon**
+ * (where the direction pill appears next); the right column the four numbered rules, each with
+ * the icon the chant screen uses. Generic: nothing names a demon or a direction. The microphone
+ * is ignored while it is up (RitualViewModel); **Summon** and ✕ start the chant. Summon glows
+ * until the player's first completed summon ([glowSummon]).
  */
 @Composable
 fun ChantIntro(
@@ -88,6 +88,7 @@ fun ChantIntro(
     showClose: Boolean,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
+    glowSummon: Boolean = false,
 ) {
     val accent = MaterialTheme.demonColors.accent(demon.accent)
     val spacing = MaterialTheme.spacing
@@ -96,13 +97,19 @@ fun ChantIntro(
         ChantBackdrop(demon.house.stage(), landscape, Modifier.fillMaxSize())
         if (landscape) {
             Row(Modifier.fillMaxSize().safeDrawingPadding().padding(spacing.lg), horizontalArrangement = Arrangement.spacedBy(spacing.lg)) {
-                ArtSlab(Modifier.fillMaxHeight().weight(INTRO_SLAB_WEIGHT))
-                Rules(accent, onSummon, Modifier.fillMaxHeight().weight(1f - INTRO_SLAB_WEIGHT))
+                Slab(accent, glowSummon, onSummon, Modifier.fillMaxHeight().weight(INTRO_SLAB_WEIGHT))
+                Rules(accent, Modifier.fillMaxHeight().weight(1f - INTRO_SLAB_WEIGHT))
             }
         } else {
-            Column(Modifier.fillMaxSize().safeDrawingPadding().padding(spacing.lg), verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
-                ArtSlab(Modifier.fillMaxWidth().height(BandHeight))
-                Rules(accent, onSummon, Modifier.fillMaxWidth().weight(1f))
+            // Large screens only (the Ritual is landscape): ribbon, rules, then Summon.
+            Column(
+                Modifier.fillMaxSize().safeDrawingPadding().padding(spacing.lg),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(spacing.lg),
+            ) {
+                ParchmentRibbon(stringResource(R.string.intro_title), Modifier.semantics { heading() })
+                Rules(accent, Modifier.fillMaxWidth().weight(1f))
+                SummonButton(accent, glowSummon, onSummon)
             }
         }
         if (showClose) {
@@ -117,72 +124,54 @@ fun ChantIntro(
     }
 }
 
+/** Title ribbon over the singer over Summon. */
 @Composable
-private fun ArtSlab(modifier: Modifier) {
+private fun Slab(accent: Color, glowSummon: Boolean, onSummon: () -> Unit, modifier: Modifier) {
     val colors = MaterialTheme.colorScheme
+    val spacing = MaterialTheme.spacing
     Surface(modifier, shape = MaterialTheme.shapes.large, color = colors.surfaceContainerLow.copy(alpha = INTRO_SLAB_ALPHA)) {
-        Box(contentAlignment = Alignment.Center) {
+        Column(
+            Modifier.padding(spacing.md),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(spacing.md),
+        ) {
+            ParchmentRibbon(stringResource(R.string.intro_title), Modifier.semantics { heading() })
             Image(
                 painter = painterResource(R.drawable.chant_intro_singer),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize(ART_FRACTION),
+                modifier = Modifier.weight(1f).fillMaxWidth(),
             )
+            SummonButton(accent, glowSummon, onSummon)
         }
     }
 }
 
+/** The four rules, centred; they scroll when large font sizes make them taller than the screen. */
 @Composable
-private fun Rules(accent: Color, onSummon: () -> Unit, modifier: Modifier) {
+private fun Rules(accent: Color, modifier: Modifier) {
     val spacing = MaterialTheme.spacing
-    Column(modifier.padding(horizontal = spacing.sm), verticalArrangement = Arrangement.spacedBy(spacing.md, Alignment.CenterVertically)) {
-        // Large font sizes scroll the rules; Summon stays pinned below them.
-        Column(
-            Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(spacing.md),
-        ) {
-            Box(
-                modifier = Modifier
-                    .height(BannerHeight)
-                    .semantics { heading() },
-                contentAlignment = Alignment.Center,
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.chant_intro_banner),
-                    contentDescription = null,
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier.matchParentSize(),
-                )
-                // The ribbon's middle band is narrower than its box: larger, the title spills over it.
-                val titleSize = BannerTitleSize.fontScaleCapped()
-                Text(
-                    text = stringResource(R.string.intro_title).upper(),
-                    style = MaterialTheme.textRoles.name.copy(fontSize = titleSize),
-                    color = BannerTitleColor,
-                    modifier = Modifier.padding(horizontal = BannerTitleInset),
-                    maxLines = 1,
-                    softWrap = false,
-                    autoSize = TextAutoSize.StepBased(minFontSize = ArtLabelMinSize, maxFontSize = titleSize),
-                )
-            }
-            Rule(R.string.intro_direction_title, R.string.intro_direction_body) { CheckIcon() }
-            Rule(R.string.intro_chant_title, R.string.intro_chant_body) { SealsIcon(accent) }
-            Rule(R.string.intro_lines_title, R.string.intro_lines_body) { LinesIcon() }
-            Rule(R.string.intro_focus_title, R.string.intro_focus_body) { FocusIcon(accent) }
+    Box(modifier.padding(horizontal = spacing.sm), contentAlignment = Alignment.CenterStart) {
+        Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(spacing.md)) {
+            Rule(1, accent, R.string.intro_direction_title, R.string.intro_direction_body) { CheckIcon() }
+            Rule(2, accent, R.string.intro_chant_title, R.string.intro_chant_body) { SealsIcon(accent) }
+            Rule(3, accent, R.string.intro_lines_title, R.string.intro_lines_body) { LinesIcon() }
+            Rule(4, accent, R.string.intro_focus_title, R.string.intro_focus_body) { FocusIcon(accent) }
         }
-        SummonButton(onClick = onSummon)
     }
 }
 
 @Composable
-private fun SummonButton(onClick: () -> Unit) {
+private fun SummonButton(accent: Color, glow: Boolean, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val label = stringResource(R.string.intro_summon).upper()
     val buttonDrawable = if (isPressed) R.drawable.chant_summon_button_pressed else R.drawable.chant_summon_button
     val inkHighlight = MaterialTheme.demonColors.inkHighlight
+    val attention = rememberAttention(glow)
     Box(
         modifier = Modifier
+            .attentionGlow(attention, accent)
             .height(SummonButtonHeight)
             .clickable(
                 interactionSource = interactionSource,
@@ -204,21 +193,30 @@ private fun SummonButton(onClick: () -> Unit) {
         )
         Text(
             text = label,
-            style = MaterialTheme.textRoles.name.copy(fontSize = SummonLabelSize),
+            style = MaterialTheme.textRoles.name.copy(fontSize = SummonLabelSize.fontScaleCapped()),
             color = inkHighlight,
             modifier = Modifier.padding(horizontal = MaterialTheme.spacing.xl),
             maxLines = 1,
             softWrap = false,
-            autoSize = TextAutoSize.StepBased(minFontSize = ArtLabelMinSize, maxFontSize = SummonLabelSize),
+            autoSize = TextAutoSize.StepBased(minFontSize = ArtLabelMinSize, maxFontSize = SummonLabelSize.fontScaleCapped()),
         )
     }
 }
 
-/** One rule: an icon that matches the chant screen, a short title, a one-line description. */
+/** One rule: its step number, the icon that matches the chant screen, a short title, a one-line description. */
 @Composable
-private fun Rule(title: Int, body: Int, icon: @Composable () -> Unit) {
+private fun Rule(step: Int, accent: Color, title: Int, body: Int, icon: @Composable () -> Unit) {
     val colors = MaterialTheme.colorScheme
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md)) {
+        Box(Modifier.size(StepSize).border(StepBorder, accent, CircleShape), contentAlignment = Alignment.Center) {
+            Text(
+                step.toString(),
+                style = MaterialTheme.textRoles.name.copy(fontSize = StepNumberSize.fontScaleCapped()),
+                color = accent,
+                maxLines = 1,
+                softWrap = false,
+            )
+        }
         Box(Modifier.size(RuleIcon), contentAlignment = Alignment.Center) { icon() }
         Column {
             Text(

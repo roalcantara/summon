@@ -99,6 +99,7 @@ fun RitualScreen(
     viewModel: RitualViewModel,
     onSummoned: () -> Unit,
     onAbort: () -> Unit,
+    firstSummon: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -175,6 +176,7 @@ fun RitualScreen(
         onShowIntro = viewModel::openIntro,
         onPhraseLaid = viewModel::onPhraseLaid,
         onAbort = onAbort,
+        firstSummon = firstSummon,
         modifier = modifier,
     )
 }
@@ -193,6 +195,7 @@ private fun RitualContent(
     onShowIntro: () -> Unit,
     onPhraseLaid: (UiRecord) -> Unit,
     onAbort: () -> Unit,
+    firstSummon: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val demon = state.demon
@@ -266,7 +269,7 @@ private fun RitualContent(
             enter = if (reduceMotion) fadeIn(tween(INTRO_MS)) else slideInVertically(tween(INTRO_MS)) { -it } + fadeIn(tween(INTRO_MS)),
             exit = if (reduceMotion) fadeOut(tween(INTRO_MS)) else slideOutVertically(tween(INTRO_MS)) { -it } + fadeOut(tween(INTRO_MS)),
         ) {
-            ChantIntro(demon = demon, onSummon = onDismissIntro, showClose = true, onClose = onDismissIntro, modifier = Modifier.fillMaxSize())
+            ChantIntro(demon = demon, onSummon = onDismissIntro, showClose = true, onClose = onDismissIntro, glowSummon = firstSummon, modifier = Modifier.fillMaxSize())
         }
         if (inClimax) ClimaxOverlay(demon, accent, ritual.climaxFraction, reduceMotion)
     }
