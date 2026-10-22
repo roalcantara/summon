@@ -28,3 +28,6 @@ tools/.cache/
 
 # Whisper model, downloaded by tools/fetch_whisper_model.sh (ADR-0027)
 app/src/main/assets/whisper/
+
+# Brainstorming visual companion (superpowers)
+.superpowers/
