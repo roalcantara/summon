@@ -68,6 +68,7 @@
     <!-- Chant screen (ADR-0019) -->
     <string name="chant_face">Cap %1$s</string>
     <string name="chant_paused">Pause</string>
+    <string name="chant_listening">J’écoute</string>
     <string name="chant_a11y_paused">Pause. Reviens au cap %1$s</string>
     <string name="chant_locked">Bloqué</string>
     <string name="chant_sealed">Scellé</string>

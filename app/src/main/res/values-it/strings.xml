@@ -68,6 +68,7 @@
     <!-- Chant screen (ADR-0019) -->
     <string name="chant_face">Mira %1$s</string>
     <string name="chant_paused">Pausa</string>
+    <string name="chant_listening">Ascolto</string>
     <string name="chant_a11y_paused">Pausa. Torna a mirare %1$s</string>
     <string name="chant_locked">Chiuso</string>
     <string name="chant_sealed">Fatto</string>

@@ -753,3 +753,10 @@ Entry format:
 - **English:** Beat the clock
 - **Translations:** es: "Gana al reloj" · pt-BR: "Ganhe do tempo" · it: "Batti il tempo" · fr: "Bats l’horloge"
 - **Lost:** Reworded to verb phrase for consistency with steps 1, 2, and 3.
+
+### en/es/pt-BR/it/fr · chant_listening
+
+- **Status:** new (2026-10-22)
+- **English (9):** Listening
+- **Translations:** es: "Oyendo" (6) · pt-BR: "Ouvindo" (7) · it: "Ascolto" (7) · fr: "J’écoute" (8)
+- **Lost:** None: concise present state on the mic chip, all shorter than English.

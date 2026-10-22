@@ -83,9 +83,10 @@ fun ChantScreen(
         val phraseGlow = rememberAttention(attention == Attention.Phrase)
         val parts = ChantParts(
             buttons = { CornerButtons(onHelp, debug) },
-            title = { ChantTitle(demon.name, screen.seals, screen.checking, screen.drifting, accent) },
+            name = { ChantNamePlate(demon.name, accent) },
+            track = { SealTrack(screen.seals, accent, screen.drifting, screen.checking) },
             pill = { DirectionPillView(screen.pill, demon.ritualHeading) },
-            sigil = { m -> ChantSigil(state, screen, accent, flash, sigilGlow, m.onSizeChanged { sigilPx = it.width }) },
+            sigil = { ChantSigil(state, screen, accent, flash, sigilGlow, Modifier.fillMaxSize().onSizeChanged { sigilPx = it.width }) },
             slot = { if (blocker == null) FeedbackSlot(screen.slot, accent, state.micLevel, screen.drifting) },
             line = { m ->
                 if (blocker != null) {

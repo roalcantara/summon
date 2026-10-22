@@ -68,6 +68,7 @@
     <!-- Chant screen (ADR-0019) -->
     <string name="chant_face">Vire %1$s</string>
     <string name="chant_paused">Pausa</string>
+    <string name="chant_listening">Ouvindo</string>
     <string name="chant_a11y_paused">Pausa. Vire de novo: %1$s</string>
     <string name="chant_locked">Trava</string>
     <string name="chant_sealed">Selado</string>

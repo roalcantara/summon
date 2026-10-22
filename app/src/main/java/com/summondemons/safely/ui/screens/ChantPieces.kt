@@ -105,7 +105,12 @@ import kotlin.math.abs
 
 // --- Sizes and tuning (ADR-0019, ADR-0029) ---
 private val NameSize = 22.sp
-private val SealSize = 22.dp
+private val SealSize = 28.dp
+private val NameMinSize = 10.sp
+private val NameRule = 1.dp
+private const val NAME_RULE_ALPHA = 0.35f
+private val TrackLink = 20.dp
+private val TrackLinkWidth = 2.dp
 private val SealNumeralSize = 10.sp
 private const val SEAL_STROKE_FRACTION = 0.065f
 private val PillTextSize = 15.sp
@@ -116,6 +121,7 @@ private val ChipBorder = 1.dp
 private const val CHIP_ALPHA = 0.85f
 private val MeterWidth = 26.dp
 private val MeterHeight = 20.dp
+private val MicSize = 16.dp
 private val MinPhraseSize = 18.sp
 private val MaxPhraseSize = 96.sp
 private val PhraseStep = 2.sp
@@ -256,22 +262,57 @@ private class BelowAnchor(private val gap: Int) : PopupPositionProvider {
 
 // --- Title: name and seals (ADR-0029 §3.2) ---
 
-/** The demon's name with the four seal marks beside it, centred at the top. */
+/** The demon's name between two thin accent rules, sized to the stack's width (spec 2026-10-22 polish §2). */
 @Composable
-internal fun ChantTitle(name: String, seals: List<SealLook>, checking: Boolean, paused: Boolean, accent: Color) {
+internal fun ChantNamePlate(name: String, accent: Color) {
     val spacing = MaterialTheme.spacing
+    val maxSize = NameSize.fontScaleCapped()
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .drawBehind {
+                val rule = NameRule.toPx()
+                val color = accent.copy(alpha = NAME_RULE_ALPHA)
+                drawLine(color, Offset(0f, rule / 2f), Offset(size.width, rule / 2f), rule)
+                drawLine(color, Offset(0f, size.height - rule / 2f), Offset(size.width, size.height - rule / 2f), rule)
+            }
+            .padding(vertical = spacing.xs),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            name.uppercase(),
+            style = MaterialTheme.textRoles.name.copy(fontSize = maxSize, letterSpacing = 0.12.em, textAlign = TextAlign.Center),
+            color = accent,
+            maxLines = 1,
+            softWrap = false,
+            autoSize = TextAutoSize.StepBased(minFontSize = NameMinSize, maxFontSize = maxSize),
+        )
+    }
+}
+
+/**
+ * The four lines as steps I–IV joined by a line that fills as they seal (spec 2026-10-22 polish §3);
+ * each step is a [SealMark] (current breathes, sealed flares, cracked red, paused amber).
+ */
+@Composable
+internal fun SealTrack(seals: List<SealLook>, accent: Color, paused: Boolean, checking: Boolean) {
     val sealed = seals.count { it == SealLook.Sealed }
     val description = pluralStringResource(R.plurals.chant_a11y_seals, sealed, sealed)
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(spacing.md)) {
-        Text(name.uppercase(), style = MaterialTheme.textRoles.name.copy(fontSize = NameSize, letterSpacing = 0.12.em), color = accent, maxLines = 1)
-        Row(
-            Modifier.semantics(mergeDescendants = true) { contentDescription = description },
-            horizontalArrangement = Arrangement.spacedBy(spacing.xs),
-        ) {
-            seals.forEachIndexed { i, look -> SealMark(ROMAN_NUMERALS[i], look, accent, paused, checking, Modifier.size(SealSize)) }
+    val pending = MaterialTheme.colorScheme.outlineVariant
+    Column(
+        Modifier.semantics(mergeDescendants = true) { contentDescription = description },
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        seals.forEachIndexed { i, look ->
+            if (i > 0) {
+                val filled = seals[i - 1] == SealLook.Sealed
+                Box(Modifier.size(TrackLinkWidth, TrackLink).background(if (filled) accent else pending))
+            }
+            SealMark(ROMAN_NUMERALS[i], look, accent, paused, checking, Modifier.size(SealSize))
         }
     }
 }
+
 
 /** A numeral in a ring: filled when sealed, error when cracked, amber when current and paused; the current one breathes. */
 @Composable
@@ -327,7 +368,7 @@ private fun SealMark(numeral: String, look: SealLook, accent: Color, paused: Boo
 // --- Direction pill (ADR-0029 §3.3) ---
 
 @Composable
-internal fun DirectionPillView(pill: DirectionPill, target: Float) {
+internal fun DirectionPillView(pill: DirectionPill, target: Float, modifier: Modifier = Modifier) {
     if (pill.look == PillLook.Hidden) return
     val colors = MaterialTheme.colorScheme
     val reduceMotion = LocalReduceMotion.current
@@ -362,12 +403,12 @@ internal fun DirectionPillView(pill: DirectionPill, target: Float) {
     }
     Text(
         label,
-        style = MaterialTheme.textRoles.ritualCue.copy(fontSize = PillTextSize.fontScaleCapped(), letterSpacing = 0.12.em),
+        style = MaterialTheme.textRoles.ritualCue.copy(fontSize = PillTextSize.fontScaleCapped(), letterSpacing = 0.12.em, textAlign = TextAlign.Center),
         color = color,
         maxLines = 1,
         softWrap = false,
         autoSize = TextAutoSize.StepBased(minFontSize = PillMinSize, maxFontSize = PillTextSize.fontScaleCapped()),
-        modifier = Modifier
+        modifier = modifier
             .graphicsLayer { alpha = blink }
             .background(colors.surfaceContainerLowest.copy(alpha = CHIP_ALPHA), CircleShape)
             .border(PillBorder, color, CircleShape)
@@ -531,7 +572,18 @@ internal fun FeedbackSlot(slot: SlotContent, accent: Color, micLevel: Float, pau
     ) {
         when (slot) {
             SlotContent.Empty -> Unit
-            SlotContent.Meter -> VoiceMeter(if (paused) 0f else micLevel, if (paused) colors.outline else accent, Modifier.size(MeterWidth, MeterHeight))
+            SlotContent.Meter -> Chip(colors.outlineVariant) {
+                // Listening (or paused) as a labelled state, never bare bars that read as "•••••".
+                Icon(painterResource(R.drawable.ic_mic), contentDescription = null, tint = if (paused) colors.outline else accent, modifier = Modifier.size(MicSize))
+                VoiceMeter(if (paused) 0f else micLevel, if (paused) colors.outline else accent, Modifier.size(MeterWidth, MeterHeight))
+                Text(
+                    stringResource(if (paused) R.string.chant_paused else R.string.chant_listening).upper(),
+                    style = style,
+                    color = if (paused) colors.outline else colors.onSurfaceVariant,
+                    maxLines = 1,
+                    softWrap = false,
+                )
+            }
             SlotContent.Locked -> Chip(colors.outlineVariant) {
                 Icon(painterResource(R.drawable.ic_lock), contentDescription = stringResource(R.string.chant_a11y_locked), tint = colors.outline, modifier = Modifier.size(LockSize))
                 Text(stringResource(R.string.chant_locked).upper(), style = style, color = colors.outline, maxLines = 1)
