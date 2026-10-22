@@ -146,6 +146,13 @@ private const val CLOCK_TWEEN_MS = 120
 private const val TILT_TWEEN_MS = 250
 private const val UNLOCK_FLARE_MS = 600
 private const val LINE_FLARE_ALPHA = 0.22f
+/** The chanting halo behind the phrase at full breath (ADR-0033). */
+private const val LINE_HALO_ALPHA = 0.18f
+/** Wavering: the phrase dims while the voice is ignored (ADR-0010, ADR-0033). */
+private const val DRIFT_LINE_ALPHA = 0.45f
+/** The sigil's extra glow at full breath while it needs the player (ADR-0033). */
+private const val GLOW_ATTENTION = 0.35f
+private val PillMinSize = 8.sp
 /** The closed line brightens from here to [GATED_ALPHA_LOCKED] as the lock fills. */
 private const val GATED_ALPHA = 0.4f
 private const val GATED_ALPHA_LOCKED = 0.85f
@@ -350,9 +357,11 @@ internal fun DirectionPillView(pill: DirectionPill, target: Float) {
     }
     Text(
         label,
-        style = MaterialTheme.textRoles.ritualCue.copy(fontSize = PillTextSize, letterSpacing = 0.12.em),
+        style = MaterialTheme.textRoles.ritualCue.copy(fontSize = PillTextSize.fontScaleCapped(), letterSpacing = 0.12.em),
         color = color,
         maxLines = 1,
+        softWrap = false,
+        autoSize = TextAutoSize.StepBased(minFontSize = PillMinSize, maxFontSize = PillTextSize.fontScaleCapped()),
         modifier = Modifier
             .graphicsLayer { alpha = blink }
             .background(colors.surfaceContainerLowest.copy(alpha = CHIP_ALPHA), CircleShape)
@@ -418,7 +427,7 @@ internal fun EdgeChevrons(turn: TurnDirection, paused: Boolean, modifier: Modifi
  * Its glow grows as the lock fills, flares once on the lock, then follows the voice.
  */
 @Composable
-internal fun ChantSigil(state: RitualUiState, screen: ChantScreenState, accent: Color, flash: SigilFlash?, modifier: Modifier) {
+internal fun ChantSigil(state: RitualUiState, screen: ChantScreenState, accent: Color, flash: SigilFlash?, attention: Float, modifier: Modifier) {
     val colors = MaterialTheme.colorScheme
     val safe = MaterialTheme.demonColors.ritualSafe
     val reduceMotion = LocalReduceMotion.current
@@ -435,7 +444,7 @@ internal fun ChantSigil(state: RitualUiState, screen: ChantScreenState, accent: 
     val tilt by animateFloatAsState(screen.tiltDegrees, if (reduceMotion) snap() else tween(TILT_TWEEN_MS), label = "tilt")
     val flare = unlockFlare(screen.gated)
     val voice = if (screen.gated || screen.drifting) 0f else state.micLevel
-    val glow = (GLOW_BASE + GLOW_LOCK * screen.lockFraction + GLOW_VOICE * voice + GLOW_FLARE * flare).coerceAtMost(1f)
+    val glow = (GLOW_BASE + GLOW_LOCK * screen.lockFraction + GLOW_VOICE * voice + GLOW_FLARE * flare + GLOW_ATTENTION * attention).coerceAtMost(1f)
     val glowColor = if (screen.drifting) colors.primary else accent
     val track = colors.surfaceContainerHighest
     Box(modifier, contentAlignment = Alignment.Center) {
@@ -604,24 +613,31 @@ fun VoiceMeter(level: Float, color: Color, modifier: Modifier = Modifier) {
 
 /**
  * The phrase floating over the stage, no frame: dim before the lock, brightening as the lock
- * fills, then a soft accent flare as it opens. [onPhraseSize] gets the auto-sized sp.
+ * fills, a soft accent flare as it opens, a breathing halo while chanting and dimmed while wavering (ADR-0033).
  */
 @Composable
 internal fun ChantLine(
     words: List<ChantWord>,
     gated: Boolean,
+    drifting: Boolean,
     lockFraction: Float,
     accent: Color,
+    halo: Float,
     onPhraseSize: (Float) -> Unit,
     modifier: Modifier,
 ) {
     val flare = unlockFlare(gated)
-    val alpha = if (gated) lerp(GATED_ALPHA, GATED_ALPHA_LOCKED, lockFraction) else 1f
+    val alpha = when {
+        gated -> lerp(GATED_ALPHA, GATED_ALPHA_LOCKED, lockFraction)
+        drifting -> DRIFT_LINE_ALPHA
+        else -> 1f
+    }
     Box(
         modifier.drawBehind {
-            if (flare > 0f) {
+            val strength = LINE_FLARE_ALPHA * flare + LINE_HALO_ALPHA * halo
+            if (strength > 0f) {
                 val radius = size.maxDimension * 0.5f
-                drawCircle(Brush.radialGradient(listOf(accent.copy(alpha = LINE_FLARE_ALPHA * flare), Color.Transparent), radius = radius), radius = radius)
+                drawCircle(Brush.radialGradient(listOf(accent.copy(alpha = strength), Color.Transparent), radius = radius), radius = radius)
             }
         },
         contentAlignment = Alignment.Center,

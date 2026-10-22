@@ -31,6 +31,7 @@ import com.summondemons.safely.ritual.TurnDirection
 import com.summondemons.safely.ritual.UiRecord
 import com.summondemons.safely.ui.components.StageBackground
 import com.summondemons.safely.ui.fx.SigilFlash
+import com.summondemons.safely.ui.fx.rememberAttention
 import com.summondemons.safely.ui.theme.Stage
 import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.spacing
@@ -76,17 +77,21 @@ fun ChantScreen(
     BoxWithConstraints(modifier) {
         val landscape = maxWidth > maxHeight
         ChantBackdrop(demon.house.stage(), landscape, Modifier.fillMaxSize())
+        // One thing glows at a time (ADR-0033); nothing while an error panel replaces the line.
+        val attention = if (blocker != null) Attention.None else screen.attention
+        val sigilGlow = rememberAttention(attention == Attention.Sigil || attention == Attention.SigilAlarm, fast = attention == Attention.SigilAlarm)
+        val phraseGlow = rememberAttention(attention == Attention.Phrase)
         val parts = ChantParts(
             buttons = { CornerButtons(onHelp, debug) },
             title = { ChantTitle(demon.name, screen.seals, screen.checking, screen.drifting, accent) },
             pill = { DirectionPillView(screen.pill, demon.ritualHeading) },
-            sigil = { m -> ChantSigil(state, screen, accent, flash, m.onSizeChanged { sigilPx = it.width }) },
+            sigil = { m -> ChantSigil(state, screen, accent, flash, sigilGlow, m.onSizeChanged { sigilPx = it.width }) },
             slot = { if (blocker == null) FeedbackSlot(screen.slot, accent, state.micLevel, screen.drifting) },
             line = { m ->
                 if (blocker != null) {
                     Box(m, contentAlignment = Alignment.Center) { blocker() }
                 } else {
-                    ChantLine(screen.words, screen.gated, screen.lockFraction, accent, onPhraseSize = { phraseSp = it }, modifier = m.onSizeChanged { box = it })
+                    ChantLine(screen.words, screen.gated, screen.drifting, screen.lockFraction, accent, phraseGlow, onPhraseSize = { phraseSp = it }, modifier = m.onSizeChanged { box = it })
                 }
             },
         )
