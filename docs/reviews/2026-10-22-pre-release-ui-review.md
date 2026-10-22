@@ -179,3 +179,18 @@ Checked on the S24 after the review fixes (font scale 1.0 and 2.0, English):
 Still to check (play-test or the matrix): the after-summon flow (⟲ glows, Awesome! flips, the
 lore inks in), the intro and chant screen glows, other languages, the larger display size and the
 small-phone emulator.
+
+## Chant screen polish (2026-10-22, ADR-0029 & ADR-0033 amended)
+
+Executed `docs/superpowers/plans/2026-10-22-chant-screen-polish.md`:
+- Stable phrase auto-size per line with balanced breaks (`LineBreak.Heading`); current word emphasized by accent colour, 2× underline thickness, and soft radial glow (no per-word font size scaling).
+- Left column is a single `SigilStack`: name plate (`ChantNamePlate`), `ChantSigil`, and full-width `DirectionPillView`, all sharing the sigil's computed diameter (`stackDiameter`, unit-tested).
+- Progress track is a vertical I–IV line (`SealTrack`) between the two columns, filling links as seals lock.
+- Mic chip in `FeedbackSlot`: labelled state with mic vector (`ic_mic`), ember bars (`VoiceMeter`), and text "LISTENING" / "PAUSED", level with the name plate.
+- Verified on `Medium_Phone_24` (emulator-5554) at font scales 1.0 and 2.0 with screenshots captured in `build/ui-matrix/emu-en/`:
+  - `build/ui-matrix/emu-en/font1.0-dpi420/intro.png`
+  - `build/ui-matrix/emu-en/font1.0-dpi420/chant-seeking.png`
+  - `build/ui-matrix/emu-en/font1.0-dpi420/chant-chanting.png`
+  - `build/ui-matrix/emu-en/font2.0-dpi420/chant-seeking.png`
+  - `build/ui-matrix/emu-en/font2.0-dpi420/chant-chanting.png`
+  Nothing clipped; name plate and pill auto-size gracefully without wrapping or overflow.
