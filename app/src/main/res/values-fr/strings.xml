@@ -65,9 +65,6 @@
     <string name="dossier_secret">Secret</string>
     <string name="dossier_secret_locked">Invoque sans faute et lis</string>
     <string name="dossier_sealed">Scellé. Invoque et vois.</string>
-    <string name="dossier_page">%1$d / %2$d</string>
-    <string name="dossier_previous">Précédente</string>
-    <string name="dossier_next">Suivante</string>
     <!-- Chant screen (ADR-0019) -->
     <string name="chant_face">Cap %1$s</string>
     <string name="chant_paused">Pause</string>

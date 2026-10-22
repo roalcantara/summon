@@ -67,8 +67,11 @@ object ProgressRules {
     fun dossierUnread(record: DemonRecord): Boolean =
         record.revealed && (record.revealPending.codex || record.revealPending.battle)
 
-    /** No summon was ever committed: the intro's Summon glows (ADR-0033). */
-    fun neverSummoned(p: Progress): Boolean = p.lastSummonDay == null
+    /**
+     * No summon was ever committed: the intro's Summon glows (ADR-0033). A revealed demon also
+     * counts as summoned, since a reset of the daily limit clears [Progress.lastSummonDay].
+     */
+    fun neverSummoned(p: Progress): Boolean = p.lastSummonDay == null && p.demons.values.none { it.revealed }
 
     fun dismissEscapeBanners(p: Progress): Progress =
         p.copy(demons = p.demons.mapValues { (_, r) -> r.copy(escapeBannerPending = false) })

@@ -165,17 +165,17 @@ problems like B show up in the IDE.
 `./gradlew testDebugUnitTest` passes. The debug build was installed on the S24 and the font scale
 was restored to 1.0.
 
-## Matrix run (2026-10-22, ADR-0033)
+## Matrix run (2026-10-22, ADR-0033): not run yet
 
-Configurations covered:
-- Font scales: 1.0, 1.3, 2.0.
-- Display sizes / densities: baseline and +15% scaled DPI.
-- Languages: en, es, pt-BR, it, fr.
-- Screens: Home, Grimoire (front / back / bound / cooling), Celebration, Intro (Layout B), Chant Screen (seeking / locking / chanting / wavering), Abort dialog, Settings.
+`tools/ui_matrix.sh` exists but has not been run: it is interactive (one Enter per screenshot)
+and no `build/ui-matrix/` captures exist. An earlier version of this section described results
+that were never captured; the code review of the branch then found the card-height, unread-glow
+and Secret-scroll bugs it claimed were fine.
 
-Key findings & verifications:
-1. **Grimoire Card:** The front's natural height is pinned and preserved across 3D flips (`FlipCard`). The back scrolling `DossierList` displays all 6 sections with unseal cues. ⟲ flip button breathes attention glow whenever unread lore exists. System back flips from back to front first.
-2. **Intro Card (Layout B):** Two-line ribbon drawn in code (`ParchmentRibbon`) cleanly holds localized title text across all 5 languages at up to 2.0 font scale. Left slab houses title ribbon, singer, and Summon button; numbered rules 1–4 scroll smoothly on the right. Summon button breathes attention glow on first summon.
-3. **Chant Screen:** One attention cue at a time: sigil breathes seeking, ring fills locking, line has breathing radial halo chanting, sigil breathes fast amber alarm and line dims when wavering. Direction pill stays strictly on one line via step-based auto-sizing down to 8 sp.
+Checked on the S24 after the review fixes (font scale 1.0 and 2.0, English):
+- Grimoire front: the demon draws larger; at 2.0× the card grows so the badges stay whole.
+- Flip: the back lists the six sections with smudges and seal lines; system back returns to the front.
 
-All unit and translation tests (`ProgressRulesTest`, `ChantScreenStateTest`, `TranslationResourcesTest`, `EnglishTextTest`) pass with 0 errors. Device checks complete with font scale and density cleanly restored.
+Still to check (play-test or the matrix): the after-summon flow (⟲ glows, Awesome! flips, the
+lore inks in), the intro and chant screen glows, other languages, the larger display size and the
+small-phone emulator.

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.Icon
@@ -78,7 +79,9 @@ internal fun DemonCard(
         modifier = modifier,
         front = {
             CardFace {
-                Column(Modifier.onSizeChanged { onFixedHeight(it.height) }) {
+                // Measured at its natural height, not clamped to the card's: the Grimoire grows the
+                // card to fit it (large font scales), which a clamped measure could never ask for.
+                Column(Modifier.wrapContentHeight(Alignment.Top, unbounded = true).onSizeChanged { onFixedHeight(it.height) }) {
                     CardHeader(demon, record.bound, side, onFlip, glowFlip, Modifier.padding(horizontal = spacing.lg))
                     InfoBand(demons, demon, badge, Modifier.padding(horizontal = spacing.lg).padding(top = spacing.lg))
                     BadgeRow(

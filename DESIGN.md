@@ -230,7 +230,7 @@ large sources are not density-scaled and the APK stays small.
 | `chant_summon_button_pressed` | `art/splash/chant_summon_button_pressed.png` | 800×359, alpha; pressed state |
 | `ic_home_grimoire` | `art/etc/RestlessGrimoire.png` | 1024×1024 opaque square asset, Home grimoire book |
 | `grimoire_arrow_large` | `art/grimoire/grimoire_arrow_large.png` | 384×512, alpha; gilded left chevron with a violet gem, Grimoire stage prev/next (56×75 dp, mirrored for next) |
-| `grimoire_arrow_small` | `art/grimoire/grimoire_arrow_small.png` | 192×256, alpha; simplified chevron, dossier page arrows (24×32 dp, mirrored for next) |
+| `grimoire_arrow_small` | `art/grimoire/grimoire_arrow_small.png` | Retired 2026-10-22 (the dossier carousel became the card's back, ADR-0033); source kept in `art/` |
 | `ic_launcher_foreground` | `art/icon/cutout-dark.png` via `mise run icon` (`tools/gen_icons.py`) | 1024×1024 opaque on `obsidian`; drawn at 84 of 108 dp, raised 10 dp, margins extend the edge pixels (ADR-0030) |
 | `ic_launcher_background` | `tools/gen_icons.py` | Solid `obsidian`, hidden behind the full-bleed foreground |
 | `ic_launcher_monochrome` | `art/icon/cutout.png` via `tools/gen_icons.py` | Cutout silhouette with the ink lines cut out, themed icon layer |

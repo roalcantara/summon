@@ -7,7 +7,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,12 +26,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -73,7 +70,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,7 +78,6 @@ import com.summondemons.safely.data.Demon
 import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.platform.GameSounds
 import com.summondemons.safely.platform.LocalGameSounds
-import com.summondemons.safely.progress.DemonRecord
 import com.summondemons.safely.progress.Progress
 import com.summondemons.safely.progress.ProgressRules
 import com.summondemons.safely.progress.Reveal
@@ -96,7 +91,6 @@ import com.summondemons.safely.ui.components.DemonCutout
 import com.summondemons.safely.ui.components.CardSide
 import com.summondemons.safely.ui.components.DemonCard
 import com.summondemons.safely.ui.components.FloorCircle
-import com.summondemons.safely.ui.components.InfoBand
 import com.summondemons.safely.ui.components.QuoteSlot
 import com.summondemons.safely.ui.components.QuoteSlotState
 import com.summondemons.safely.ui.components.RibbonBanner
@@ -140,8 +134,6 @@ private const val SCENE_SHADE_START = 0.55f
 private const val SCENE_SHADE_ALPHA = 0.7f
 private const val FLOAT_PERIOD_S = 4f
 private const val PARTY_POP_FROM = 0.85f
-private const val CARD_ALPHA = 0.95f
-private const val METAL_RING_ALPHA = 0.45f
 private const val STAGE_ARROW_PRESSED = 0.92f
 private val StageArrowWidth = 56.dp
 private val StageArrowHeight = 75.dp
@@ -180,24 +172,38 @@ fun GrimoireScreen(
     // Captured when this demon is first shown: the visit clears restlessness, but he still sulks for this viewing.
     // Saved, so a configuration change doesn't re-read the already-visited record.
     val restless = rememberSaveable(demon.id, state.today) { ProgressRules.isRestless(record, state.today) }
-    // Ink flags are read once per viewing and consumed at once; the saved values keep the animation alive.
-    val inkCodex = rememberSaveable(demon.id) { record.revealed && record.revealPending.codex }
-    val inkBattle = rememberSaveable(demon.id) { record.revealed && record.revealPending.battle }
+    // Ink plays where it can be seen: a pending reveal inks in when the back shows, then is consumed.
+    // Read from the live record (a value saved before a ritual would be stale on return); the
+    // latch keeps the ink animation alive for this viewing once the reveal is consumed.
+    val pendingCodex = record.revealed && record.revealPending.codex
+    val pendingBattle = record.revealed && record.revealPending.battle
+    var inkedCodex by rememberSaveable(demon.id) { mutableStateOf(false) }
+    var inkedBattle by rememberSaveable(demon.id) { mutableStateOf(false) }
+    val inkCodex = inkedCodex || pendingCodex
+    val inkBattle = inkedBattle || pendingBattle
     // The card's face (spec §2): kept when switching demon; back turns it over before leaving.
     var side by rememberSaveable { mutableStateOf(CardSide.Front) }
     var scrollToSecret by remember(demon.id) { mutableStateOf(false) }
-    // Ink plays where it can be seen: the reveals are consumed when the back is shown.
-    LaunchedEffect(demon.id, side) {
-        if (side == CardSide.Back) {
-            if (inkCodex) onConsumeReveal(demon.id, Reveal.Codex)
-            if (inkBattle) onConsumeReveal(demon.id, Reveal.Battle)
+    LaunchedEffect(demon.id, side, pendingCodex, pendingBattle) {
+        if (side != CardSide.Back) return@LaunchedEffect
+        if (pendingCodex) {
+            inkedCodex = true
+            onConsumeReveal(demon.id, Reveal.Codex)
+        }
+        if (pendingBattle) {
+            inkedBattle = true
+            onConsumeReveal(demon.id, Reveal.Battle)
         }
     }
+    // The Secret is scrolled to once; later flips keep the reader's place.
+    LaunchedEffect(side) { if (side == CardSide.Front) scrollToSecret = false }
     // Awesome! (or back) ends the celebration and turns the card to the newly revealed dossier.
-    var wasParty by remember { mutableStateOf(party != null) }
-    LaunchedEffect(party != null) {
-        if (wasParty && party == null) side = CardSide.Back
-        wasParty = party != null
+    // Keyed on the celebration itself, so selecting another demon is not mistaken for its end.
+    val celebrating = state.celebration != null
+    var wasCelebrating by remember { mutableStateOf(celebrating) }
+    LaunchedEffect(celebrating) {
+        if (wasCelebrating && !celebrating) side = CardSide.Back
+        wasCelebrating = celebrating
     }
     var badge by remember(demon.id) { mutableStateOf<BadgeKey?>(null) }
     var badgeTaps by remember { mutableIntStateOf(0) }

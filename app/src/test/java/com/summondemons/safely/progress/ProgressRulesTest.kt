@@ -187,4 +187,10 @@ class ProgressRulesTest {
         assertTrue(neverSummoned(Progress()))
         assertFalse(neverSummoned(commitSummon(Progress(), "astaroth", 3, flawless = true)))
     }
+
+    @Test
+    fun aResetDailyLimitDoesNotMakeTheFirstSummonGlowAgain() {
+        val summoned = commitSummon(Progress(), "astaroth", 3, flawless = false)
+        assertFalse(neverSummoned(summoned.copy(lastSummonDay = null)))
+    }
 }

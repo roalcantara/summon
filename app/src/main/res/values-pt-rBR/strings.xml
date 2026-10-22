@@ -65,9 +65,6 @@
     <string name="dossier_secret">Sigilo</string>
     <string name="dossier_secret_locked">Invocação perfeita revela</string>
     <string name="dossier_sealed">Selado. Invoque para ver.</string>
-    <string name="dossier_page">%1$d / %2$d</string>
-    <string name="dossier_previous">Voltar página</string>
-    <string name="dossier_next">Próxima</string>
     <!-- Chant screen (ADR-0019) -->
     <string name="chant_face">Vire %1$s</string>
     <string name="chant_paused">Pausa</string>

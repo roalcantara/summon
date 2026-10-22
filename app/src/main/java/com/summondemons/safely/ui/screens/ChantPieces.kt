@@ -36,6 +36,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -427,7 +428,7 @@ internal fun EdgeChevrons(turn: TurnDirection, paused: Boolean, modifier: Modifi
  * Its glow grows as the lock fills, flares once on the lock, then follows the voice.
  */
 @Composable
-internal fun ChantSigil(state: RitualUiState, screen: ChantScreenState, accent: Color, flash: SigilFlash?, attention: Float, modifier: Modifier) {
+internal fun ChantSigil(state: RitualUiState, screen: ChantScreenState, accent: Color, flash: SigilFlash?, attention: State<Float>, modifier: Modifier) {
     val colors = MaterialTheme.colorScheme
     val safe = MaterialTheme.demonColors.ritualSafe
     val reduceMotion = LocalReduceMotion.current
@@ -444,11 +445,13 @@ internal fun ChantSigil(state: RitualUiState, screen: ChantScreenState, accent: 
     val tilt by animateFloatAsState(screen.tiltDegrees, if (reduceMotion) snap() else tween(TILT_TWEEN_MS), label = "tilt")
     val flare = unlockFlare(screen.gated)
     val voice = if (screen.gated || screen.drifting) 0f else state.micLevel
-    val glow = (GLOW_BASE + GLOW_LOCK * screen.lockFraction + GLOW_VOICE * voice + GLOW_FLARE * flare + GLOW_ATTENTION * attention).coerceAtMost(1f)
+    val baseGlow = GLOW_BASE + GLOW_LOCK * screen.lockFraction + GLOW_VOICE * voice + GLOW_FLARE * flare
     val glowColor = if (screen.drifting) colors.primary else accent
     val track = colors.surfaceContainerHighest
     Box(modifier, contentAlignment = Alignment.Center) {
         Canvas(Modifier.fillMaxSize()) {
+            // The breathing term is read here, while drawing, so it only redraws the canvas.
+            val glow = (baseGlow + GLOW_ATTENTION * attention.value).coerceAtMost(1f)
             drawCircle(
                 Brush.radialGradient(listOf(glowColor.copy(alpha = glow), Color.Transparent), radius = size.minDimension * GLOW_RADIUS),
                 radius = size.minDimension * GLOW_RADIUS,
@@ -622,7 +625,7 @@ internal fun ChantLine(
     drifting: Boolean,
     lockFraction: Float,
     accent: Color,
-    halo: Float,
+    halo: State<Float>,
     onPhraseSize: (Float) -> Unit,
     modifier: Modifier,
 ) {
@@ -634,7 +637,7 @@ internal fun ChantLine(
     }
     Box(
         modifier.drawBehind {
-            val strength = LINE_FLARE_ALPHA * flare + LINE_HALO_ALPHA * halo
+            val strength = LINE_FLARE_ALPHA * flare + LINE_HALO_ALPHA * halo.value
             if (strength > 0f) {
                 val radius = size.maxDimension * 0.5f
                 drawCircle(Brush.radialGradient(listOf(accent.copy(alpha = strength), Color.Transparent), radius = radius), radius = radius)
