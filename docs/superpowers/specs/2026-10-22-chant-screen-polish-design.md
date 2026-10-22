@@ -57,12 +57,15 @@
   **PAUSED** (`chant_paused`, existing) while wavering. Chip style = the slot's other chips
   (`Chip`), edge `outlineVariant`; label text capped at 1.3× like the slot.
 - All other slot states (Locked, Checking, Sealed, Missed, Cracked) are unchanged.
+- **Placement:** both columns are top-aligned: the slot (chip) starts level with the name
+  plate, so the two columns begin on one line; the phrase is centred in the rest of the right
+  column, at least `spacing.xl` below the slot.
 - New string `chant_listening`: en "Listening", es "Oyendo", pt-BR "Ouvindo", it "Ascolto",
   fr "J’écoute".
 
 ### 6. Portrait arrangement (large screens only)
-- Top row as §4; a band with the stack (§2) and the track laid horizontally beside it; then the
-  slot and the phrase, as today.
+- Top row as §4; a band with the stack (§2, fixed band size) and the vertical track beside it;
+  then the slot and the phrase, as today.
 
 ## Validation
 - Unit tests stay green; `ChantScreenStateTest` unchanged (no state changes).
