@@ -161,4 +161,31 @@ class ChantScreenStateTest {
         assertFalse("break at the space", splitsAWord(text) { if (it < 10) 0 else 1 })
         assertFalse("one line", splitsAWord(text) { 0 })
     }
+
+    // --- Attention (ADR-0033): one thing glows at a time ---
+
+    @Test
+    fun seekingDrawsTheEyeToTheSigil() {
+        assertEquals(Attention.Sigil, state(seeking).attention)
+    }
+
+    @Test
+    fun lockingGlowsNothingWhileTheRingFills() {
+        assertEquals(Attention.None, state(seeking.copy(phase = RitualPhase.Locking, azimuth = 90f, lockMs = 300L)).attention)
+    }
+
+    @Test
+    fun chantingHandsTheGlowToThePhrase() {
+        assertEquals(Attention.Phrase, state(chanting).attention)
+    }
+
+    @Test
+    fun waveringCallsTheEyeBackToTheSigil() {
+        assertEquals(Attention.SigilAlarm, state(chanting.copy(phase = RitualPhase.Wavering, azimuth = 0f), azimuth = 0f).attention)
+    }
+
+    @Test
+    fun theClimaxGlowsNothing() {
+        assertEquals(Attention.None, state(chanting.copy(phase = RitualPhase.Climax, phrase = 4)).attention)
+    }
 }

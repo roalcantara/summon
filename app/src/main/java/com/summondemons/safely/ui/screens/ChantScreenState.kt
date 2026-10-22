@@ -33,6 +33,9 @@ enum class PillLook { Seeking, Facing, Paused, Hidden }
 /** [turn] is shown while seeking or paused; null otherwise. */
 data class DirectionPill(val look: PillLook, val turn: TurnDirection?)
 
+
+/** The one element that glows to say "act here" (ADR-0033): the sigil while seeking, amber and faster while wavering, the phrase while chanting. */
+enum class Attention { None, Sigil, SigilAlarm, Phrase }
 /** The one slot above the phrase (ADR-0029 §3.5). */
 sealed interface SlotContent {
     data object Empty : SlotContent
@@ -71,6 +74,8 @@ data class ChantScreenState(
     val tiltDegrees: Float,
     /** Before the lock: the line is shown but closed. */
     val gated: Boolean,
+    /** What glows now (ADR-0033); the screen turns it off while an error panel shows. */
+    val attention: Attention,
 )
 
 /** Splits a chant phrase into words of syllables for display, matching [LatinSyllables]. */
@@ -133,6 +138,13 @@ fun chantScreenState(
         },
         tiltDegrees = if (pointing && marker != null) marker.coerceIn(-SIGIL_TILT_MAX_DEG, SIGIL_TILT_MAX_DEG) else 0f,
         gated = gated,
+        attention = when {
+            done -> Attention.None
+            ritual.phase == RitualPhase.Seeking -> Attention.Sigil
+            ritual.phase == RitualPhase.Wavering -> Attention.SigilAlarm
+            ritual.phase == RitualPhase.Chanting -> Attention.Phrase
+            else -> Attention.None
+        },
     )
 }
 
