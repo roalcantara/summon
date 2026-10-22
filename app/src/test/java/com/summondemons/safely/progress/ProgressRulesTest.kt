@@ -10,6 +10,8 @@ import com.summondemons.safely.progress.ProgressRules.focusDemon
 import com.summondemons.safely.progress.ProgressRules.isRestless
 import com.summondemons.safely.progress.ProgressRules.unsummon
 import com.summondemons.safely.progress.ProgressRules.visit
+import com.summondemons.safely.progress.ProgressRules.dossierUnread
+import com.summondemons.safely.progress.ProgressRules.neverSummoned
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
@@ -160,5 +162,29 @@ class ProgressRulesTest {
     fun anUnknownLastViewedFallsBackToTheFirstDemon() {
         val p = Progress(lastSummonDay = 10, lastViewed = "baal")
         assertEquals("asmodeus", focusDemon(p, ids, 10))
+    }
+
+    // --- Attention glow (ADR-0033) ---
+
+    @Test
+    fun aFreshSummonLeavesTheDossierUnreadUntilBothRevealsAreConsumed() {
+        var p = commitSummon(Progress(), "asmodeus", 10, flawless = false)
+        assertTrue(dossierUnread(p.record("asmodeus")))
+        p = consumeReveal(p, "asmodeus", Reveal.Codex)
+        assertTrue(dossierUnread(p.record("asmodeus")))
+        p = consumeReveal(p, "asmodeus", Reveal.Battle)
+        assertFalse(dossierUnread(p.record("asmodeus")))
+    }
+
+    @Test
+    fun anUnrevealedDemonHasNothingUnread() {
+        assertFalse(dossierUnread(DemonRecord()))
+        assertFalse(dossierUnread(DemonRecord(revealPending = RevealPending.All)))
+    }
+
+    @Test
+    fun neverSummonedUntilTheFirstCommit() {
+        assertTrue(neverSummoned(Progress()))
+        assertFalse(neverSummoned(commitSummon(Progress(), "astaroth", 3, flawless = true)))
     }
 }

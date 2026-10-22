@@ -63,6 +63,13 @@ object ProgressRules {
         return p.copy(demons = p.demons + (id to record.copy(revealPending = pending)))
     }
 
+    /** Revealed lore the player has not seen ink in yet: the Grimoire's dossier button glows (ADR-0033). */
+    fun dossierUnread(record: DemonRecord): Boolean =
+        record.revealed && (record.revealPending.codex || record.revealPending.battle)
+
+    /** No summon was ever committed: the intro's Summon glows (ADR-0033). */
+    fun neverSummoned(p: Progress): Boolean = p.lastSummonDay == null
+
     fun dismissEscapeBanners(p: Progress): Progress =
         p.copy(demons = p.demons.mapValues { (_, r) -> r.copy(escapeBannerPending = false) })
 
