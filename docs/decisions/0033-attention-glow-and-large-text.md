@@ -20,6 +20,7 @@ and players unsure where to look next on the chant screen.
 3. **Grimoire:** the demon card is a tarot card; its back is the dossier list (amends ADR-0016).
 4. **Intro card:** layout B — ribbon, singer and Summon on the left slab, numbered rules on the
    right; the ribbon is drawn in code (amends ADR-0021).
+5. **Chant screen polish:** The current word is marked by colour, a 2× underline and a soft glow, never by size; the phrase keeps one size per line and breaks balanced (`LineBreak.Heading`).
 
 ## Consequences
 - `chant_intro_banner.webp` and `DossierCarousel` are gone.
