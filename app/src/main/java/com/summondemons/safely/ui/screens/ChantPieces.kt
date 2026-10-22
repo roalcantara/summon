@@ -56,12 +56,14 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -168,6 +170,8 @@ private const val GATED_ALPHA_LOCKED = 0.85f
 private const val CURRENT_LINE_SCALE = 2f
 /** The soft glow behind the current word, at the chanting halo's strength. */
 private const val CURRENT_WORD_GLOW_ALPHA = 0.18f
+/** The glow reaches this far past the word's centre, in line heights, stretched to the word's width. */
+private const val WORD_GLOW_SPREAD = 0.8f
 private const val DIM_ALPHA = 0.55f
 private const val LINE_FRACTION = 0.06f
 private const val PENDING_LINE_SCALE = 0.7f
@@ -582,6 +586,9 @@ internal fun FeedbackSlot(slot: SlotContent, accent: Color, micLevel: Float, pau
                     color = if (paused) colors.outline else colors.onSurfaceVariant,
                     maxLines = 1,
                     softWrap = false,
+                    // Visual only: the slot is a live region, and announcing "Listening" after every
+                    // line (or "Paused" next to the pill's own description) would only add noise.
+                    modifier = Modifier.clearAndSetSemantics { },
                 )
             }
             SlotContent.Locked -> Chip(colors.outlineVariant) {
@@ -682,6 +689,8 @@ internal fun ChantLine(
     lockFraction: Float,
     accent: Color,
     halo: State<Float>,
+    /** Chanting: the current word is marked (ADR-0033); otherwise the sigil holds the attention. */
+    emphasize: Boolean,
     onPhraseSize: (Float) -> Unit,
     modifier: Modifier,
 ) {
@@ -701,13 +710,17 @@ internal fun ChantLine(
         },
         contentAlignment = Alignment.Center,
     ) {
-        Phrase(words, accent, onPhraseSize, Modifier.fillMaxSize().graphicsLayer { this.alpha = alpha })
+        Phrase(words, accent, emphasize, onPhraseSize, Modifier.fillMaxSize().graphicsLayer { this.alpha = alpha })
     }
 }
 
-/** The phrase as one auto-sized text that never splits a word; a line under each word is drawn from the layout. */
+/**
+ * The phrase as one auto-sized text that never splits a word; a line under each word is drawn
+ * from the layout. The current word is marked (accent underline, 2×, soft glow) only when
+ * [emphasize]: while chanting, the phrase is the one thing that glows (ADR-0033).
+ */
 @Composable
-private fun Phrase(words: List<ChantWord>, accent: Color, onPhraseSize: (Float) -> Unit, modifier: Modifier) {
+private fun Phrase(words: List<ChantWord>, accent: Color, emphasize: Boolean, onPhraseSize: (Float) -> Unit, modifier: Modifier) {
     val colors = MaterialTheme.colorScheme
     val safe = MaterialTheme.demonColors.ritualSafe
     val dim = colors.onSurface.copy(alpha = DIM_ALPHA)
@@ -728,10 +741,11 @@ private fun Phrase(words: List<ChantWord>, accent: Color, onPhraseSize: (Float) 
     val lineColors = words.map {
         when (it.look) {
             WordLook.Pending -> colors.outlineVariant
-            WordLook.Current -> accent
+            WordLook.Current -> if (emphasize) accent else colors.onSurfaceVariant
             WordLook.Heard -> safe
         }
     }
+    val currentGlow = if (emphasize) accent.copy(alpha = CURRENT_WORD_GLOW_ALPHA) else null
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
     BasicText(
         text = text,
@@ -742,7 +756,7 @@ private fun Phrase(words: List<ChantWord>, accent: Color, onPhraseSize: (Float) 
             onPhraseSize(it.layoutInput.style.fontSize.value)
         },
         modifier = modifier.wrapContentHeight(Alignment.CenterVertically).drawBehind {
-            layout?.let { drawWordLines(it, ranges, words, lineColors, accent.copy(alpha = CURRENT_WORD_GLOW_ALPHA)) }
+            layout?.let { drawWordLines(it, ranges, words, lineColors, currentGlow) }
         },
     )
 }
@@ -775,7 +789,8 @@ private fun DrawScope.drawWordLines(
     ranges: List<IntRange>,
     words: List<ChantWord>,
     lineColors: List<Color>,
-    currentGlow: Color,
+    /** Null: the current word is not emphasised (not chanting). */
+    currentGlow: Color?,
 ) {
     ranges.forEachIndexed { i, range ->
         if (range.isEmpty() || range.last >= layout.layoutInput.text.length) return@forEachIndexed
@@ -785,17 +800,22 @@ private fun DrawScope.drawWordLines(
         val height = last.bottom - last.top
         val thickness = height * LINE_FRACTION
         val look = words[i].look
-        if (look == WordLook.Current) {
-            // A soft glow behind the word being chanted (drawn first, so the text sits on it).
+        val emphasised = look == WordLook.Current && currentGlow != null
+        if (emphasised && currentGlow != null) {
+            // A soft oval glow behind the word being chanted, sized to the word so it stays on its
+            // line (drawn first, so the text sits on it).
+            val width = last.right - first.left
             val center = Offset((first.left + last.right) / 2f, (first.top + last.bottom) / 2f)
-            val radius = maxOf(last.right - first.left, height) * 0.6f
-            drawCircle(Brush.radialGradient(listOf(currentGlow, Color.Transparent), center, radius), radius, center)
+            val radius = height * WORD_GLOW_SPREAD
+            scale(scaleX = (width / height).coerceAtLeast(1f), scaleY = 1f, pivot = center) {
+                drawCircle(Brush.radialGradient(listOf(currentGlow, Color.Transparent), center, radius), radius, center)
+            }
         }
         val y = last.bottom + thickness
-        val width = when (look) {
-            WordLook.Pending -> thickness * PENDING_LINE_SCALE
-            WordLook.Current -> thickness * CURRENT_LINE_SCALE
-            WordLook.Heard -> thickness
+        val width = when {
+            look == WordLook.Pending -> thickness * PENDING_LINE_SCALE
+            emphasised -> thickness * CURRENT_LINE_SCALE
+            else -> thickness
         }
         drawLine(lineColors[i], Offset(first.left, y), Offset(last.right, y), width, StrokeCap.Round)
     }

@@ -92,7 +92,7 @@ fun ChantScreen(
                 if (blocker != null) {
                     Box(m, contentAlignment = Alignment.Center) { blocker() }
                 } else {
-                    ChantLine(screen.words, screen.gated, screen.drifting, screen.lockFraction, accent, phraseGlow, onPhraseSize = { phraseSp = it }, modifier = m.onSizeChanged { box = it })
+                    ChantLine(screen.words, screen.gated, screen.drifting, screen.lockFraction, accent, phraseGlow, emphasize = attention == Attention.Phrase, onPhraseSize = { phraseSp = it }, modifier = m.onSizeChanged { box = it })
                 }
             },
         )

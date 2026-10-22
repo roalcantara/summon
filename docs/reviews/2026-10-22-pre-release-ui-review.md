@@ -193,4 +193,7 @@ Executed `docs/superpowers/plans/2026-10-22-chant-screen-polish.md`:
   - `build/ui-matrix/emu-en/font1.0-dpi420/chant-chanting.png`
   - `build/ui-matrix/emu-en/font2.0-dpi420/chant-seeking.png`
   - `build/ui-matrix/emu-en/font2.0-dpi420/chant-chanting.png`
-  Nothing clipped; name plate and pill auto-size gracefully without wrapping or overflow.
+  Correction (code review): `font2.0-dpi420/chant-chanting.png` shows the intro card, not the
+  chant screen, so the chant screen at 2.0× has not been captured yet. The 1.0× seeking shot
+  showed the current word emphasised while the sigil held the attention (two cues); fixed in
+  the review commit. Still to capture: chant screen seeking and chanting at 2.0× (S24 and emulator).
