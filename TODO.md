@@ -45,6 +45,31 @@
   - **Created**: 2026-10-21 13:31
   - **Tags**: post-release
 
+- [x] 3HtG **-** App Name
+  - **Priority**: high
+  - **Created**: 2026-10-22 14:46
+  - **Tags**: release
+
+- [ ] U6Mc **-** Success Evaluation Strategy
+  - **Priority**: high
+  - **Created**: 2026-10-22 14:46
+  - **Tags**: release
+
+- [ ] yMM3 **-** Evaluate App Android Design
+  - **Priority**: high
+  - **Created**: 2026-10-22 14:47
+  - **Tags**: release
+
+- [ ] OFki **-** Evaluate App UI Design
+  - **Priority**: high
+  - **Created**: 2026-10-22 14:47
+  - **Tags**: release
+
+- [x] tKjM **-** Setup Developer Account
+  - **Priority**: high
+  - **Created**: 2026-10-22 14:48
+  - **Tags**: release
+
 # Actors
 
 # Comments
