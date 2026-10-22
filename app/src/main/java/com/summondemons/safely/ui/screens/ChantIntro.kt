@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
 import com.summondemons.safely.ui.theme.demonColors
+import com.summondemons.safely.ui.theme.fontScaleCapped
 import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.stage
 import com.summondemons.safely.ui.theme.textRoles
@@ -57,8 +61,12 @@ private const val ART_FRACTION = 0.8f
 private val BannerTitleColor = Color(0xFF3A2400)
 private val BannerHeight = 56.dp
 private val BannerTitleSize = 24.sp
+/** Clears the ribbon's folded tails, so the title sits on its flat middle band. */
+private val BannerTitleInset = 48.dp
 private val SummonButtonHeight = 56.dp
 private val SummonLabelSize = 20.sp
+/** The banner and button art are fixed-height: large font sizes shrink their words back to fit. */
+private val ArtLabelMinSize = 8.sp
 private val RuleTitleSize = 18.sp
 private val RuleBodySize = 16.sp
 private val RuleIcon = 40.dp
@@ -128,30 +136,40 @@ private fun ArtSlab(modifier: Modifier) {
 private fun Rules(accent: Color, onSummon: () -> Unit, modifier: Modifier) {
     val spacing = MaterialTheme.spacing
     Column(modifier.padding(horizontal = spacing.sm), verticalArrangement = Arrangement.spacedBy(spacing.md, Alignment.CenterVertically)) {
-        Box(
-            modifier = Modifier
-                .height(BannerHeight)
-                .semantics { heading() },
-            contentAlignment = Alignment.Center,
+        // Large font sizes scroll the rules; Summon stays pinned below them.
+        Column(
+            Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(spacing.md),
         ) {
-            Image(
-                painter = painterResource(R.drawable.chant_intro_banner),
-                contentDescription = null,
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier.matchParentSize(),
-            )
-            Text(
-                text = stringResource(R.string.intro_title).upper(),
-                style = MaterialTheme.textRoles.name.copy(fontSize = BannerTitleSize),
-                color = BannerTitleColor,
-                modifier = Modifier.padding(horizontal = spacing.xl),
-                maxLines = 1,
-            )
+            Box(
+                modifier = Modifier
+                    .height(BannerHeight)
+                    .semantics { heading() },
+                contentAlignment = Alignment.Center,
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.chant_intro_banner),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier.matchParentSize(),
+                )
+                // The ribbon's middle band is narrower than its box: larger, the title spills over it.
+                val titleSize = BannerTitleSize.fontScaleCapped()
+                Text(
+                    text = stringResource(R.string.intro_title).upper(),
+                    style = MaterialTheme.textRoles.name.copy(fontSize = titleSize),
+                    color = BannerTitleColor,
+                    modifier = Modifier.padding(horizontal = BannerTitleInset),
+                    maxLines = 1,
+                    softWrap = false,
+                    autoSize = TextAutoSize.StepBased(minFontSize = ArtLabelMinSize, maxFontSize = titleSize),
+                )
+            }
+            Rule(R.string.intro_direction_title, R.string.intro_direction_body) { CheckIcon() }
+            Rule(R.string.intro_chant_title, R.string.intro_chant_body) { SealsIcon(accent) }
+            Rule(R.string.intro_lines_title, R.string.intro_lines_body) { LinesIcon() }
+            Rule(R.string.intro_focus_title, R.string.intro_focus_body) { FocusIcon(accent) }
         }
-        Rule(R.string.intro_direction_title, R.string.intro_direction_body) { CheckIcon() }
-        Rule(R.string.intro_chant_title, R.string.intro_chant_body) { SealsIcon(accent) }
-        Rule(R.string.intro_lines_title, R.string.intro_lines_body) { LinesIcon() }
-        Rule(R.string.intro_focus_title, R.string.intro_focus_body) { FocusIcon(accent) }
         SummonButton(onClick = onSummon)
     }
 }
@@ -190,6 +208,8 @@ private fun SummonButton(onClick: () -> Unit) {
             color = inkHighlight,
             modifier = Modifier.padding(horizontal = MaterialTheme.spacing.xl),
             maxLines = 1,
+            softWrap = false,
+            autoSize = TextAutoSize.StepBased(minFontSize = ArtLabelMinSize, maxFontSize = SummonLabelSize),
         )
     }
 }

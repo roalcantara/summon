@@ -95,6 +95,7 @@ import com.summondemons.safely.ui.fx.InkedSigil
 import com.summondemons.safely.ui.fx.LocalReduceMotion
 import com.summondemons.safely.ui.fx.SigilFlash
 import com.summondemons.safely.ui.theme.demonColors
+import com.summondemons.safely.ui.theme.fontScaleCapped
 import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.textRoles
 import com.summondemons.safely.ui.theme.upper
@@ -307,7 +308,7 @@ private fun SealMark(numeral: String, look: SealLook, accent: Color, paused: Boo
             if (look == SealLook.Sealed) drawCircle(accent, radius = radius)
             drawCircle(ring, radius = radius, style = Stroke(stroke))
         }
-        Text(numeral, style = MaterialTheme.textRoles.name.copy(fontSize = SealNumeralSize), color = numeralColor, maxLines = 1)
+        Text(numeral, style = MaterialTheme.textRoles.name.copy(fontSize = SealNumeralSize.fontScaleCapped()), color = numeralColor, maxLines = 1)
     }
 }
 
@@ -507,7 +508,7 @@ private fun unlockFlare(gated: Boolean): Float {
 internal fun FeedbackSlot(slot: SlotContent, accent: Color, micLevel: Float, paused: Boolean) {
     val colors = MaterialTheme.colorScheme
     val safe = MaterialTheme.demonColors.ritualSafe
-    val style = MaterialTheme.textRoles.ritualCue.copy(fontSize = SlotTextSize, letterSpacing = 0.1.em)
+    val style = MaterialTheme.textRoles.ritualCue.copy(fontSize = SlotTextSize.fontScaleCapped(), letterSpacing = 0.1.em)
     Box(
         Modifier.fillMaxWidth().height(SlotHeight).semantics(mergeDescendants = true) { liveRegion = LiveRegionMode.Polite },
         contentAlignment = Alignment.Center,

@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,9 +30,14 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
@@ -52,6 +59,13 @@ private const val LAYER_FADE_MS = 150
 private val BadgeIconSize = 24.dp
 private val BandIconSize = 14.dp
 private val BadgeLabelSize = 13.sp
+/**
+ * Large font sizes shrink the labels back towards this rather than cut one off ("72 legions").
+ * It scales too: at the 200% maximum it is about the label's default size.
+ */
+private val BadgeLabelMinSize = 6.sp
+private const val LABEL_STEP_SP = 0.5f
+private val SelectedBorder = 1.5.dp
 private val BandTextSize = 14.sp
 private val SelectedGlow = 8.dp
 
@@ -91,41 +105,64 @@ fun BadgeRow(demon: Demon, selected: BadgeKey?, onSelect: (BadgeKey?) -> Unit, m
     val accent = MaterialTheme.demonColors.accent(demon.accent)
     val rim = MaterialTheme.demonColors.metal(demon.house)
     val shape = MaterialTheme.shapes.small
-    Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)) {
-        rememberBadges(demon).forEach { badge ->
-            val on = badge.key == selected
-            val explain = stringResource(R.string.badge_explain, badge.label)
-            Column(
-                Modifier
-                    .weight(1f)
-                    .then(if (on) Modifier.shadow(SelectedGlow, shape, ambientColor = accent, spotColor = accent) else Modifier)
-                    .clip(shape)
-                    .background(
-                        Brush.linearGradient(
-                            listOf(
-                                if (on) lerp(colors.surfaceContainerHigh, accent, SELECTED_TINT) else colors.surfaceContainerHigh,
-                                colors.surfaceContainerLow,
+    val spacing = MaterialTheme.spacing
+    val badges = rememberBadges(demon)
+    val labelStyle = MaterialTheme.textRoles.name
+    val measurer = rememberTextMeasurer()
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        val labelWidth = with(LocalDensity.current) {
+            ((maxWidth - spacing.sm * (badges.size - 1)) / badges.size - spacing.xs * 2 - SelectedBorder * 2).roundToPx()
+        }
+        val labels = badges.map { it.label }
+        val labelSize = remember(labels, labelWidth, labelStyle) { sharedLabelSize(measurer, labels, labelStyle, labelWidth) }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
+            badges.forEach { badge ->
+                val on = badge.key == selected
+                val explain = stringResource(R.string.badge_explain, badge.label)
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .then(if (on) Modifier.shadow(SelectedGlow, shape, ambientColor = accent, spotColor = accent) else Modifier)
+                        .clip(shape)
+                        .background(
+                            Brush.linearGradient(
+                                listOf(
+                                    if (on) lerp(colors.surfaceContainerHigh, accent, SELECTED_TINT) else colors.surfaceContainerHigh,
+                                    colors.surfaceContainerLow,
+                                ),
                             ),
-                        ),
+                        )
+                        .border(if (on) SelectedBorder else 1.dp, if (on) accent else rim.copy(alpha = RIM_ALPHA), shape)
+                        .selectable(selected = on, role = Role.Tab, onClick = { onSelect(if (on) null else badge.key) })
+                        .semantics { contentDescription = explain }
+                        .padding(vertical = spacing.sm, horizontal = spacing.xs),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(spacing.xs),
+                ) {
+                    BadgeIcon(badge.key, demon, BadgeIconSize)
+                    Text(
+                        badge.label,
+                        style = labelStyle.copy(fontSize = labelSize),
+                        color = colors.onSurface,
+                        maxLines = 1,
+                        softWrap = false,
+                        modifier = Modifier.clearAndSetSemantics { },
                     )
-                    .border(if (on) 1.5.dp else 1.dp, if (on) accent else rim.copy(alpha = RIM_ALPHA), shape)
-                    .selectable(selected = on, role = Role.Tab, onClick = { onSelect(if (on) null else badge.key) })
-                    .semantics { contentDescription = explain }
-                    .padding(vertical = MaterialTheme.spacing.sm, horizontal = MaterialTheme.spacing.xs),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs),
-            ) {
-                BadgeIcon(badge.key, demon, BadgeIconSize)
-                Text(
-                    badge.label,
-                    style = MaterialTheme.textRoles.name.copy(fontSize = BadgeLabelSize),
-                    color = colors.onSurface,
-                    maxLines = 1,
-                    modifier = Modifier.clearAndSetSemantics { },
-                )
+                }
             }
         }
     }
+}
+
+/**
+ * The largest size, from [BadgeLabelSize] down to [BadgeLabelMinSize], at which every label fits
+ * one line of [widthPx]: the four tiles share it so the row reads as one set, at any font scale.
+ */
+private fun sharedLabelSize(measurer: TextMeasurer, labels: List<String>, style: TextStyle, widthPx: Int): TextUnit {
+    var size = BadgeLabelSize.value
+    fun fits() = labels.all { measurer.measure(it, style.copy(fontSize = size.sp), maxLines = 1, softWrap = false).size.width <= widthPx }
+    while (size > BadgeLabelMinSize.value && !fits()) size -= LABEL_STEP_SP
+    return size.sp
 }
 
 /**

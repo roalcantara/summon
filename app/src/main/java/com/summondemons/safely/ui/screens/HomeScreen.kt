@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -186,7 +187,7 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(spacing.md),
         ) {
             Text(pluralStringResource(R.plurals.home_bound, demonCount, boundCount, demonCount).upper(), style = MaterialTheme.textRoles.meta)
-            if (showHint) CueChip(stringResource(R.string.home_hint), CueTone.Neutral, Modifier.clickable(onClick = open))
+            if (showHint) CueChip(stringResource(R.string.home_hint), CueTone.Neutral, Modifier.minimumInteractiveComponentSize().clickable(onClick = open))
         }
 
         MenuButton(onMenu, Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(spacing.sm))

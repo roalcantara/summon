@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,6 +55,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
@@ -80,8 +82,10 @@ private const val SLOT_FADE_OUT_MS = 150
 val QuoteSlotHeight = 72.dp
 private val QuoteSlotMaxWidth = 320.dp
 private val QuoteSize = 15.sp
-/** Three lines + padding must fit the 72 dp slot. */
-private val QuoteLineHeight = 18.sp
+/** Large font sizes shrink the quote back towards this rather than cut it off. */
+private val QuoteMinSize = 8.sp
+/** Three lines + padding must fit the 72 dp slot; relative, so it shrinks with the quote. */
+private val QuoteLineHeight = 1.2.em
 private val SmallCueSize = 10.sp
 private val DashOn = 6.dp
 private val DashOff = 4.dp
@@ -136,6 +140,7 @@ private fun SpeechBubble(quote: String, accent: Color) {
             textAlign = TextAlign.Center,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
+            autoSize = TextAutoSize.StepBased(minFontSize = QuoteMinSize, maxFontSize = QuoteSize),
             modifier = Modifier.padding(horizontal = MaterialTheme.spacing.lg, vertical = MaterialTheme.spacing.sm),
         )
     }

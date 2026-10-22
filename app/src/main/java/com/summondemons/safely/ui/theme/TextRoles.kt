@@ -5,8 +5,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import java.util.Locale
@@ -54,3 +56,17 @@ val MaterialTheme.textRoles: TextRoles
 
 /** Compose has no text-transform: the `cue`, `meta` and `ritualCue` roles upper-case at the call site. */
 fun String.upper(): String = uppercase(Locale.ROOT)
+
+/** How far the system font size may grow words inside fixed-size art or HUD slots. */
+const val FIXED_SLOT_MAX_FONT_SCALE = 1.3f
+
+/**
+ * This size, grown by the system font scale only up to [max]: for words inside fixed-size art or
+ * HUD slots (banner ribbon, seals, the chant feedback line), which larger sizes would clip.
+ */
+@Composable
+@ReadOnlyComposable
+fun TextUnit.fontScaleCapped(max: Float = FIXED_SLOT_MAX_FONT_SCALE): TextUnit {
+    val scale = LocalDensity.current.fontScale
+    return if (scale <= max) this else this * (max / scale)
+}
