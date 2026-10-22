@@ -45,6 +45,11 @@ internal object Palette {
     val houseSol = Color(0xFFF2C14E)
     val houseVenus = Color(0xFFC87A3C)
     val inkHighlight = Color(0xFFFFF6D0)
+    /** Intro title ribbon (ADR-0033): parchment gradient, its edge and the ink on it. */
+    val parchmentLight = Color(0xFFF5DC9C)
+    val parchmentDark = Color(0xFFD9B46A)
+    val parchmentEdge = Color(0xFF8A6A30)
+    val parchmentInk = Color(0xFF3A2400)
     val stageHomeGlow = Color(0xFF3A2A55)
     val stageHomeMid = Color(0xFF1A1530)
     val stageSolGlow = Color(0xFF6B4A12)
