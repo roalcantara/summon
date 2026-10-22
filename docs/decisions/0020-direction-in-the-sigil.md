@@ -1,7 +1,7 @@
 # 0020 — Direction in the sigil
 
 - Date: 2026-10-18
-- Status: Accepted. Amends ADR-0019 (the chant screen now covers the whole ritual) and
+- Status: Accepted; amended 2026-10-22. Amends ADR-0019 (the chant screen now covers the whole ritual) and
   supersedes the portrait altar of ADR-0014. Amended by ADR-0021: no verdict text
   before the lock (only the count), and the intro card shows before every ritual.
 
@@ -54,3 +54,6 @@ The chant screen covers the whole Ritual, and the sigil carries the direction:
   the component table.
 - No rule changes: lock, tolerance, wavering and the clock are as in ADR-0010/0019.
 - Plan: `docs/superpowers/plans/2026-10-18-chant-direction.md`.
+
+## Amendment (2026-10-22)
+The sigil breathes while seeking and wavering; the phrase has a halo while chanting; ADR-0033.

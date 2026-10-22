@@ -1,7 +1,7 @@
 # 0016 — The demon card replaces Profile
 
 - Date: 2026-10-16
-- Status: Accepted
+- Status: Accepted; amended 2026-10-22
 
 ## Context
 Profile duplicated the Grimoire page with a bigger picture, and the success screen
@@ -25,3 +25,6 @@ lived there. The prototype review merged both into the Grimoire.
 ## Consequences
 `ProfileScreen`, the `Profile` route and the debug Unsummon on Profile are removed
 (Unsummon moves to the debug sheet).
+
+## Amendment (2026-10-22)
+The dossier carousel is replaced by the back of a flipping card; the card's height is the front's natural height, at least 36 % of the area below the header; ADR-0033.

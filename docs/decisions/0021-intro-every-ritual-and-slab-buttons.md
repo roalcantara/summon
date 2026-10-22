@@ -1,7 +1,7 @@
 # 0021 — Intro before every ritual, slab buttons, debug panel
 
 - Date: 2026-10-18
-- Status: Accepted. Amends ADR-0019 (intro card, turn-sideways hint, "?", debug controls)
+- Status: Accepted; amended 2026-10-22. Amends ADR-0019 (intro card, turn-sideways hint, "?", debug controls)
   and ADR-0020 (verdict line before the lock, intro on the first ritual only). Amended by ADR-0024 (the card's four rules).
 
 ## Context
@@ -48,3 +48,6 @@ A prototype (v12) was approved on 2026-10-18.
 - No rule changes: lock, clock and chant check are as before. The microphone is still
   ignored while the card is up, so every ritual starts with a deliberate SUMMON (or ✕).
 - Plan: `docs/superpowers/plans/2026-10-18-chant-intro-and-debug.md`.
+
+## Amendment (2026-10-22)
+Layout B: ribbon, singer and Summon on the left slab; rules numbered 1–4 with their icons; ADR-0033.

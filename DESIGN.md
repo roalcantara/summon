@@ -149,6 +149,22 @@ dark palette carries the RPG feel.
   a 150 ms fade; badge/carousel changes cross-fade. Ink-in,
   karaoke and the focus bar still update.
 
+### Text sizing (ADR-0033)
+
+- **Body text:** Scales fully with system font scale. Where it can overflow, its container scrolls.
+- **Words on fixed art or HUD slots:** Scale up to 1.3× (`TextUnit.fontScaleCapped()`), then auto-size down to fit.
+- **Labels in one row:** Share one size: the largest at which all fit.
+- **One-line labels:** Never wrap: `maxLines = 1`, `softWrap = false`, shrink to fit.
+- The primary action of a screen is never inside a scrolling region and never off-screen.
+
+### Attention glow (ADR-0033)
+
+One cue across the game: a soft **breathing glow** (accent colour, 1.6 s period; 0.8 s fast for alarm/wavering; steady glow with `LocalReduceMotion`) marks the one thing to act on:
+- Grimoire dossier button (⟲) while the demon's dossier has unread text.
+- Intro Summon button until the player's first completed summon.
+- Chant sigil while seeking (accent) and wavering (amber `colors.primary`, fast).
+- Halo behind the chant phrase while chanting.
+
 ## Components (contracts)
 
 | Component | Purpose | States / inputs |
@@ -169,7 +185,11 @@ dark palette carries the RPG feel.
 | ~~`ChantTablet`~~ | Removed with the portrait altar (ADR-0020) |
 | `BadgeRow` | Direction / House / Calling / Legions tiles | `demon`, `selected`, `onSelect`; rim = House metal, glyph = accent (House glyph = metal); `BadgeIcon` draws one glyph |
 | `InfoBand` | Description or the selected badge's explanation | `demons`, `demon`, `badge`; height of the tallest text |
-| `DossierCarousel` | Six dossier pages | `demon`, `record`, `inkCodex`, `inkBattle`, `page`, `onPage`; ‹ › and swipe, wrapping |
+| `FlipCard` | Tarot card with front/back 3D Y-axis flip in 400 ms (crossfade 150 ms with reduced motion) | `side` (`CardSide.Front` / `CardSide.Back`), `front`, `back` |
+| `DossierList` | Back of the demon card: six sections in one scrolling list | `demon`, `record`, `inkCodex`, `inkBattle`, `scrollToSecret`; sealed sections show smudge and seal line; ink-in for revealed lines |
+| `DemonCard` | Tarot card with front (identity, info band, badges) and back (`DossierList`) | `demons`, `demon`, `record`, `side`, `onFlip`, `glowFlip`, `badge`, `onBadge`, `inkCodex`, `inkBattle`, `scrollToSecret`, `onFixedHeight`, `onBadgeRowBounds` |
+| `ParchmentRibbon` | Code-drawn parchment ribbon with notched tails, grows with text (ADR-0033; replaces `chant_intro_banner`) | `text` |
+| ~~`DossierCarousel`~~ | Retired: replaced by `DossierList` on the back of `DemonCard` (ADR-0033) |
 | `Smudge` / `InkLine` | Sealed page lines / ink-in of revealed lines | `lines`; `ink`, `index` |
 | `QuoteSlot` | Fixed 72 dp slot under the demon | `state` (celebration / bound / ready / cooling), quote, hours, `shake` |
 | `GrimoireHeader` | Grimoire top bar: back arrow, `TitlePlaque`, menu gear (ADR-0032) | `onBack`, `onMenu` |
@@ -205,7 +225,7 @@ large sources are not density-scaled and the APK stays small.
 | `stage_sol` | `art/etc/stage_sol.png` | 768×1376 scene, Sol House stage background |
 | `stage_venus` | `art/etc/stage_venus.png` | 768×1376 scene, Venus House stage background |
 | `chant_intro_singer` | `art/splash/chant_intro_singer_full.png` | 1024×1024, alpha; generic chibi demon singing into karaoke mic |
-| `chant_intro_banner` | `art/splash/chant_intro_banner.png` | 1200×531, alpha; parchment ribbon banner |
+| ~~`chant_intro_banner`~~ | Retired: replaced by code-drawn `ParchmentRibbon` (ADR-0033) | 1200×531, alpha; parchment ribbon banner |
 | `chant_summon_button` | `art/splash/chant_summon_button_unpressed.png` | 800×359, alpha; plum-enamel stone plaque button |
 | `chant_summon_button_pressed` | `art/splash/chant_summon_button_pressed.png` | 800×359, alpha; pressed state |
 | `ic_home_grimoire` | `art/etc/RestlessGrimoire.png` | 1024×1024 opaque square asset, Home grimoire book |

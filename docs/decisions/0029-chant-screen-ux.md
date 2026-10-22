@@ -1,6 +1,6 @@
 # ADR-0029: Chant screen UX: one place per fact, split layout in the Stitch style
 
-- **Status:** Accepted
+- **Status:** Accepted; amended 2026-10-22
 - **Date:** 2026-10-18 (decided 2026-10-19 after the device comparison)
 - **Amends:** ADR-0019 (chant screen), ADR-0020 (direction in the sigil), ADR-0024 (status column)
 - **Spec:** `docs/superpowers/specs/2026-10-18-chant-screen-ux-design.md`
@@ -49,3 +49,6 @@ arrangement looked heavier than Stitch 08, with a framed box, a dark tile and a 
 split a word mid-word. It was restyled toward 08 as above. The centred arrangement, the debug
 switch and the `layout` log fields were removed; old logs still decode, because unknown keys are
 ignored.
+
+## Amendment (2026-10-22)
+The sigil breathes while seeking and wavering; the phrase has a halo while chanting; ADR-0033.
