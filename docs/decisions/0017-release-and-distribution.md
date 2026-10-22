@@ -1,7 +1,7 @@
 # 0017 — Release and distribution
 
 - Date: 2026-10-16
-- Status: Accepted
+- Status: Accepted; amended 2026-10-22 (§7, §8)
 
 ## Context
 The game is functionally complete and ready for distribution via Google Play. We need
@@ -40,6 +40,15 @@ shrinking, signing secrets, versioning, privacy commitments, and launcher icon a
    A text-free emblem remains a future upgrade opportunity (DESIGN.md Gaps).
 7. **Large screens:** Portrait orientation lock is retained as compass headings assume it.
    Large screen system overrides (sw >= 600 dp) on Android 16+ are accepted for v1.
+   *Amended 2026-10-22:* targeting API 37, Android 17 ignores orientation requests on
+   sw >= 600 dp with no developer opt-out, except for games. The manifest declares
+   `android:appCategory="game"`, so the portrait lock and the landscape chant screen
+   (ADR-0019) hold on tablets and foldables too (they letterbox). A tablet layout is a
+   post-release decision.
+8. **Required hardware** (2026-10-22): the microphone and the compass are declared
+   `required="true"`. Without either the Ritual can't begin, so Play doesn't offer the game
+   to such devices rather than letting players reach a dead end on the chant screen. The
+   in-game panels (`mic_unavailable`, `heading_unavailable`) stay for runtime failures.
 
 ## How to build a release
 
