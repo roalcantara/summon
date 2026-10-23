@@ -1,7 +1,7 @@
 # 0017 — Release and distribution
 
 - Date: 2026-10-16
-- Status: Accepted; amended 2026-10-22 (§7, §8)
+- Status: Accepted; amended 2026-10-22 (§7, §8); §3 superseded by ADR-0035
 
 ## Context
 The game is functionally complete and ready for distribution via Google Play. We need
@@ -18,11 +18,11 @@ shrinking, signing secrets, versioning, privacy commitments, and launcher icon a
    `SUMMON_UPLOAD_KEY_ALIAS`, and `SUMMON_UPLOAD_KEY_PASSWORD` from environment variables,
    falling back to `local.properties` (git-ignored). Without them, release builds stay
    unsigned with a logger warning.
-3. **Privacy stance:** No `INTERNET` permission and no third-party SDKs collecting user
+3. **Privacy stance:** *Superseded 2026-10-23 by ADR-0035 (anonymous analytics).*
+   Originally: no `INTERNET` permission and no third-party SDKs collecting user
    data. The microphone and heading sensor operate strictly while the Ritual screen is in
    the foreground; audio data is analysed in memory and immediately discarded. Data safety
-   answer is "no data collected". Any future network feature requires a new ADR and
-   privacy policy update.
+   answer was "no data collected".
 4. **Shrinking:** R8 code optimization and resource shrinking are enabled for release builds.
    In AGP 9.4+, `optimization { enable = true }` enables R8 code shrinking/obfuscation and
    resource shrinking. Specifying `packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")`

@@ -47,7 +47,7 @@ MEET THE FIRST TWO
 • Astaroth, Mighty Duke of Past, Present & Future. Knows your secrets, your future, and that you didn't read the terms of service.
 
 PRIVACY, SERIOUSLY
-The microphone is used only during the ritual, only on your device, and only to tell whether you are chanting. Speech is recognised on your device, only to check that you chant the line. Nothing you say is stored or sent anywhere. The app has no internet access, no ads, no accounts and no tracking.
+The microphone is used only during the ritual, only on your device, and only to tell whether you are chanting. Speech is recognised on your device, only to check that you chant the line. Nothing you say is stored or sent anywhere. The app has no ads, no accounts, and no personal tracking. Anonymous gameplay stats can be turned off anytime in Settings.
 
 NEEDS
 A microphone, and a compass (magnetometer) to tell which way you're facing. Best played in portrait, somewhere you don't mind chanting Latin out loud.
@@ -88,14 +88,27 @@ Suggested screenshot order and captions:
 
 | Question | Answer |
 |---|---|
-| Does your app collect or share any of the required user data types? | **No** |
-| Is all of the user data collected by your app encrypted in transit? | Not applicable (no data collected) |
-| Do you provide a way for users to request that their data is deleted? | Not applicable; progress is local and removed by clearing app storage or uninstalling |
+| Does your app collect or share any of the required user data types? | **Yes** (App activity and Device or other IDs) |
+| Is all of the user data collected by your app encrypted in transit? | **Yes** |
+| Do you provide a way for users to request that their data is deleted? | **Yes** (Clearing app storage or uninstalling removes the ID) |
 
-Why "No" is correct for the microphone: Play does not count data as "collected" when it is
-processed only on the device and never sent off it. Audio here is analysed in memory and
-thrown away (`PRIVACY_POLICY.md`), and the app has no `INTERNET` permission.
+### Data collected:
+1. **App activity → App interactions:**
+   - **Collected:** Yes
+   - **Shared:** No
+   - **Processed ephemerally:** No
+   - **Required:** No (users can turn it off in Settings)
+   - **Purpose:** Analytics
+   - **Linked to user identity:** No
+2. **Device or other IDs (random app-instance ID):**
+   - **Collected:** Yes
+   - **Shared:** No
+   - **Processed ephemerally:** No
+   - **Required:** No (users can turn it off in Settings)
+   - **Purpose:** Analytics
+   - **Linked to user identity:** No
 
+*Note:* Play does not count microphone audio as "collected" because it is analysed only in memory on the device and never sent off it (`PRIVACY_POLICY.md`). Re-check each answer against the Play Console form wording when filling it in.
 ## Content rating (IARC questionnaire) notes
 
 - Violence: none. Fear/horror: mild fantasy themes (demons, occult symbols), comedic

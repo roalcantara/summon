@@ -1,13 +1,47 @@
 # Privacy Policy — Summon Demons Safely
 
-**Effective date:** 2026-10-16
+**Effective date:** 2026-10-23
 **Developer:** `Rogério Rodrigues de Alcântara`
 **Contact:** `rogerio.alcantara@gmail.com`
 
-Summon Demons Safely ("the app") is a single-player offline game. This policy explains
-what the app touches on your device and what it does with it. In short: **the app
-collects nothing, shares nothing and sends nothing anywhere.** It has no internet
-permission, so it has no way to send data off your device.
+Summon Demons Safely ("the app") is a single-player native Android game. This policy explains
+what the app touches on your device, what anonymous usage data is sent, and what never leaves your device.
+In short: **the game sends only anonymous, aggregated game events so we know whether rituals work
+and whether players return. It never collects or transmits audio, text, location, or personal information.**
+
+## Anonymous analytics
+
+Release builds of the app send minimal, anonymous game events to TelemetryDeck (TelemetryDeck GmbH, EU)
+so we can evaluate game balance, fix ritual difficulties across phone models, and measure retention.
+
+### What is collected
+1. **The 8 typed game events and bucketed values:**
+   - `app_open`: days since install (in buckets: 0, 1, 2, 3-6, 7-13, 14-29, 30+).
+   - `ritual_start`: demon summoned, check mode (whisper or lenient), and whether the demon's House was in court.
+   - `mic_permission`: dialog result (granted, denied, or denied permanently).
+   - `direction_locked`: seconds taken to face the required direction (bucketed: 0-5, 5-10, 10-30, 30-60, 60+).
+   - `line_result`: line index (1–4), result (sealed or cracked), and chant score bucket (0-49, 50-69, 70-84, 85-100; whisper only).
+   - `ritual_end`: outcome (completed or abandoned), phase where it ended, whether flawless, and duration bucket (0-30s, 30-60s, 1-2m, 2-5m, 5m+).
+   - `demon_escaped`: demon identifier when a neglected seal breaks.
+   - `device_check`: check mode and diagnostic outcome code (e.g. ok, too_slow, load_error).
+2. **Device and app metadata added by TelemetryDeck:** app version, operating system version, device model, and locale.
+3. **App-instance ID:** A random UUID generated locally on first launch. It is hashed on your device before transmission and is never associated with your name, account, or personal identity.
+
+### What is never collected or sent
+- **No audio:** microphone input is analysed in memory on your device in real time and immediately discarded.
+- **No speech transcripts or free-form text:** chant validation runs on device.
+- **No location data:** compass readings are processed locally to check heading.
+- **No personal data:** no names, emails, contacts, photos, files, or advertising identifiers.
+
+### How to turn it off (opt-out)
+Anonymous usage sharing is on by default. You can turn it off at any time directly in the game:
+- Open **Settings** (gear icon) → turn off **Share anonymous usage data**.
+When turned off, the game immediately stops recording and sending any events.
+
+### Data retention and deletion
+The random app-instance ID is stored only in the app's local storage and is permanently deleted
+if you clear app data or uninstall the app. Stored data on TelemetryDeck is retained in accordance
+with TelemetryDeck's privacy standards and data retention policy.
 
 ## Microphone (`RECORD_AUDIO`)
 
@@ -51,10 +85,10 @@ or uninstalling the app.
 ## What the app does not do
 
 - No accounts, sign-in or registration.
-- No advertising, analytics, crash reporting or tracking SDKs.
+- No advertising or ad-tracking SDKs.
 - No in-app purchases.
 - No location, contacts, camera, photos or files.
-- No sharing or selling of data to anyone, because no data is collected.
+- No selling or sharing of personal data to anyone.
 
 ## Children
 

@@ -84,6 +84,7 @@ cd ../mydemon && npm install && npm run dev   # http://localhost:3000
   `tools/pull_sessions.sh`, then `./gradlew testDebugUnitTest --tests '*SessionReplayTest*' -i`
   replays them (ADR-0025). Calibration corpus: `tools/gen_chant_corpus.py` (see its header), read by
   `ChantClipReplayTest`.
+- Anonymous analytics (ADR-0035): `platform/analytics/`; debug builds log events to Logcat (tag `Analytics`); success evaluation in `docs/success/`.
 - Open items: the "LOVIS" question in ADR-0005; per-device tuning of the voice
   thresholds (ADR-0008); calibrating the chant check's thresholds from tester clips (ADR-0018);
   Stitch art for the DESIGN.md Gaps.

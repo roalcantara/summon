@@ -41,7 +41,7 @@ the new summon. One summon per local calendar day across all demons (ADR-0015).
 | Orientation | Portrait, except the chant screen, which is landscape (ADR-0019). The heading follows the screen's rotation. |
 | Permissions | `RECORD_AUDIO` requested on entering the Ritual only if not already granted; if denied, explain why and offer a retry (or a shortcut to app settings once the denial is permanent). |
 | Motion | If system animations are off: no particles, parallax, floating, jitter, shimmer, sunburst rotation, grimoire bob/hop/peek, dust puff, pulses or climax flash; the grimoire opening and badge/carousel changes become short fades; the climax keeps its timing but the demon simply fades in. Ink-in, karaoke and the focus bar still update. |
-| Privacy | No network access, no data collection. The mic and heading sensor run only while the Ritual is in the foreground; audio is analysed in memory and never stored or sent (ADR-0017, docs/PRIVACY_POLICY.md). Debug builds can save tester clips on the device (ADR-0018); release builds contain no recording code. |
+| Privacy | No ads, no accounts. Anonymous usage events (ritual funnel, daily activity) are sent unless the player turns them off in Settings; the mic and heading sensor run only while the Ritual is in the foreground and audio never leaves the device (ADR-0035, docs/PRIVACY_POLICY.md). Debug builds can save tester clips on the device (ADR-0018); release builds contain no recording code. |
 
 ## Languages
 
