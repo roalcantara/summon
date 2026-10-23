@@ -74,3 +74,13 @@
 
 # Comments
 
+
+- [ ] Rt11 **-** v1.1 retention: Renew the pact, lore over days, bond counter (ADR-0034)
+  - **Priority**: high
+  - **Created**: 2026-10-23 08:00
+  - **Tags**: v1.1
+
+- [ ] Ms01 **-** Define success criteria and how to measure them before v1.1 (ADR-0034)
+  - **Priority**: high
+  - **Created**: 2026-10-23 08:00
+  - **Tags**: release
