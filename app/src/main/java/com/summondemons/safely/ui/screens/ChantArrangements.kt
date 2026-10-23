@@ -14,6 +14,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.summondemons.safely.ui.theme.spacing
@@ -56,7 +59,7 @@ internal fun SplitArrangement(parts: ChantParts, modifier: Modifier) {
         Box(Modifier.fillMaxHeight(), contentAlignment = Alignment.Center) { parts.track() }
         Box(Modifier.fillMaxHeight().weight(1f - SIGIL_WEIGHT)) {
             parts.line(Modifier.fillMaxSize(), LineReservedTop)
-            HudRow(parts, Modifier.align(Alignment.TopCenter))
+            HudRow(parts, Modifier.align(Alignment.TopCenter).semantics { isTraversalGroup = true; traversalIndex = -1f })
         }
     }
 }

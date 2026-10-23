@@ -15,9 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.semantics.LiveRegionMode
-import androidx.compose.ui.semantics.liveRegion
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.summondemons.safely.ui.fx.rememberShake
 import com.summondemons.safely.ui.theme.PillShape
@@ -55,8 +52,7 @@ fun CueChip(text: String, tone: CueTone, modifier: Modifier = Modifier, shake: I
         contentColor = content,
         border = BorderStroke(1.dp, border),
         modifier = modifier
-            .graphicsLayer { translationX = offset.value.dp.toPx() }
-            .semantics { liveRegion = LiveRegionMode.Polite },
+            .graphicsLayer { translationX = offset.value.dp.toPx() },
     ) {
         Row(
             Modifier.padding(horizontal = MaterialTheme.spacing.md, vertical = MaterialTheme.spacing.xs + 2.dp),

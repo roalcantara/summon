@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -73,6 +74,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -100,6 +103,7 @@ import com.summondemons.safely.ui.components.QuoteSlotState
 import com.summondemons.safely.ui.components.RibbonBanner
 import com.summondemons.safely.ui.components.RotatingSunburstBackground
 import com.summondemons.safely.ui.components.StageBackground
+import com.summondemons.safely.ui.components.focusRing
 import com.summondemons.safely.ui.fx.Jitter
 import com.summondemons.safely.ui.fx.LocalReduceMotion
 import com.summondemons.safely.ui.fx.ParticleField
@@ -375,7 +379,7 @@ fun GrimoireScreen(
         }
 
         // Fixed above the pages: the header, the arrows over the stage, the celebration banner.
-        Column(Modifier.fillMaxSize().statusBarsPadding()) {
+        Column(Modifier.fillMaxSize().statusBarsPadding().semantics { isTraversalGroup = true; traversalIndex = -1f }) {
             // Like system back (the BackHandlers above): dismiss the celebration, else turn the card to its front, else leave.
             GrimoireHeader(
                 {
@@ -415,7 +419,7 @@ private fun GrimoireHeader(onBack: () -> Unit, onMenu: () -> Unit) {
     val back = stringResource(R.string.grimoire_back)
     Box(Modifier.fillMaxWidth().height(RailHeight).padding(horizontal = spacing.sm)) {
         IconButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart).semantics { contentDescription = back }) {
-            Text("←", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.clearAndSetSemantics { })
+            Icon(painterResource(R.drawable.ic_arrow_back), contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         TitlePlaque(stringResource(R.string.grimoire_title), Modifier.align(Alignment.Center))
         MenuButton(onMenu, Modifier.align(Alignment.CenterEnd))
@@ -438,6 +442,7 @@ private fun StageArrow(next: Boolean, label: String, modifier: Modifier, onClick
                 scaleX = if (next) -scale else scale
                 scaleY = scale
             }
+            .focusRing(interaction, MaterialTheme.shapes.medium)
             .clickable(interaction, indication = null, role = Role.Button, onClick = onClick),
     )
 }
@@ -508,6 +513,7 @@ private fun Stage(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null,
                                     enabled = !bound || party,
+                                    role = Role.Button,
                                     onClick = onPrimary,
                                 )
                                 .semantics { contentDescription = label },

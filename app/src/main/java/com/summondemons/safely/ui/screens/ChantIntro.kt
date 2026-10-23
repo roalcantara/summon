@@ -51,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
+import com.summondemons.safely.ui.components.focusRing
 import com.summondemons.safely.data.Demon
 import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.ui.components.ParchmentRibbon
@@ -184,6 +185,7 @@ private fun SummonButton(accent: Color, glow: Boolean, onClick: () -> Unit) {
         modifier = Modifier
             .attentionGlow(attention, accent)
             .height(SummonButtonHeight)
+            .focusRing(interactionSource, CircleShape)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,

@@ -48,6 +48,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -202,7 +203,7 @@ fun HomeScreen(
                     .offset(y = maxHeight * (1f - DAIS_BOTTOM_FRACTION) - GrimoireArtInset + spacing.xs)
                     .minimumInteractiveComponentSize()
                     .attentionHalo(rememberAttention(true), lockAccent) // on the chip itself, inside the 48 dp target
-                    .clickable(onClick = open),
+                    .clickable(role = Role.Button, onClick = open),
             )
         }
         // The count on its own line, centred in the band under the rose; it never moves with the hint.
