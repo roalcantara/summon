@@ -51,7 +51,7 @@ private const val PHRASE_SETTLE_MS = 300L
 
 /**
  * The chant screen (ADR-0019, ADR-0029): the pieces of ChantPieces.kt in the split arrangement
- * (ChantArrangements.kt) over the House stage. ✕ sits alone top-right; chevrons on the edge
+ * (ChantArrangements.kt) over the House stage. ✕ ends the HUD row (ADR-0029, 2026-10-23); chevrons on the edge
  * point the way to turn while seeking or paused.
  */
 @Composable
@@ -106,12 +106,13 @@ fun ChantScreen(
             pill = { DirectionPillView(screen.pill, demon.ritualHeading) },
             sigil = { ChantSigil(state, screen, accent, flash, sigilGlow, Modifier.fillMaxSize().onSizeChanged { sigilPx = it.width }) },
             slot = { if (blocker == null) FeedbackSlot(screen.slot, accent, state.micLevel, screen.drifting) },
-            line = { m ->
-                val reserved = LineReservedTop
+            line = { m, reserved ->
                 if (blocker != null) {
                     Box(m.padding(top = reserved), contentAlignment = Alignment.Center) { blocker() }
                 } else {
-                    AxisLine(reservedTop = reserved, modifier = m.onSizeChanged { box = it }) {
+                    val reservedPx = with(LocalDensity.current) { reserved.roundToPx() }
+                    // Logged size = the phrase's room, not the HUD area above it (ADR-0029 session log).
+                    AxisLine(reservedTop = reserved, modifier = m.onSizeChanged { box = IntSize(it.width, (it.height - reservedPx).coerceAtLeast(0)) }) {
                         ChantLine(screen.words, screen.gated, screen.drifting, screen.lockFraction, accent, phraseGlow, emphasize = attention == Attention.Phrase, onPhraseSize = { phraseSp = it }, modifier = Modifier.fillMaxWidth())
                     }
                 }

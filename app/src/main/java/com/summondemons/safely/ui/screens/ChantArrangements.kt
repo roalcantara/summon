@@ -30,7 +30,8 @@ internal class ChantParts(
     val pill: @Composable () -> Unit,
     val sigil: @Composable () -> Unit,
     val slot: @Composable () -> Unit,
-    val line: @Composable (Modifier) -> Unit,
+    /** The line in its box; the top [Dp] of the box is left free (the HUD row overlaid there). */
+    val line: @Composable (Modifier, Dp) -> Unit,
 )
 
 /** The sigil column's share of the width; the line takes the rest (ADR-0029). */
@@ -54,7 +55,7 @@ internal fun SplitArrangement(parts: ChantParts, modifier: Modifier) {
         SigilStack(parts.name, parts.sigil, parts.pill, gap = spacing.lg, air = spacing.xl, modifier = Modifier.fillMaxHeight().weight(SIGIL_WEIGHT))
         Box(Modifier.fillMaxHeight(), contentAlignment = Alignment.Center) { parts.track() }
         Box(Modifier.fillMaxHeight().weight(1f - SIGIL_WEIGHT)) {
-            parts.line(Modifier.fillMaxSize())
+            parts.line(Modifier.fillMaxSize(), LineReservedTop)
             HudRow(parts, Modifier.align(Alignment.TopCenter))
         }
     }
@@ -73,7 +74,7 @@ private fun HudRow(parts: ChantParts, modifier: Modifier = Modifier) {
 /** Space the line leaves for the HUD row and its gap. */
 internal val LineReservedTop: Dp @Composable get() = HudHeight + MaterialTheme.spacing.xl
 
-/** Large screens that ignore the rotation: the top bar, a band with the stack and the track, then the slot and the line. */
+/** Large screens that ignore the rotation: the HUD row, a band with the stack and the track, then the line. */
 @Composable
 internal fun PortraitArrangement(parts: ChantParts, modifier: Modifier) {
     val spacing = MaterialTheme.spacing
@@ -83,6 +84,7 @@ internal fun PortraitArrangement(parts: ChantParts, modifier: Modifier) {
             SigilStack(parts.name, parts.sigil, parts.pill, gap = spacing.sm, air = spacing.sm, modifier = Modifier.size(BandStackWidth, BandStackHeight))
             parts.track()
         }
-        parts.line(Modifier.fillMaxWidth().weight(1f))
+        // The HUD row is its own row above, so nothing to leave free here.
+        parts.line(Modifier.fillMaxWidth().weight(1f), 0.dp)
     }
 }

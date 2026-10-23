@@ -141,6 +141,10 @@ restore() {
   echo "Restored font_scale=$orig_font density=${orig_density:-physical} animator_duration_scale=${orig_anim/null/1.0}"
 }
 trap restore EXIT
+# A killed run (kill -9, a tool timeout) cannot restore: print how to undo it by hand.
+echo "If interrupted, restore with: adb shell settings put system font_scale $orig_font;" \
+  "adb shell settings put global animator_duration_scale ${orig_anim/null/1.0};" \
+  "adb shell wm density ${orig_density:-reset}"
 
 adb shell pm grant "$PKG" android.permission.RECORD_AUDIO 2>/dev/null || true
 # Infinite animations keep UI Automator from ever seeing an idle screen.

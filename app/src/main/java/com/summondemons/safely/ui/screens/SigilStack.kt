@@ -60,11 +60,14 @@ internal fun SigilStack(
         val n = nameM.measure(Constraints.fixedWidth(d))
         val sg = sigils.first().measure(Constraints.fixed(d, d))
         val p = pillM?.measure(Constraints.fixedWidth(d))
+        // Placed by the plate's real height at the sigil's width (it can differ from the estimate),
+        // re-centred so nothing overlaps.
+        val group = n.height + gapPx + d + (p?.let { gapPx + it.height } ?: 0)
         layout(constraints.maxWidth, constraints.maxHeight) {
             val x = (constraints.maxWidth - d) / 2
-            var y = s.top
+            var y = ((constraints.maxHeight - group) / 2).coerceAtLeast(0)
             n.place(x, y)
-            y += nameH + gapPx
+            y += n.height + gapPx
             sg.place(x, y)
             y += d + gapPx
             p?.place(x, y)
