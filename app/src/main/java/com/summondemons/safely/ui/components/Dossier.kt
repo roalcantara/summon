@@ -44,6 +44,7 @@ import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.textRoles
 import com.summondemons.safely.ui.theme.upper
 import kotlinx.coroutines.delay
+import com.summondemons.safely.ui.fx.LocalReduceMotion
 
 const val DOSSIER_PAGES = 6
 const val SECRET_PAGE = 5
@@ -77,7 +78,12 @@ fun DossierList(
     val spacing = MaterialTheme.spacing
     val scroll = rememberScrollState()
     LaunchedEffect(demon.id) { scroll.scrollTo(0) }
-    LaunchedEffect(scrollToSecret) { if (scrollToSecret) scroll.animateScrollTo(scroll.maxValue) }
+    val reduceMotion = LocalReduceMotion.current
+    LaunchedEffect(scrollToSecret) {
+        if (scrollToSecret) {
+            if (reduceMotion) scroll.scrollTo(scroll.maxValue) else scroll.animateScrollTo(scroll.maxValue)
+        }
+    }
     Column(modifier.verticalScroll(scroll), verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
         repeat(DOSSIER_PAGES) { page ->
             Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
@@ -153,12 +159,13 @@ private fun SealLine(text: String) {
     Text(text.upper(), style = MaterialTheme.textRoles.meta, modifier = Modifier.padding(top = MaterialTheme.spacing.xs))
 }
 
-/** Revealed text soaking in once: blur → sharp, staggered 120 ms per line, 900 ms each (§4). */
+/** Revealed text soaking in once: blur → sharp, staggered 120 ms per line, 900 ms each (§4); at once with reduced motion. */
 @Composable
 fun InkLine(ink: Boolean, index: Int, content: @Composable () -> Unit) {
-    val progress = remember { Animatable(if (ink) 0f else 1f) }
+    val animate = ink && !LocalReduceMotion.current
+    val progress = remember { Animatable(if (animate) 0f else 1f) }
     LaunchedEffect(Unit) {
-        if (ink) {
+        if (animate) {
             delay(index * INK_STAGGER_MS)
             progress.animateTo(1f, tween(INK_MS, easing = FastOutSlowInEasing))
         }

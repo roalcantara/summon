@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.summondemons.safely.ui.theme.PillShape
 import com.summondemons.safely.ui.theme.spacing
+import com.summondemons.safely.ui.fx.LocalReduceMotion
 
 enum class ButtonTone { Primary, Danger }
 
@@ -45,7 +46,8 @@ fun PrimaryActionButton(
     }
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(if (pressed) 0.96f else 1f, label = "buttonPress")
+    val reduceMotion = LocalReduceMotion.current
+    val scale by animateFloatAsState(if (pressed && !reduceMotion) 0.96f else 1f, label = "buttonPress")
 
     Surface(
         onClick = onClick,
