@@ -28,3 +28,10 @@ lived there. The prototype review merged both into the Grimoire.
 
 ## Amendment (2026-10-22)
 The dossier carousel is replaced by the back of a flipping card; the card's height is the front's natural height, at least 36 % of the area below the header; ADR-0033.
+
+## Amendment (2026-10-23): demons as pages
+
+Moving between demons uses the M3 lateral pattern as a pager: each demon is a full page (scene,
+stage and card) that follows the finger and snaps, wrapping both ways; ‹ › animate it, and with
+reduce motion they switch instantly. The header and the arrows stay fixed above the pages; swiping
+is off during the celebration. A settled page is the selection.

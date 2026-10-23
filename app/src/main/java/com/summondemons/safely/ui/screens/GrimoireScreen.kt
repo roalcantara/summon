@@ -2,7 +2,6 @@ package com.summondemons.safely.ui.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -10,14 +9,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
@@ -41,9 +42,11 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -71,6 +74,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
@@ -109,16 +113,17 @@ import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.stage
 import com.summondemons.safely.ui.theme.textRoles
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.sin
 
 /** Share of the area below the avatar rail taken by the card; raise for more text, lower for bigger art. */
 private const val CARD_HEIGHT_FRACTION = 0.36f
 private const val BADGE_INFO_MS = 5_000L
 private const val AVATAR_BURN_CONSUME_MS = 2_200L
-private const val STAGE_CROSSFADE_MS = 500
+private const val PAGE_COUNT = 10_000
+private const val PAGE_MIDDLE = PAGE_COUNT / 2
 private const val DIM_BOUND = 0.35f
 private const val DIM_SEALED = 0.55f
 private const val EMBER_ALPHA = 0.67f
@@ -140,7 +145,6 @@ private val StageArrowHeight = 75.dp
 private val RailHeight = 72.dp
 private val FloatAmplitude = 6.dp
 private val SceneBlur = 3.dp
-private val StageSwipe = 60.dp
 private val BannerDrop = 30.dp
 
 /** The Grimoire (ADR-0016): a stage over the demon card, a tarot card whose back is the dossier (ADR-0016 amended, spec §2). */
@@ -252,7 +256,38 @@ fun GrimoireScreen(
         }
     }
     val index = demons.indexOf(demon)
-    val step: (Int) -> Unit = { delta -> onSelect(demons[(index + delta + demons.size) % demons.size].id) }
+    val count = demons.size
+    // Peers in one set (M3 lateral): each demon is a page that follows the finger and snaps; the
+    // pager owns the swipe. A large page count with index % count wraps both ways.
+    val pager = rememberPagerState(initialPage = PAGE_MIDDLE - PAGE_MIDDLE % count + index) { PAGE_COUNT }
+    val scope = rememberCoroutineScope()
+    val currentId by rememberUpdatedState(demon.id)
+    val select by rememberUpdatedState(onSelect)
+    // A settled page is the selection (saved by the view model).
+    LaunchedEffect(pager) {
+        snapshotFlow { pager.settledPage }.collect { page ->
+            val id = demons[page.mod(count)].id
+            if (id != currentId) select(id)
+        }
+    }
+    // A selection made elsewhere (celebration, restored state) moves the pager without animation.
+    LaunchedEffect(demon.id) {
+        val page = pager.currentPage
+        if (demons[page.mod(count)].id != demon.id && !pager.isScrollInProgress) {
+            pager.scrollToPage(page - page.mod(count) + index)
+        }
+    }
+    val step: (Int) -> Unit = { delta ->
+        scope.launch {
+            val target = pager.currentPage + delta
+            if (reduceMotion) pager.scrollToPage(target) else pager.animateScrollToPage(target)
+        }
+    }
+    // The card keeps the front's natural height (header + band + badges) for both faces, never below the fraction.
+    var fixedPx by remember { mutableIntStateOf(0) }
+    val navBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val minimumCard = with(density) { fixedPx.toDp() } + spacing.lg + spacing.md + navBottom
+    val cardHeightIn: (Dp) -> Dp = { area -> maxOf(area * CARD_HEIGHT_FRACTION, minimumCard) }
 
     Box(
         modifier
@@ -272,67 +307,88 @@ fun GrimoireScreen(
                 }
             },
     ) {
-        Crossfade(targetState = demon.house.stage(), animationSpec = tween(STAGE_CROSSFADE_MS), label = "stage") { stage ->
-            StageBackground(stage, dim = if (bound) DIM_BOUND else DIM_SEALED, modifier = Modifier.fillMaxSize())
-        }
-        if (party != null) RotatingSunburstBackground(accent.copy(alpha = SUNBURST_ALPHA), Modifier.fillMaxSize(), rotating = !reduceMotion)
-        ParticleField(
-            accent.copy(alpha = EMBER_ALPHA), ParticleStyle.Embers, Modifier.fillMaxSize(),
-            count = if (party != null) PARTY_EMBERS else EMBERS, seed = demon.id.hashCode(),
-        )
-        if (!bound) {
-            ParticleField(colors.onSurfaceVariant, ParticleStyle.Smoke, Modifier.fillMaxSize(), count = SMOKE, seed = demon.id.hashCode() + 1)
+        HorizontalPager(
+            state = pager,
+            modifier = Modifier.fillMaxSize(),
+            userScrollEnabled = party == null && count > 1, // no swiping during the celebration
+            key = { it },
+        ) { page ->
+            // Each page draws its own demon from his record; only the selected one takes input.
+            val d = demons[page.mod(count)]
+            val current = d.id == demon.id
+            val r = state.record(d.id)
+            val pageAccent = MaterialTheme.demonColors.accent(d.accent)
+            val pageParty = current && party != null
+            val sulks = if (current) restless else ProgressRules.isRestless(r, state.today)
+            Box(Modifier.fillMaxSize()) {
+                StageBackground(d.house.stage(), dim = if (r.bound) DIM_BOUND else DIM_SEALED, modifier = Modifier.fillMaxSize())
+                if (pageParty) RotatingSunburstBackground(pageAccent.copy(alpha = SUNBURST_ALPHA), Modifier.fillMaxSize(), rotating = !reduceMotion)
+                ParticleField(
+                    pageAccent.copy(alpha = EMBER_ALPHA), ParticleStyle.Embers, Modifier.fillMaxSize(),
+                    count = if (pageParty) PARTY_EMBERS else EMBERS, seed = d.id.hashCode(),
+                )
+                if (!r.bound) {
+                    ParticleField(colors.onSurfaceVariant, ParticleStyle.Smoke, Modifier.fillMaxSize(), count = SMOKE, seed = d.id.hashCode() + 1)
+                }
+                Column(Modifier.fillMaxSize().statusBarsPadding()) {
+                    Spacer(Modifier.height(RailHeight)) // the header is drawn once, above the pages
+                    BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
+                        val cardHeight = cardHeightIn(maxHeight)
+                        Column(Modifier.fillMaxSize()) {
+                            Stage(
+                                demon = d,
+                                bound = r.bound,
+                                restless = sulks,
+                                party = pageParty,
+                                canSummon = state.canSummonToday,
+                                quote = stringResource(if (sulks) d.restlessQuote else d.quote),
+                                hours = state.hoursToNextSummon,
+                                shake = if (current) shake else 0,
+                                onPrimary = if (current) primary else ({}),
+                                modifier = Modifier.weight(1f).fillMaxWidth(),
+                            )
+                            DemonCard(
+                                demons = demons,
+                                demon = d,
+                                record = r,
+                                side = side,
+                                onFlip = { if (current) side = if (side == CardSide.Front) CardSide.Back else CardSide.Front },
+                                glowFlip = ProgressRules.dossierUnread(r),
+                                badge = if (current) badge else null,
+                                onBadge = {
+                                    if (current) {
+                                        badge = it
+                                        badgeTaps++
+                                    }
+                                },
+                                inkCodex = current && inkCodex,
+                                inkBattle = current && inkBattle,
+                                scrollToSecret = current && scrollToSecret,
+                                onFixedHeight = { if (current) fixedPx = it },
+                                onBadgeRowBounds = { if (current) badgeRowBounds = it },
+                                modifier = Modifier.fillMaxWidth().height(cardHeight),
+                            )
+                        }
+                    }
+                }
+            }
         }
 
+        // Fixed above the pages: the header, the arrows over the stage, the celebration banner.
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
-            // Like system back (BackHandler above), the rail's back arrow dismisses the celebration first.
+            // Like system back (BackHandler above), the header's back arrow dismisses the celebration first.
             GrimoireHeader({ if (party != null) onDismissCelebration() else onBack() }, onMenu)
             BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
-                var fixedPx by remember { mutableIntStateOf(0) }
-                val navBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-                // The front's natural height (header + band + badges), kept for both faces; never below the fraction.
-                val minimum = with(density) { fixedPx.toDp() } + spacing.lg + spacing.md + navBottom
-                val cardHeight = maxOf(maxHeight * CARD_HEIGHT_FRACTION, minimum)
+                val cardHeight = cardHeightIn(maxHeight)
                 Column(Modifier.fillMaxSize()) {
                     Box(Modifier.weight(1f).fillMaxWidth()) {
-                        Stage(
-                            demon = demon,
-                            bound = bound,
-                            restless = restless,
-                            party = party != null,
-                            canSummon = state.canSummonToday,
-                            quote = stringResource(if (restless) demon.restlessQuote else demon.quote),
-                            hours = state.hoursToNextSummon,
-                            shake = shake,
-                            onPrimary = primary,
-                            onSwipe = step,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                        // Arrows make the stage swipe visible (RC, TODO r62v); hidden while celebrating, like the swipe.
-                        if (party == null && demons.size > 1) {
+                        // Arrows make the swipe visible (RC, TODO r62v); hidden while celebrating, like the swipe.
+                        if (party == null && count > 1) {
                             StageArrow(next = false, stringResource(R.string.grimoire_previous), Modifier.align(Alignment.CenterStart)) { step(-1) }
                             StageArrow(next = true, stringResource(R.string.grimoire_next), Modifier.align(Alignment.CenterEnd)) { step(1) }
                         }
                     }
-                    DemonCard(
-                        demons = demons,
-                        demon = demon,
-                        record = record,
-                        side = side,
-                        onFlip = { side = if (side == CardSide.Front) CardSide.Back else CardSide.Front },
-                        glowFlip = ProgressRules.dossierUnread(record),
-                        badge = badge,
-                        onBadge = {
-                            badge = it
-                            badgeTaps++
-                        },
-                        inkCodex = inkCodex,
-                        inkBattle = inkBattle,
-                        scrollToSecret = scrollToSecret,
-                        onFixedHeight = { fixedPx = it },
-                        onBadgeRowBounds = { badgeRowBounds = it },
-                        modifier = Modifier.fillMaxWidth().height(cardHeight),
-                    )
+                    Spacer(Modifier.height(cardHeight))
                 }
                 if (party != null) PartyBanner(Modifier.align(Alignment.TopCenter).padding(top = spacing.sm))
             }
@@ -388,14 +444,11 @@ private fun Stage(
     hours: Int,
     shake: Int,
     onPrimary: () -> Unit,
-    onSwipe: (Int) -> Unit,
     modifier: Modifier,
 ) {
     val accent = MaterialTheme.demonColors.accent(demon.accent)
     val spacing = MaterialTheme.spacing
     val reduceMotion = LocalReduceMotion.current
-    val swipePx = with(LocalDensity.current) { StageSwipe.toPx() }
-    val currentSwipe by rememberUpdatedState(onSwipe)
     val time by if (reduceMotion) remember { mutableLongStateOf(0L) } else rememberFrameTimeMs()
     val floatPx = with(LocalDensity.current) { FloatAmplitude.toPx() }
     val pop = remember(demon.id, party) { Animatable(if (party && !reduceMotion) PARTY_POP_FROM else 1f) }
@@ -414,14 +467,6 @@ private fun Stage(
     }
     Column(
         modifier
-            .pointerInput(party) {
-                if (party) return@pointerInput // no swiping during the celebration
-                var total = 0f
-                detectHorizontalDragGestures(
-                    onDragStart = { total = 0f },
-                    onDragEnd = { if (abs(total) > swipePx) currentSwipe(if (total < 0f) 1 else -1) },
-                ) { _, amount -> total += amount }
-            }
             .padding(horizontal = spacing.xl)
             .padding(bottom = spacing.md),
         horizontalAlignment = Alignment.CenterHorizontally,
