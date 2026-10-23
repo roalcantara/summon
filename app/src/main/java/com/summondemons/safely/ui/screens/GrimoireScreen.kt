@@ -79,7 +79,6 @@ import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
 import com.summondemons.safely.data.DemonCatalog
@@ -213,7 +212,7 @@ fun GrimoireScreen(
         if (wasCelebrating && !celebrating) side = CardSide.Back
         wasCelebrating = celebrating
     }
-    var badge by remember(demon.id) { mutableStateOf<BadgeKey?>(null) }
+    var badge by rememberSaveable(demon.id) { mutableStateOf<BadgeKey?>(null) }
     var badgeTaps by remember { mutableIntStateOf(0) }
     var shake by remember { mutableIntStateOf(0) }
     var badgeRowBounds by remember { mutableStateOf(Rect.Zero) }

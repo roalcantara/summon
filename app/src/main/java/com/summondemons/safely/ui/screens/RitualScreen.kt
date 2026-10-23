@@ -12,6 +12,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -322,7 +323,7 @@ private fun ClimaxOverlay(demon: Demon, accent: Color, fraction: Float, reduceMo
     val dim = segment(fraction, 0f, 0.3f)
     val converge = segment(fraction, 0f, 0.6f)
     val flash = if (reduceMotion) 0f else 1f - (abs(fraction - FLASH_PEAK) / FLASH_HALF_WIDTH).coerceIn(0f, 1f)
-    val rise = if (reduceMotion) fraction else segment(fraction, 0.7f, 1f)
+    val rise = if (reduceMotion) fraction else FastOutSlowInEasing.transform(segment(fraction, 0.7f, 1f))
     val riseDistance = with(LocalDensity.current) { RiseDistance.toPx() }
     Box(
         Modifier

@@ -2,6 +2,8 @@ package com.summondemons.safely.ui.screens
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -180,7 +182,6 @@ private const val BLINK_MIN = 0.55f
 private const val BREATH_MIN = 0.55f
 private const val BREATH_HALF_MS = 900
 private const val FLARE_SCALE = 1.18f
-private const val FLARE_MS = 450
 private const val METER_TWEEN_MS = 120
 private const val METER_FLOOR = 0.22f
 private const val CHECKING_HALF_MS = 250
@@ -335,7 +336,7 @@ private fun SealMark(numeral: String, look: SealLook, accent: Color, paused: Boo
     LaunchedEffect(look) {
         if (look == SealLook.Sealed && !reduceMotion) {
             pulse.snapTo(FLARE_SCALE)
-            pulse.animateTo(1f, tween(FLARE_MS))
+            pulse.animateTo(1f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium))
         }
     }
     val ring = when {

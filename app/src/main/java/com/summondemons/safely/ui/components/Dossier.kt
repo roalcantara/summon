@@ -189,7 +189,7 @@ fun Smudge(lines: Int, modifier: Modifier = Modifier) {
     val sealed = stringResource(R.string.dossier_sealed)
     Column(
         modifier.semantics { contentDescription = sealed },
-        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs + 2.dp),
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
     ) {
         repeat(lines) { i ->
             Box(

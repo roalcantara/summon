@@ -31,4 +31,19 @@ class FxMathTest {
         assertEquals(0f, keyframe(1f, values), 0.0001f)
         assertEquals(0f, keyframe(2f, values), 0.0001f) // clamped
     }
+    @Test
+    fun smoothKeyframeEasesInAndOutOfEachKeyframe() {
+        val values = floatArrayOf(0f, -22f, 0f, -6f, 0f)
+        // On the keyframes and halfway between them it matches the linear version.
+        assertEquals(0f, smoothKeyframe(0f, values), 0.0001f)
+        assertEquals(-11f, smoothKeyframe(0.125f, values), 0.0001f)
+        assertEquals(-22f, smoothKeyframe(0.25f, values), 0.0001f)
+        assertEquals(-3f, smoothKeyframe(0.625f, values), 0.0001f)
+        assertEquals(0f, smoothKeyframe(1f, values), 0.0001f)
+        // A quarter into the first segment: smoothstep(0.25) = 0.15625, so -22 * 0.15625 (linear: -5.5).
+        assertEquals(-3.4375f, smoothKeyframe(0.0625f, values), 0.0001f)
+        // Clamped like keyframe().
+        assertEquals(0f, smoothKeyframe(-1f, values), 0.0001f)
+        assertEquals(0f, smoothKeyframe(2f, values), 0.0001f)
+    }
 }

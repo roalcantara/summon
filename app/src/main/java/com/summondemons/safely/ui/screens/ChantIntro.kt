@@ -40,6 +40,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import com.summondemons.safely.platform.Haptics
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -175,6 +177,7 @@ private fun Rules(accent: Color, modifier: Modifier) {
 
 @Composable
 private fun SummonButton(accent: Color, glow: Boolean, onClick: () -> Unit) {
+    val context = LocalContext.current
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val label = stringResource(R.string.intro_summon).upper()
@@ -190,7 +193,10 @@ private fun SummonButton(accent: Color, glow: Boolean, onClick: () -> Unit) {
                 interactionSource = interactionSource,
                 indication = null,
                 role = Role.Button,
-                onClick = onClick,
+                onClick = {
+                    Haptics.tick(context)
+                    onClick()
+                },
             )
             .semantics {
                 contentDescription = label

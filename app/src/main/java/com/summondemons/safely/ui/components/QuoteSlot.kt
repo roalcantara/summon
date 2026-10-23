@@ -239,7 +239,7 @@ private fun DashedBubble(color: Color, modifier: Modifier = Modifier, content: @
                     style = Stroke(2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(DashOn.toPx(), DashOff.toPx()))),
                 )
             }
-            .padding(horizontal = MaterialTheme.spacing.xl, vertical = MaterialTheme.spacing.sm + 2.dp),
+            .padding(horizontal = MaterialTheme.spacing.xl, vertical = MaterialTheme.spacing.sm),
         contentAlignment = Alignment.Center,
     ) { content() }
 }

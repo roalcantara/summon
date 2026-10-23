@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.semantics
 import com.summondemons.safely.R
 import com.summondemons.safely.ui.fx.LocalReduceMotion
 import com.summondemons.safely.ui.fx.keyframe
+import com.summondemons.safely.ui.fx.smoothKeyframe
 import com.summondemons.safely.ui.theme.demonColors
 import kotlinx.coroutines.delay
 import kotlin.random.Random
@@ -82,8 +83,8 @@ fun RestlessGrimoire(restless: Boolean, accent: Color, opening: Boolean, onOpen:
         modifier
             .graphicsLayer {
                 val unit = size.width / VIEW_W
-                translationY = ((bob?.value ?: 0f) + keyframe(hop.value, HOP_Y)) * unit
-                rotationZ = keyframe(hop.value, HOP_DEG)
+                translationY = ((bob?.value ?: 0f) + smoothKeyframe(hop.value, HOP_Y)) * unit
+                rotationZ = smoothKeyframe(hop.value, HOP_DEG)
                 val o = open.value
                 if (reduceMotion) {
                     alpha = 1f - o

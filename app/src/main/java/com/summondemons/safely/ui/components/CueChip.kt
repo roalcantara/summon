@@ -55,7 +55,7 @@ fun CueChip(text: String, tone: CueTone, modifier: Modifier = Modifier, shake: I
             .graphicsLayer { translationX = offset.value.dp.toPx() },
     ) {
         Row(
-            Modifier.padding(horizontal = MaterialTheme.spacing.md, vertical = MaterialTheme.spacing.xs + 2.dp),
+            Modifier.padding(horizontal = MaterialTheme.spacing.md, vertical = MaterialTheme.spacing.sm),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
             verticalAlignment = Alignment.CenterVertically,
         ) {

@@ -199,12 +199,12 @@ fun InfoBand(demons: List<Demon>, demon: Demon, badge: BadgeKey?, modifier: Modi
                 BandLayer(visible = current && badge == info.key) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs + 2.dp),
+                            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(bottom = MaterialTheme.spacing.xs),
                         ) {
                             BadgeIcon(info.key, d, BandIconSize)
-                            Text(info.label.upper(), style = roles.meta, color = MaterialTheme.demonColors.accent(d.accent))
+                            Text(info.label.upper(), style = roles.meta.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.demonColors.accent(d.accent))
                         }
                         Text(info.text, style = roles.body.copy(fontSize = BandTextSize), color = colors.onSurface, textAlign = TextAlign.Center)
                     }

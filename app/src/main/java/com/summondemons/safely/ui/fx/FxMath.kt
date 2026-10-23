@@ -21,3 +21,12 @@ fun keyframe(t: Float, values: FloatArray): Float {
     val i = x.toInt().coerceAtMost(values.size - 2)
     return values[i] + (values[i + 1] - values[i]) * (x - i)
 }
+
+/** Like [keyframe], but each segment eases in and out (smoothstep): no velocity break at a keyframe. */
+fun smoothKeyframe(t: Float, values: FloatArray): Float {
+    require(values.size >= 2) { "need at least two keyframes" }
+    val x = t.coerceIn(0f, 1f) * (values.size - 1)
+    val i = x.toInt().coerceAtMost(values.size - 2)
+    val s = x - i
+    return values[i] + (values[i + 1] - values[i]) * s * s * (3f - 2f * s)
+}
