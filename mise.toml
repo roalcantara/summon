@@ -4,16 +4,16 @@
 [tasks."icon:gen"]
 description = """Regenerate the launcher icons (all mipmaps, adaptive layers, themed icon) and the \
 Play icon from icon art, and write a preview sheet (dark wallpaper, splash colour, white; sizes \
-192 to 32 px) to build/icon-preview.png. With no arguments it rebuilds the shipped icon (ADR-0030). Flat mode by default (one opaque square image); pass \
---backdrop to use the art as a cutout over a backdrop. Tune the framing with --zoom (art size in \
+192 to 32 px) to build/icon-preview.png. With no arguments it rebuilds the shipped icon (ADR-0030): the cutout over the violet backdrop \
+(layered mode); pass --backdrop "" for flat mode (one opaque square image). Tune the framing with --zoom (art size in \
 dp on the 108 dp canvas, 72 dp visible) and --shift (dp to raise the art). --install puts the \
 debug build on every connected device; --open shows the preview. Overwrites tracked files under \
 app/src/main/res/mipmap-* and docs/play-store/."""
 alias = "icon"
 usage = '''
-arg "[icon]" default="art/icon/cutout-dark.png" help="Icon art: opaque square (flat), or alpha cutout with --backdrop"
+arg "[icon]" default="art/icon/cutout.png" help="Icon art: alpha cutout over --backdrop (layered, the shipped icon), or an opaque square with --backdrop \"\" (flat)"
 flag "--mono <file>" default="art/icon/cutout.png" help="Alpha cutout for the themed (monochrome) icon"
-flag "--backdrop <file>" help="Layered mode: opaque background behind the cutout"
+flag "--backdrop <file>" default="art/icon/backdrop-violet.png" help="Layered mode: opaque background behind the cutout (tools/gen_icon_backdrop.py); empty for flat mode"
 flag "--zoom <dp>" default="84" help="Art size in dp on the 108 dp canvas (72 dp visible); 84 is the shipped icon"
 flag "--shift <dp>" default="10" help="Raise the art by this many dp; negative lowers it; 10 is the shipped icon"
 flag "--preview <file>" default="build/icon-preview.png" help="Preview sheet path"
