@@ -31,6 +31,8 @@ data class DemonRecord(
     val lastVisitDay: Long? = null,
     val revealPending: RevealPending = RevealPending(),
     val escapeBannerPending: Boolean = false,
+    /** Local epoch day of the last summon; null in saves from before 2026-10-23 (ADR-0036). */
+    val boundDay: Long? = null,
 )
 
 /** Everything that survives a restart (ADR-0013). Days are local epoch days. */

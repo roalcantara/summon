@@ -22,6 +22,7 @@ object ProgressRules {
             lastVisitDay = day,
             revealPending = RevealPending.All,
             escapeBannerPending = false,
+            boundDay = day,
         )
         return p.copy(
             demons = p.demons + (id to record),
@@ -71,6 +72,10 @@ object ProgressRules {
     fun dossierUnread(record: DemonRecord): Boolean =
         record.revealed && (record.revealPending.codex || record.revealPending.battle)
 
+
+    /** The "Psst" balloon shows (ADR-0036): bound since an earlier day, lore read. */
+    fun teaserEligible(record: DemonRecord, today: Long): Boolean =
+        record.bound && (record.boundDay ?: Long.MIN_VALUE) < today && !dossierUnread(record)
     /**
      * No summon was ever committed: the intro's Summon glows (ADR-0033). A revealed demon also
      * counts as summoned, since a reset of the daily limit clears [Progress.lastSummonDay].

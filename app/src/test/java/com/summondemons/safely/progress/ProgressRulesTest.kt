@@ -13,6 +13,7 @@ import com.summondemons.safely.progress.ProgressRules.visit
 import com.summondemons.safely.progress.ProgressRules.dossierUnread
 import com.summondemons.safely.progress.ProgressRules.neverSummoned
 import com.summondemons.safely.progress.ProgressRules.newlyEscaped
+import com.summondemons.safely.progress.ProgressRules.teaserEligible
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
@@ -46,6 +47,7 @@ class ProgressRulesTest {
                 lastVisitDay = 50,
                 revealPending = RevealPending.All,
                 escapeBannerPending = false,
+                boundDay = 50,
             ),
             p.record("astaroth"),
         )
@@ -202,5 +204,21 @@ class ProgressRulesTest {
         assertEquals(listOf("asmodeus"), newlyEscaped(bound, escaped))
         assertEquals(emptyList<String>(), newlyEscaped(escaped, escaped))
         assertEquals(emptyList<String>(), newlyEscaped(Progress(), bound))
+    }
+
+    @Test
+    fun commitRecordsTheBoundDay() {
+        assertEquals(10L, commitSummon(Progress(), "asmodeus", 10, flawless = false).record("asmodeus").boundDay)
+    }
+
+    @Test
+    fun theTeaserWaitsForTheNextDayAndForTheLoreToBeRead() {
+        var p = commitSummon(Progress(), "asmodeus", 10, flawless = false)
+        assertFalse(teaserEligible(p.record("asmodeus"), today = 11)) // lore still unread
+        p = consumeReveal(consumeReveal(p, "asmodeus", Reveal.Codex), "asmodeus", Reveal.Battle)
+        assertFalse(teaserEligible(p.record("asmodeus"), today = 10)) // summoned today
+        assertTrue(teaserEligible(p.record("asmodeus"), today = 11))
+        assertFalse(teaserEligible(DemonRecord(), today = 11)) // unbound
+        assertTrue(teaserEligible(DemonRecord(bound = true, revealed = true), today = 11)) // old save, no boundDay
     }
 }

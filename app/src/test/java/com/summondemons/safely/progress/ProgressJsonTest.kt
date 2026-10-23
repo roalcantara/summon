@@ -60,4 +60,10 @@ class ProgressJsonTest {
     fun aMissingRecordIsTheDefault() {
         assertEquals(DemonRecord(), Progress().record("baal"))
     }
+
+    @Test
+    fun oldSavesWithoutBoundDayStillLoad() {
+        val json = """{"demons":{"asmodeus":{"bound":true,"revealed":true}}}"""
+        assertEquals(null, ProgressJson.decode(json).record("asmodeus").boundDay)
+    }
 }
