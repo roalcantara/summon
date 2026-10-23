@@ -41,6 +41,8 @@
     <string name="quote_tap_to_summon">Tap to summon</string>
     <string name="quote_cooling">Circle cooling</string>
     <string name="quote_next_summon">Next summon in %1$d h</string>
+    <string name="psst_invite">Psst… come closer.</string>
+    <string name="psst_reply">Heh heh heh… Come back soon… if you dare, mortal.</string>
     <string name="cd_summon">Summon %1$s</string>
     <plurals name="cd_cooling">
         <item quantity="one">Circle cooling. Next summon in %1$d hour.</item>

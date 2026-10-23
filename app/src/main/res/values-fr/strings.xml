@@ -38,6 +38,8 @@
     <string name="quote_tap_to_summon">Invoque-le !</string>
     <string name="quote_cooling">Ça refroidit</string>
     <string name="quote_next_summon">Invoque dans %1$d h</string>
+    <string name="psst_invite">Psst… approche.</string>
+    <string name="psst_reply">Hé hé hé… Reviens vite… si tu l’oses, mortel.</string>
     <string name="cd_summon">Évoque %1$s</string>
     <plurals name="cd_cooling">
         <item quantity="one">Ça refroidit. Invoque dans %1$d heure.</item>

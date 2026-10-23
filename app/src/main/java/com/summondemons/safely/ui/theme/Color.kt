@@ -56,4 +56,8 @@ internal object Palette {
     val stageSolMid = Color(0xFF2A1D0B)
     val stageVenusGlow = Color(0xFF3B2A4A)
     val stageVenusMid = Color(0xFF2A1A26)
+    /** The Psst balloon (ADR-0036). */
+    val psstViolet = Color(0xFF8F3FB0)
+    val psstVioletDeep = Color(0xFF4A1764)
+    val psstHalo = Color(0xFF6BFF9F)
 }

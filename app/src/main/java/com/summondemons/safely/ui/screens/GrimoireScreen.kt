@@ -68,6 +68,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -91,6 +92,8 @@ import com.summondemons.safely.ui.GameUiState
 import com.summondemons.safely.ui.components.BadgeKey
 import com.summondemons.safely.ui.components.BadgeRow
 import com.summondemons.safely.ui.components.MenuButton
+import com.summondemons.safely.platform.Haptics
+import com.summondemons.safely.ui.components.PsstBalloon
 import com.summondemons.safely.ui.components.TitlePlaque
 import com.summondemons.safely.ui.components.CUTOUT_ASPECT
 import com.summondemons.safely.ui.components.DemonCutout
@@ -149,6 +152,7 @@ private val RailHeight = 72.dp
 private val FloatAmplitude = 6.dp
 private val SceneBlur = 3.dp
 private val BannerDrop = 30.dp
+private const val REPLY_MS = 3_000L
 
 /** The Grimoire (ADR-0016): a stage over the demon card, a tarot card whose back is the dossier (ADR-0016 amended, spec §2). */
 @Composable
@@ -162,6 +166,8 @@ fun GrimoireScreen(
     onConsumeReveal: (String, Reveal) -> Unit,
     onSecretShown: () -> Unit,
     onMenu: () -> Unit,
+    onTeaserShown: (String) -> Unit = {},
+    onTeaserTap: (String, Boolean) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
     demons: List<Demon> = DemonCatalog.all,
 ) {
@@ -323,6 +329,8 @@ fun GrimoireScreen(
             val pageAccent = MaterialTheme.demonColors.accent(d.accent)
             val pageParty = current && party != null
             val sulks = if (current) restless else ProgressRules.isRestless(r, state.today)
+            val teaser = current && party == null && ProgressRules.teaserEligible(r, state.today)
+            if (teaser) LaunchedEffect(d.id, state.today) { onTeaserShown(d.id) }
             Box(Modifier.fillMaxSize()) {
                 StageBackground(d.house.stage(), dim = if (r.bound) DIM_BOUND else DIM_SEALED, modifier = Modifier.fillMaxSize())
                 if (pageParty) RotatingSunburstBackground(pageAccent.copy(alpha = SUNBURST_ALPHA), Modifier.fillMaxSize(), rotating = !reduceMotion)
@@ -343,6 +351,8 @@ fun GrimoireScreen(
                                 bound = r.bound,
                                 restless = sulks,
                                 party = pageParty,
+                                teaser = teaser,
+                                onTeaserTap = { onDemon -> onTeaserTap(d.id, onDemon) },
                                 canSummon = state.canSummonToday,
                                 quote = stringResource(if (sulks) d.restlessQuote else d.quote),
                                 hours = state.hoursToNextSummon,
@@ -453,6 +463,8 @@ private fun Stage(
     restless: Boolean,
     party: Boolean,
     canSummon: Boolean,
+    teaser: Boolean,
+    onTeaserTap: (onDemon: Boolean) -> Unit,
     quote: String,
     hours: Int,
     shake: Int,
@@ -477,6 +489,22 @@ private fun Stage(
         QuoteSlotState.Bound -> demon.name
         QuoteSlotState.Ready -> stringResource(R.string.cd_summon, demon.name)
         QuoteSlotState.Cooling -> pluralStringResource(R.plurals.cd_cooling, hours, hours)
+    }
+    var replyTick by remember(demon.id) { mutableIntStateOf(0) }
+    val context = LocalContext.current
+    val sounds = LocalGameSounds.current
+    val tapTeaser: (Boolean) -> Unit = { onDemon ->
+        onTeaserTap(onDemon)
+        Haptics.chime(context)
+        sounds?.playLaughIfPresent()
+        replyTick++
+    }
+    var replying by remember(demon.id) { mutableStateOf(false) }
+    LaunchedEffect(replyTick) {
+        if (replyTick == 0) return@LaunchedEffect
+        replying = true
+        kotlinx.coroutines.delay(REPLY_MS)
+        replying = false
     }
     Column(
         modifier
@@ -511,16 +539,24 @@ private fun Stage(
                                 .clickable(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null,
-                                    enabled = !bound || party,
+                                    enabled = !bound || party || teaser,
                                     // A button only while it acts; a bound portrait is not a disabled control.
-                                    role = if (!bound || party) Role.Button else null,
-                                    onClick = onPrimary,
+                                    role = if (!bound || party || teaser) Role.Button else null,
+                                    onClick = { if (teaser && !party) tapTeaser(true) else onPrimary() },
                                 )
                                 .semantics { contentDescription = label },
                             silhouette = if (bound) 0f else 1f,
                             alignment = Alignment.BottomCenter,
                         )
                     }
+                }
+                if (teaser) {
+                    PsstBalloon(
+                        text = stringResource(if (replying) R.string.psst_reply else R.string.psst_invite),
+                        replying = replying,
+                        onTap = { tapTeaser(false) },
+                        modifier = Modifier.align(Alignment.TopEnd).padding(top = spacing.sm),
+                    )
                 }
             }
         }

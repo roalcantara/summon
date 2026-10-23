@@ -38,6 +38,8 @@
     <string name="quote_tap_to_summon">Evocalo!</string>
     <string name="quote_cooling">Si raffredda</string>
     <string name="quote_next_summon">Evoca tra %1$d h</string>
+    <string name="psst_invite">Psst… avvicinati.</string>
+    <string name="psst_reply">Eh eh eh… Torna presto… se osi, mortale.</string>
     <string name="cd_summon">Evoca %1$s</string>
     <plurals name="cd_cooling">
         <item quantity="one">Si raffredda. Evoca tra %1$d ora.</item>

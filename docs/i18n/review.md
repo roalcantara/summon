@@ -773,4 +773,17 @@ Entry format:
 - **Status:** new (2026-10-23)
 - **English (28):** No audio, no personal data.
 - **Translations:** es: "Sin audio ni datos tuyos." (26) · pt-BR: "Sem áudio, sem dados seus." (26) · it: "Niente audio né dati tuoi." (26) · fr: "Ni audio ni données perso." (26)
-- **Lost:** None: concise hint, all shorter than English.
+
+### en/es/pt-BR/it/fr · psst_invite
+
+- **Status:** new (2026-10-23)
+- **English (19):** Psst… come closer.
+- **Translations:** es: "Psst… acércate." (15) · pt-BR: "Psiu… vem cá." (13) · it: "Psst… avvicinati." (16) · fr: "Psst… approche." (14)
+- **Lost:** None: concise whisper, all shorter than English.
+
+### en/es/pt-BR/it/fr · psst_reply
+
+- **Status:** new (2026-10-23)
+- **English (50):** Heh heh heh… Come back soon… if you dare, mortal.
+- **Translations:** es: "Je je je… Vuelve pronto… si te atreves, mortal." (48) · pt-BR: "Hehehe… Volte logo… se tiver coragem, mortal." (46) · it: "Eh eh eh… Torna presto… se osi, mortale." (40) · fr: "Hé hé hé… Reviens vite… si tu l’oses, mortel." (46)
+- **Lost:** None: concise laugh reply, all shorter than English.

@@ -7,6 +7,8 @@ import androidx.annotation.RawRes
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.summondemons.safely.R
 
+import android.annotation.SuppressLint
+
 /**
  * One-shot sounds outside the Ritual (§5): the Home opening chime and the Grimoire "Tada!".
  * One SoundPool, created once and released with the activity. Main thread only.
@@ -22,6 +24,15 @@ class GameSounds(context: Context) {
     private val pool = SoundPool.Builder().setMaxStreams(MAX_STREAMS).setAudioAttributes(attributes).build()
     private val ids: Map<Cue, Int> = Cue.entries.associateWith { pool.load(context.applicationContext, it.res, 1) }
     private var released = false
+    @SuppressLint("DiscouragedApi")
+    private val laughId: Int? = context.resources.getIdentifier("demon_laugh", "raw", context.packageName)
+        .takeIf { it != 0 }?.let { pool.load(context.applicationContext, it, 1) }
+
+    /** The Psst reply's laugh (ADR-0036), only if `res/raw/demon_laugh` was added. */
+    fun playLaughIfPresent() {
+        laughId?.let { pool.play(it, LAUGH_VOLUME, LAUGH_VOLUME, 1, 0, 1f) }
+    }
+
 
     fun play(cue: Cue, volume: Float = 1f) {
         if (released) return
@@ -36,6 +47,7 @@ class GameSounds(context: Context) {
 
     private companion object {
         const val MAX_STREAMS = 2
+        const val LAUGH_VOLUME = 0.7f
     }
 }
 

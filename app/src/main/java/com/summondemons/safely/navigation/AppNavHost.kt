@@ -110,6 +110,8 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
                                 onConsumeReveal = game::consumeReveal,
                                 onSecretShown = game::secretShown,
                                 onMenu = onMenu,
+                                onTeaserShown = game::teaserShown,
+                                onTeaserTap = game::teaserTapped,
                             )
                         }
                     }

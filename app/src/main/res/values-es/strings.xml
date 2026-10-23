@@ -38,6 +38,8 @@
     <string name="quote_tap_to_summon">Toca e invoca</string>
     <string name="quote_cooling">Enfriándose</string>
     <string name="quote_next_summon">Invoca en %1$d h</string>
+    <string name="psst_invite">Psst… acércate.</string>
+    <string name="psst_reply">Je je je… Vuelve pronto… si te atreves, mortal.</string>
     <string name="cd_summon">Invoca %1$s</string>
     <plurals name="cd_cooling">
         <item quantity="one">Círculo enfriándose. Invoca en %1$d hora.</item>
