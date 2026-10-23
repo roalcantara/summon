@@ -45,7 +45,7 @@ fun PsstBalloon(text: String, replying: Boolean, onTap: () -> Unit, modifier: Mo
     val colors = MaterialTheme.demonColors
     val gold = MaterialTheme.colorScheme.primary
     val breath = rememberAttention(active = !replying)
-    val size = TextSize.fontScaleCapped()
+    val fontSize = TextSize.fontScaleCapped()
     Box(
         modifier
             .widthIn(max = BalloonMaxWidth)
@@ -53,12 +53,12 @@ fun PsstBalloon(text: String, replying: Boolean, onTap: () -> Unit, modifier: Mo
             .attentionGlow(breath, colors.psstViolet)
             .drawBehind {
                 val tail = Tail.toPx()
-                val body = Size(this.size.width, this.size.height - tail)
+                val body = Size(size.width, size.height - tail)
                 val radius = body.height / 2f
                 val path = Path().apply {
                     addRoundRect(androidx.compose.ui.geometry.RoundRect(0f, 0f, body.width, body.height, radius, radius))
                     moveTo(radius * 0.6f, body.height - 1f)
-                    lineTo(radius * 0.2f, this@drawBehind.size.height)
+                    lineTo(radius * 0.2f, size.height)
                     lineTo(radius * 1.4f, body.height - 1f)
                     close()
                 }
@@ -72,10 +72,10 @@ fun PsstBalloon(text: String, replying: Boolean, onTap: () -> Unit, modifier: Mo
     ) {
         Text(
             text,
-            style = MaterialTheme.textRoles.name.copy(fontSize = size, textAlign = TextAlign.Center),
+            style = MaterialTheme.textRoles.name.copy(fontSize = fontSize, textAlign = TextAlign.Center),
             color = colors.inkHighlight,
             maxLines = 3,
-            autoSize = TextAutoSize.StepBased(minFontSize = TextMinSize, maxFontSize = size),
+            autoSize = TextAutoSize.StepBased(minFontSize = TextMinSize, maxFontSize = fontSize),
         )
     }
 }
