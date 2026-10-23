@@ -26,9 +26,11 @@ demon's head invites a tap; the tap gets an in-character "not yet", and the taps
   3. pip 3 lights; a summon-style flash, the bubble vanishes, the sunburst turns behind him and a
      spiky burst bubble springs in with "Heh heh heh… Come back soon… if you dare, mortal.";
      `Haptics.success` and, if the clip exists, the laugh.
-  The reply floats with him for 10 s and fades. Then no bubble for this demon until tomorrow
-  (`DemonRecord.teaserOpenedDay`). Leaving before the third tap forgets the count. Nothing else
-  happens (no penalty, no navigation).
+  The reply floats with him for 7 s between the stage arrows (his face stays clear), then it and
+  the rays fade out slowly (1.2 s) and the invite comes back with empty pips: the player may play
+  it again as often as they like. `DemonRecord.teaserOpenedDay` keeps the day of the last burst, so
+  later bursts that day are reported as replays. Leaving before the third tap forgets the count.
+  Nothing else happens (no penalty, no navigation).
 - **Reduce motion:** no float, shake, squash, flash or ray spin; the pips light, the burst fades in,
   the haptics stay.
 - **Look:** drawn in code. Bubble and burst: `parchmentLight` fill with a `parchmentDark`
@@ -41,7 +43,7 @@ demon's head invites a tap; the tap gets an in-character "not yet", and the taps
 - `teaser_shown` — `demon`, `days_since_summon` (buckets as `days_since_install`): once per demon
   per day per app process.
 - `teaser_tap` — `demon`, `target` (balloon, demon), `step` (1, 2, 3).
-- `teaser_open` — `demon`: the third tap, once per demon per day (persisted).
+- `teaser_open` — `demon`, `repeat` (true when this demon already burst today; persisted day).
 - Playbook additions (metric and rule): **teaser tap rate** = users with ≥ 1 `teaser_tap` / users
   with ≥ 1 `teaser_shown`, over the v1 window; **open rate** = users with ≥ 1 `teaser_open` / tappers; **return
   openers** = users opening on ≥ 2 different days / openers. Rule: ≥ 20 % → new demon content (lore over days, daily lines) is v1.1's lever;
@@ -49,7 +51,7 @@ demon's head invites a tap; the tap gets an in-character "not yet", and the taps
 
 ## Model
 `DemonRecord.boundDay: Long?` (null by default; set by `ProgressRules.commitSummon`) and
-`DemonRecord.teaserOpenedDay: Long?` (set by `ProgressRules.openTeaser`; eligibility needs it ≠ today);
+`DemonRecord.teaserOpenedDay: Long?` (set by `ProgressRules.openTeaser`; marks replays);
 old saves load unchanged (unknown/absent keys are fine, ADR-0013).
 
 ## The laugh (optional)

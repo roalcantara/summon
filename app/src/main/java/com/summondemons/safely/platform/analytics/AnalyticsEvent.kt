@@ -85,10 +85,10 @@ sealed interface AnalyticsEvent {
         override fun params() = mapOf("demon" to demon, "target" to if (onDemon) "demon" else "balloon", "step" to step.toString())
     }
 
-    /** The third tap burst the bubble (once per demon per day). */
-    data class TeaserOpen(val demon: String) : AnalyticsEvent {
+    /** The third tap burst the bubble; [repeat] when this demon already burst today. */
+    data class TeaserOpen(val demon: String, val repeat: Boolean) : AnalyticsEvent {
         override val name = "teaser_open"
-        override fun params() = mapOf("demon" to demon)
+        override fun params() = mapOf("demon" to demon, "repeat" to repeat.toString())
     }
 }
 

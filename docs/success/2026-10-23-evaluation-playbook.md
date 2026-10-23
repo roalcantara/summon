@@ -37,7 +37,8 @@ Reports lag about 2 days; never read a day earlier than 2 days ago.
 - **Rituals per active player-day:** `ritual_start` count / active player-days, for users on day 3+.
 - **Teaser tap rate:** users with ≥ 1 `teaser_tap` / users with ≥ 1 `teaser_shown`, over the v1 window.
 - **Open rate:** users with ≥ 1 `teaser_open` (third tap) / users with ≥ 1 `teaser_tap`.
-- **Return openers:** users with `teaser_open` on ≥ 2 different days / all openers (the bubble comes back the next day).
+- **Replays:** `teaser_open` with `repeat = true` per opener (how often they play it again the same day).
+- **Return openers:** users with `teaser_open` on ≥ 2 different days / all openers.
 
 ## Targets
 

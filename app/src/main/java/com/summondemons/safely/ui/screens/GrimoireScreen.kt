@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -160,7 +161,7 @@ private val FloatAmplitude = 6.dp
 private val SceneBlur = 3.dp
 private val BannerDrop = 30.dp
 /** The reply floats this long after the burst (ADR-0036, amended). */
-private const val REPLY_MS = 10_000L
+private const val REPLY_MS = 7_000L
 private const val SQUASH_MS = 220
 private const val SQUASH_X = 0.05f
 private const val SQUASH_Y = 0.07f
@@ -172,6 +173,10 @@ private const val BURST_FLASH_MS = 700
 private const val BURST_DELAY_MS = 260L
 private const val BURST_POP_IN_MS = 120
 private const val BURST_FADE_MS = 400
+/** The arrows are centred on the art and the quote slot (72 dp + its 12 dp gaps): half of that below the art's centre. */
+private val BurstDrop = 48.dp
+/** The reply leaves slowly. */
+private const val BURST_FADE_OUT_MS = 1_200
 private const val BURST_FROM = 0.3f
 
 /** The Grimoire (ADR-0016): a stage over the demon card, a tarot card whose back is the dossier (ADR-0016 amended, spec §2). */
@@ -515,11 +520,13 @@ private fun Stage(
     val sounds = LocalGameSounds.current
     val scope = rememberCoroutineScope()
     var taps by remember(demon.id) { mutableIntStateOf(0) }
+    // The burst is on screen while [burstAlive]; [bursting] drives its fade in and out.
     var bursting by remember(demon.id) { mutableStateOf(false) }
+    var burstAlive by remember(demon.id) { mutableStateOf(false) }
     val squash = remember { Animatable(0f) }
     val flash = remember { Animatable(0f) }
     val tapTeaser: (Boolean) -> Unit = tap@{ onDemon ->
-        if (taps >= ProgressRules.TEASER_TAPS || bursting) return@tap
+        if (taps >= ProgressRules.TEASER_TAPS || burstAlive) return@tap
         val step = ++taps
         when (step) {
             1 -> Haptics.tick(context)
@@ -535,12 +542,15 @@ private fun Stage(
         } else {
             scope.launch {
                 if (!reduceMotion) delay(BURST_DELAY_MS)
-                onTeaserTap(onDemon, step) // persists the open: the bubble leaves until tomorrow
+                onTeaserTap(onDemon, step)
                 sounds?.playLaughIfPresent()
+                burstAlive = true
                 bursting = true
                 delay(REPLY_MS)
                 bursting = false
-                taps = 0
+                delay(BURST_FADE_OUT_MS.toLong())
+                burstAlive = false
+                taps = 0 // the invite comes back, ready for another three taps
             }
         }
     }
@@ -560,8 +570,14 @@ private fun Stage(
                     sigil = rememberSigil(demon.sigil),
                     modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(FLOOR_WIDTH).aspectRatio(FLOOR_ASPECT),
                 )
-                if (bursting) {
-                    RotatingSunburstBackground(accent.copy(alpha = SUNBURST_ALPHA), Modifier.matchParentSize().clipToBounds(), rotating = !reduceMotion)
+                // The rays come and go with the burst.
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = bursting,
+                    enter = fadeIn(tween(BURST_FADE_MS)),
+                    exit = fadeOut(tween(BURST_FADE_OUT_MS)),
+                    modifier = Modifier.matchParentSize(),
+                ) {
+                    RotatingSunburstBackground(accent.copy(alpha = SUNBURST_ALPHA), Modifier.fillMaxSize().clipToBounds(), rotating = !reduceMotion)
                 }
                 SharedDemonArt(
                     demonId = demon.id,
@@ -593,9 +609,9 @@ private fun Stage(
                         )
                     }
                 }
-                if (teaser && taps < ProgressRules.TEASER_TAPS || bursting) {
+                if (teaser || burstAlive) {
                     Box(Modifier.matchParentSize().graphicsLayer { translationY = floatY() }) {
-                        if (!bursting) {
+                        if (teaser && !burstAlive) {
                             PsstBubble(
                                 text = stringResource(R.string.psst_invite),
                                 taps = taps,
@@ -609,8 +625,9 @@ private fun Stage(
                         androidx.compose.animation.AnimatedVisibility(
                             visible = bursting,
                             enter = if (reduceMotion) fadeIn(tween(BURST_FADE_MS)) else fadeIn(tween(BURST_POP_IN_MS)) + scaleIn(spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium), initialScale = BURST_FROM),
-                            exit = fadeOut(tween(BURST_FADE_MS)),
-                            modifier = Modifier.align(Alignment.TopCenter),
+                            exit = fadeOut(tween(BURST_FADE_OUT_MS)),
+                            // On the stage arrows' centre line, below his face.
+                            modifier = Modifier.align(Alignment.Center).offset(y = BurstDrop),
                         ) {
                             PsstBurst(stringResource(R.string.psst_reply))
                         }

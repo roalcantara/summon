@@ -73,15 +73,14 @@ object ProgressRules {
         record.revealed && (record.revealPending.codex || record.revealPending.battle)
 
 
-    /** The "Psst" bubble shows (ADR-0036): bound since an earlier day, lore read, not yet burst today. */
+    /** The "Psst" bubble shows (ADR-0036): bound since an earlier day, lore read. */
     fun teaserEligible(record: DemonRecord, today: Long): Boolean =
-        record.bound && (record.boundDay ?: Long.MIN_VALUE) < today && !dossierUnread(record) &&
-            record.teaserOpenedDay != today
+        record.bound && (record.boundDay ?: Long.MIN_VALUE) < today && !dossierUnread(record)
 
     /** Taps that burst the "Psst" bubble (ADR-0036, amended). */
     const val TEASER_TAPS = 3
 
-    /** The third tap burst the bubble: none for this demon until tomorrow. */
+    /** The third tap burst the bubble: the day is kept, so later bursts that day count as replays. */
     fun openTeaser(p: Progress, id: String, day: Long): Progress =
         p.copy(demons = p.demons + (id to p.record(id).copy(teaserOpenedDay = day)))
     /**

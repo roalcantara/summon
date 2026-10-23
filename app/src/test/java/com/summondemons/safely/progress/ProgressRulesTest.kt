@@ -224,11 +224,10 @@ class ProgressRulesTest {
     }
 
     @Test
-    fun anOpenedTeaserComesBackTheNextDay() {
+    fun anOpenedTeaserRecordsTheDayAndStaysOpenToReplays() {
         val read = DemonRecord(bound = true, revealed = true, boundDay = 5)
         val p = openTeaser(Progress(demons = mapOf("asmodeus" to read)), "asmodeus", day = 11)
         assertEquals(11L, p.record("asmodeus").teaserOpenedDay)
-        assertFalse(teaserEligible(p.record("asmodeus"), today = 11))
-        assertTrue(teaserEligible(p.record("asmodeus"), today = 12))
+        assertTrue(teaserEligible(p.record("asmodeus"), today = 11))
     }
 }

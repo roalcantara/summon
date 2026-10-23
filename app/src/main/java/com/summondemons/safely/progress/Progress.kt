@@ -33,7 +33,7 @@ data class DemonRecord(
     val escapeBannerPending: Boolean = false,
     /** Local epoch day of the last summon; null in saves from before 2026-10-23 (ADR-0036). */
     val boundDay: Long? = null,
-    /** Local epoch day the "Psst" bubble last burst; it comes back the next day (ADR-0036, amended). */
+    /** Local epoch day the "Psst" bubble last burst; later bursts that day are replays (ADR-0036, amended). */
     val teaserOpenedDay: Long? = null,
 )
 
