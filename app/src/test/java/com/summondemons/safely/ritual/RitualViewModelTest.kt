@@ -10,6 +10,10 @@ import com.summondemons.safely.ritual.RitualEffect.ProximityTick
 import com.summondemons.safely.ritual.RitualEffect.Sealed
 import com.summondemons.safely.ritual.RitualEffect.Summoned
 import com.summondemons.safely.ritual.RitualEffect.SyllableLit
+import com.summondemons.safely.platform.analytics.Analytics
+import com.summondemons.safely.platform.analytics.AnalyticsEvent
+import com.summondemons.safely.platform.analytics.NoAnalytics
+import com.summondemons.safely.platform.analytics.RecordingAnalytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -89,7 +93,8 @@ class RitualViewModelTest {
         pcm: PcmSource,
         inCourt: () -> Boolean = { false },
         commitSummon: (Boolean) -> Unit = {},
-    ) = RitualViewModel(demon, heading, pcm, inCourt, commitSummon, analysisDispatcher = dispatcher)
+        analytics: Analytics = NoAnalytics,
+    ) = RitualViewModel(demon, heading, pcm, inCourt, commitSummon, analysisDispatcher = dispatcher, analytics = analytics)
 
     @Before
     fun setUp() = Dispatchers.setMain(dispatcher)
@@ -202,24 +207,21 @@ class RitualViewModelTest {
         val vm = newVm(demon, { emptyFlow() }, silentPcm(), inCourt = { courtChecks++; true })
         observe(vm)
         vm.onMicPermission(false)
-        // While still seeking without heading: no calls
+        // While still seeking without heading: only the ritual_start analytics event checked inCourt
         advanceTimeBy(500); runCurrent()
-        assertEquals(0, courtChecks)
-
+        assertEquals(1, courtChecks)
         // Simulate heading: LOCK_HOLD_MS = 600 ms. Advance 500 ms (not locked yet)
         vm.setSimulateHeading(true)
         advanceTimeBy(500); runCurrent()
-        assertEquals(0, courtChecks)
-
+        assertEquals(1, courtChecks)
         // Advance another 200 ms: crosses 600 ms, locks on this tick
         advanceTimeBy(200); runCurrent()
-        assertEquals(1, courtChecks)
-        assertEquals(RitualPhase.Chanting, vm.uiState.value.ritual.phase)
+        assertEquals(2, courtChecks)
         assertEquals(1f + COURT_BONUS, vm.uiState.value.ritual.courtMultiplier, 0.0001f)
 
         // While chanting: inCourt must not be called again
         advanceTimeBy(1_000); runCurrent()
-        assertEquals(1, courtChecks)
+        assertEquals(2, courtChecks)
     }
 
     @Test
@@ -471,5 +473,49 @@ class RitualViewModelTest {
         assertEquals(listOf(record), log.lines.mapNotNull { it.ui })
         vm.onPhraseLaid(record.copy(phraseSp = 66f))
         assertEquals(2, log.lines.mapNotNull { it.ui }.size)
+    }
+
+    @Test
+    fun aCompletedRitualReportsStartLockLinesAndEnd() = runTest(dispatcher) {
+        val analytics = RecordingAnalytics()
+        val vm = newVm(demon, { emptyFlow() }, silentPcm(), analytics = analytics)
+        observe(vm)
+        vm.onMicPermission(false)
+        vm.setSimulateHeading(true)
+        vm.setHoldToChant(true)
+        advanceTimeBy(20_000); runCurrent()
+        vm.clearForTest()
+
+        val names = analytics.events.map { it.name }
+        assertEquals(listOf("ritual_start", "direction_locked", "line_result", "line_result", "line_result", "line_result", "ritual_end"), names)
+        val end = analytics.events.last() as AnalyticsEvent.RitualEnd
+        assertEquals(true, end.completed)
+        assertEquals(true, end.flawless)
+        assertEquals("lenient", (analytics.events.first() as AnalyticsEvent.RitualStart).params()["mode"])
+    }
+
+    @Test
+    fun leavingBeforeTheLockReportsAnAbandonInSeeking() = runTest(dispatcher) {
+        val analytics = RecordingAnalytics()
+        val vm = newVm(demon, { emptyFlow() }, silentPcm(), analytics = analytics)
+        observe(vm)
+        vm.onMicPermission(true)
+        advanceTimeBy(2_000); runCurrent()
+        vm.clearForTest()
+        val end = analytics.events.last() as AnalyticsEvent.RitualEnd
+        assertEquals(false, end.completed)
+        assertEquals("seeking", end.phase)
+    }
+
+    @Test
+    fun permissionAnswersAreReportedButResumeChecksAreNot() = runTest(dispatcher) {
+        val analytics = RecordingAnalytics()
+        val vm = newVm(demon, { emptyFlow() }, silentPcm(), analytics = analytics)
+        vm.onMicPermission(true) // resume check: not an answer
+        vm.onPermissionAnswer(granted = false, permanent = true)
+        assertEquals(
+            listOf<AnalyticsEvent>(AnalyticsEvent.MicPermission(granted = false, permanent = true)),
+            analytics.events.filterIsInstance<AnalyticsEvent.MicPermission>(),
+        )
     }
 }

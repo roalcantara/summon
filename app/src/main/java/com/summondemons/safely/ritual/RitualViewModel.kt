@@ -1,5 +1,8 @@
 package com.summondemons.safely.ritual
 
+import com.summondemons.safely.platform.analytics.Analytics
+import com.summondemons.safely.platform.analytics.AnalyticsEvent
+import com.summondemons.safely.platform.analytics.NoAnalytics
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -90,6 +93,7 @@ class RitualViewModel(
     private val transcriber: Transcriber? = null,
     /** The device's check mode and its reason, read once when the ritual opens (ADR-0027). */
     private val checkMode: () -> Pair<CheckMode, String> = { CheckMode.Lenient to "" },
+    private val analytics: Analytics = NoAnalytics,
 ) : ViewModel() {
 
     private val mode = checkMode()
@@ -151,9 +155,16 @@ class RitualViewModel(
     fun dismissIntro() {
         note("intro:closed")
         state.update { it.copy(introVisible = false) }
+        introClosedTick = ticks
     }
 
     /** "?" on the chant screen: show the intro card again. */
+
+    /** An answer from the permission dialog (not the resume re-check): reported, then applied. */
+    fun onPermissionAnswer(granted: Boolean, permanent: Boolean) {
+        analytics.track(AnalyticsEvent.MicPermission(granted, permanent))
+        onMicPermission(granted)
+    }
     fun openIntro() = state.update { it.copy(introVisible = true) }
 
     private var lastUi: UiRecord? = null
@@ -178,9 +189,33 @@ class RitualViewModel(
     }
 
     override fun onCleared() {
+        reportEnd()
         clipRecorder.stop()
         sessionLog.stop()
     }
+
+    /** Tests: run the end-of-ritual report as `onCleared` would. */
+    internal fun clearForTest() = reportEnd()
+
+    private fun reportEnd() {
+        if (ended) return
+        ended = true
+        val s = state.value
+        val phase = s.ritual.phase
+        val completed = phase == RitualPhase.Climax || phase == RitualPhase.Done
+        val where = when {
+            completed -> "done"
+            s.introVisible -> "intro"
+            s.micGranted == false || s.micUnavailable -> "error_mic"
+            s.headingUnavailable && !s.simulateHeading -> "error_heading"
+            else -> phase.name.lowercase()
+        }
+        analytics.track(AnalyticsEvent.RitualEnd(completed, where, flawless = s.ritual.flawless, durationMs = ticks * RitualConfig.FRAME_MS))
+    }
+
+    /** Tick at which the intro card closed (or 0 when it never showed): the lock's clock starts there. */
+    private var introClosedTick = 0L
+    private var ended = false
 
     /** Ticks run so far; the session log's clock (ADR-0025). */
     private var ticks = 0L
@@ -188,6 +223,7 @@ class RitualViewModel(
     private fun note(text: String) = sessionLog.write(SessionTick(t = ticks * RitualConfig.FRAME_MS, note = text))
 
     init {
+        analytics.track(AnalyticsEvent.RitualStart(demon.id, whisper = mode.first == CheckMode.Whisper, inCourt = inCourt()))
         sessionLog.start(
             SessionHeader(demon.id, demon.ritualHeading, demon.chantPhrases, mode = mode.first.name, startedMs = System.currentTimeMillis()),
         )
@@ -246,7 +282,23 @@ class RitualViewModel(
                 feedback = feedback,
             )
         }
+        reportEffects(step.effects)
         step.effects.forEach { _effects.tryEmit(it) }
+    }
+
+    private fun reportEffects(effects: List<RitualEffect>) {
+        val checked = effects.filterIsInstance<RitualEffect.LineChecked>()
+        effects.forEach { e ->
+            when (e) {
+                RitualEffect.Locked -> analytics.track(AnalyticsEvent.DirectionLocked((ticks - introClosedTick) * RitualConfig.FRAME_MS))
+                is RitualEffect.Sealed -> {
+                    val score = checked.firstOrNull { it.phrase == e.phrase && it.found }?.let { LineFeedback.score(it.distance) }
+                    analytics.track(AnalyticsEvent.LineResult(e.phrase, sealed = true, score = score))
+                }
+                is RitualEffect.Cracked -> analytics.track(AnalyticsEvent.LineResult(e.phrase, sealed = false, score = null))
+                else -> Unit
+            }
+        }
     }
 
     /**
@@ -313,6 +365,7 @@ class RitualViewModel(
             sessionLog: SessionLog = SessionLog.None,
             transcriber: Transcriber? = null,
             checkMode: () -> Pair<CheckMode, String> = { CheckMode.Lenient to "" },
+            analytics: Analytics = NoAnalytics,
         ): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 RitualViewModel(
@@ -326,6 +379,7 @@ class RitualViewModel(
                     sessionLog = sessionLog,
                     transcriber = transcriber,
                     checkMode = checkMode,
+                    analytics = analytics,
                 )
             }
         }
