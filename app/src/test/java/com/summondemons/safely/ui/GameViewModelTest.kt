@@ -267,19 +267,26 @@ class GameViewModelTest {
     }
 
     @Test
-    fun theTeaserIsReportedOncePerDayAndRepeatsAreMarked() = runTest(dispatcher) {
+    fun theTeaserIsReportedOncePerDayAndTheThirdTapOpensItUntilTomorrow() = runTest(dispatcher) {
         val analytics = RecordingAnalytics()
-        val vm = vm(InMemoryProgressStore(boundOn(day0 - 2)), analytics = analytics)
+        val store = InMemoryProgressStore(boundOn(day0 - 2))
+        val vm = vm(store, analytics = analytics)
         observe(vm); runCurrent()
         vm.teaserShown("asmodeus"); vm.teaserShown("asmodeus")
-        vm.teaserTapped("asmodeus", onDemon = false); vm.teaserTapped("asmodeus", onDemon = true)
+        vm.teaserTapped("asmodeus", onDemon = false, step = 1)
+        vm.teaserTapped("asmodeus", onDemon = true, step = 2)
+        vm.teaserTapped("asmodeus", onDemon = true, step = 3)
+        runCurrent()
         assertEquals(
             listOf(
                 AnalyticsEvent.TeaserShown("asmodeus", 2),
-                AnalyticsEvent.TeaserTap("asmodeus", onDemon = false, repeat = false),
-                AnalyticsEvent.TeaserTap("asmodeus", onDemon = true, repeat = true),
+                AnalyticsEvent.TeaserTap("asmodeus", onDemon = false, step = 1),
+                AnalyticsEvent.TeaserTap("asmodeus", onDemon = true, step = 2),
+                AnalyticsEvent.TeaserTap("asmodeus", onDemon = true, step = 3),
+                AnalyticsEvent.TeaserOpen("asmodeus"),
             ),
-            analytics.events.filter { it is AnalyticsEvent.TeaserShown || it is AnalyticsEvent.TeaserTap },
+            analytics.events.filter { it is AnalyticsEvent.TeaserShown || it is AnalyticsEvent.TeaserTap || it is AnalyticsEvent.TeaserOpen },
         )
+        assertEquals(day0, store.state.value.record("asmodeus").teaserOpenedDay)
     }
 }

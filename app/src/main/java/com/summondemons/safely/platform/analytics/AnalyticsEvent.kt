@@ -79,9 +79,16 @@ sealed interface AnalyticsEvent {
         override fun params() = mapOf("demon" to demon, "days_since_summon" to Buckets.daysSinceInstall(daysSinceSummon))
     }
 
-    data class TeaserTap(val demon: String, val onDemon: Boolean, val repeat: Boolean) : AnalyticsEvent {
+    /** [step] is the tap's place in the three-tap build-up (1–3). */
+    data class TeaserTap(val demon: String, val onDemon: Boolean, val step: Int) : AnalyticsEvent {
         override val name = "teaser_tap"
-        override fun params() = mapOf("demon" to demon, "target" to if (onDemon) "demon" else "balloon", "repeat" to repeat.toString())
+        override fun params() = mapOf("demon" to demon, "target" to if (onDemon) "demon" else "balloon", "step" to step.toString())
+    }
+
+    /** The third tap burst the bubble (once per demon per day). */
+    data class TeaserOpen(val demon: String) : AnalyticsEvent {
+        override val name = "teaser_open"
+        override fun params() = mapOf("demon" to demon)
     }
 }
 

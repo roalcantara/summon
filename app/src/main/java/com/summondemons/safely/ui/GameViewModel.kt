@@ -166,9 +166,8 @@ class GameViewModel(
 
     fun dismissEscapeBanners() = update(ProgressRules::dismissEscapeBanners)
 
-    // "Psst" teaser (ADR-0036): shown once per demon per day; taps marked as repeats within the day.
+    // "Psst" teaser (ADR-0036): shown once per demon per day; the third tap bursts it until tomorrow.
     private val teaserShownOn = mutableSetOf<String>()
-    private val teaserTappedOn = mutableSetOf<String>()
 
     fun teaserShown(id: String) {
         val day = today()
@@ -177,9 +176,12 @@ class GameViewModel(
         analytics.track(AnalyticsEvent.TeaserShown(id, since))
     }
 
-    fun teaserTapped(id: String, onDemon: Boolean) {
-        val repeat = !teaserTappedOn.add("$id@${today()}")
-        analytics.track(AnalyticsEvent.TeaserTap(id, onDemon, repeat))
+    fun teaserTapped(id: String, onDemon: Boolean, step: Int) {
+        analytics.track(AnalyticsEvent.TeaserTap(id, onDemon, step))
+        if (step < ProgressRules.TEASER_TAPS) return
+        analytics.track(AnalyticsEvent.TeaserOpen(id))
+        val day = today()
+        update { ProgressRules.openTeaser(it, id, day) }
     }
 
     // --- Debug sheet (§7) ---

@@ -13,6 +13,7 @@ import com.summondemons.safely.progress.ProgressRules.visit
 import com.summondemons.safely.progress.ProgressRules.dossierUnread
 import com.summondemons.safely.progress.ProgressRules.neverSummoned
 import com.summondemons.safely.progress.ProgressRules.newlyEscaped
+import com.summondemons.safely.progress.ProgressRules.openTeaser
 import com.summondemons.safely.progress.ProgressRules.teaserEligible
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -220,5 +221,14 @@ class ProgressRulesTest {
         assertTrue(teaserEligible(p.record("asmodeus"), today = 11))
         assertFalse(teaserEligible(DemonRecord(), today = 11)) // unbound
         assertTrue(teaserEligible(DemonRecord(bound = true, revealed = true), today = 11)) // old save, no boundDay
+    }
+
+    @Test
+    fun anOpenedTeaserComesBackTheNextDay() {
+        val read = DemonRecord(bound = true, revealed = true, boundDay = 5)
+        val p = openTeaser(Progress(demons = mapOf("asmodeus" to read)), "asmodeus", day = 11)
+        assertEquals(11L, p.record("asmodeus").teaserOpenedDay)
+        assertFalse(teaserEligible(p.record("asmodeus"), today = 11))
+        assertTrue(teaserEligible(p.record("asmodeus"), today = 12))
     }
 }

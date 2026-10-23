@@ -6,13 +6,14 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -30,6 +31,8 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,12 +55,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -66,16 +72,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -84,6 +90,7 @@ import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
 import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.platform.GameSounds
+import com.summondemons.safely.platform.Haptics
 import com.summondemons.safely.platform.LocalGameSounds
 import com.summondemons.safely.progress.Progress
 import com.summondemons.safely.progress.ProgressRules
@@ -91,20 +98,20 @@ import com.summondemons.safely.progress.Reveal
 import com.summondemons.safely.ui.GameUiState
 import com.summondemons.safely.ui.components.BadgeKey
 import com.summondemons.safely.ui.components.BadgeRow
-import com.summondemons.safely.ui.components.MenuButton
-import com.summondemons.safely.platform.Haptics
-import com.summondemons.safely.ui.components.PsstBalloon
-import com.summondemons.safely.ui.components.TitlePlaque
 import com.summondemons.safely.ui.components.CUTOUT_ASPECT
-import com.summondemons.safely.ui.components.DemonCutout
 import com.summondemons.safely.ui.components.CardSide
 import com.summondemons.safely.ui.components.DemonCard
+import com.summondemons.safely.ui.components.DemonCutout
 import com.summondemons.safely.ui.components.FloorCircle
+import com.summondemons.safely.ui.components.MenuButton
+import com.summondemons.safely.ui.components.PsstBubble
+import com.summondemons.safely.ui.components.PsstBurst
 import com.summondemons.safely.ui.components.QuoteSlot
 import com.summondemons.safely.ui.components.QuoteSlotState
 import com.summondemons.safely.ui.components.RibbonBanner
 import com.summondemons.safely.ui.components.RotatingSunburstBackground
 import com.summondemons.safely.ui.components.StageBackground
+import com.summondemons.safely.ui.components.TitlePlaque
 import com.summondemons.safely.ui.components.focusRing
 import com.summondemons.safely.ui.fx.Jitter
 import com.summondemons.safely.ui.fx.LocalReduceMotion
@@ -118,11 +125,11 @@ import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.stage
 import com.summondemons.safely.ui.theme.textRoles
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 import kotlin.math.PI
 import kotlin.math.sin
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /** Share of the area below the avatar rail taken by the card; raise for more text, lower for bigger art. */
 private const val CARD_HEIGHT_FRACTION = 0.36f
@@ -152,7 +159,20 @@ private val RailHeight = 72.dp
 private val FloatAmplitude = 6.dp
 private val SceneBlur = 3.dp
 private val BannerDrop = 30.dp
-private const val REPLY_MS = 3_000L
+/** The reply floats this long after the burst (ADR-0036, amended). */
+private const val REPLY_MS = 10_000L
+private const val SQUASH_MS = 220
+private const val SQUASH_X = 0.05f
+private const val SQUASH_Y = 0.07f
+/** Peak flash per tap: faint, stronger, a summon-like burst. */
+private val TAP_FLASH = floatArrayOf(0.22f, 0.4f, 0.95f)
+private const val TAP_FLASH_MS = 260
+private const val BURST_FLASH_MS = 700
+/** The third tap shakes first, then bursts. */
+private const val BURST_DELAY_MS = 260L
+private const val BURST_POP_IN_MS = 120
+private const val BURST_FADE_MS = 400
+private const val BURST_FROM = 0.3f
 
 /** The Grimoire (ADR-0016): a stage over the demon card, a tarot card whose back is the dossier (ADR-0016 amended, spec §2). */
 @Composable
@@ -167,7 +187,7 @@ fun GrimoireScreen(
     onSecretShown: () -> Unit,
     onMenu: () -> Unit,
     onTeaserShown: (String) -> Unit = {},
-    onTeaserTap: (String, Boolean) -> Unit = { _, _ -> },
+    onTeaserTap: (String, Boolean, Int) -> Unit = { _, _, _ -> },
     modifier: Modifier = Modifier,
     demons: List<Demon> = DemonCatalog.all,
 ) {
@@ -352,7 +372,7 @@ fun GrimoireScreen(
                                 restless = sulks,
                                 party = pageParty,
                                 teaser = teaser,
-                                onTeaserTap = { onDemon -> onTeaserTap(d.id, onDemon) },
+                                onTeaserTap = { onDemon, step -> onTeaserTap(d.id, onDemon, step) },
                                 canSummon = state.canSummonToday,
                                 quote = stringResource(if (sulks) d.restlessQuote else d.quote),
                                 hours = state.hoursToNextSummon,
@@ -464,7 +484,7 @@ private fun Stage(
     party: Boolean,
     canSummon: Boolean,
     teaser: Boolean,
-    onTeaserTap: (onDemon: Boolean) -> Unit,
+    onTeaserTap: (onDemon: Boolean, step: Int) -> Unit,
     quote: String,
     hours: Int,
     shake: Int,
@@ -490,22 +510,41 @@ private fun Stage(
         QuoteSlotState.Ready -> stringResource(R.string.cd_summon, demon.name)
         QuoteSlotState.Cooling -> pluralStringResource(R.plurals.cd_cooling, hours, hours)
     }
-    var replyTick by remember(demon.id) { mutableIntStateOf(0) }
+    // "Psst" (ADR-0036, amended): three taps, each stronger; the third bursts into the reply.
     val context = LocalContext.current
     val sounds = LocalGameSounds.current
-    val tapTeaser: (Boolean) -> Unit = { onDemon ->
-        onTeaserTap(onDemon)
-        Haptics.chime(context)
-        sounds?.playLaughIfPresent()
-        replyTick++
+    val scope = rememberCoroutineScope()
+    var taps by remember(demon.id) { mutableIntStateOf(0) }
+    var bursting by remember(demon.id) { mutableStateOf(false) }
+    val squash = remember { Animatable(0f) }
+    val flash = remember { Animatable(0f) }
+    val tapTeaser: (Boolean) -> Unit = tap@{ onDemon ->
+        if (taps >= ProgressRules.TEASER_TAPS || bursting) return@tap
+        val step = ++taps
+        when (step) {
+            1 -> Haptics.tick(context)
+            2 -> Haptics.clunk(context)
+            else -> Haptics.success(context)
+        }
+        if (!reduceMotion) {
+            scope.launch { squash.snapTo(1f); squash.animateTo(0f, tween(SQUASH_MS)) }
+            scope.launch { flash.snapTo(TAP_FLASH[step - 1]); flash.animateTo(0f, tween(if (step < 3) TAP_FLASH_MS else BURST_FLASH_MS)) }
+        }
+        if (step < ProgressRules.TEASER_TAPS) {
+            onTeaserTap(onDemon, step)
+        } else {
+            scope.launch {
+                if (!reduceMotion) delay(BURST_DELAY_MS)
+                onTeaserTap(onDemon, step) // persists the open: the bubble leaves until tomorrow
+                sounds?.playLaughIfPresent()
+                bursting = true
+                delay(REPLY_MS)
+                bursting = false
+                taps = 0
+            }
+        }
     }
-    var replying by remember(demon.id) { mutableStateOf(false) }
-    LaunchedEffect(replyTick) {
-        if (replyTick == 0) return@LaunchedEffect
-        replying = true
-        kotlinx.coroutines.delay(REPLY_MS)
-        replying = false
-    }
+    val floatY: () -> Float = { if (reduceMotion) 0f else sin(time / 1_000f * 2f * PI.toFloat() / FLOAT_PERIOD_S) * floatPx }
     Column(
         modifier
             .padding(horizontal = spacing.xl)
@@ -521,12 +560,16 @@ private fun Stage(
                     sigil = rememberSigil(demon.sigil),
                     modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(FLOOR_WIDTH).aspectRatio(FLOOR_ASPECT),
                 )
+                if (bursting) {
+                    RotatingSunburstBackground(accent.copy(alpha = SUNBURST_ALPHA), Modifier.matchParentSize().clipToBounds(), rotating = !reduceMotion)
+                }
                 SharedDemonArt(
                     demonId = demon.id,
                     modifier = Modifier.fillMaxSize().graphicsLayer {
-                        translationY = if (reduceMotion) 0f else sin(time / 1_000f * 2f * PI.toFloat() / FLOAT_PERIOD_S) * floatPx
-                        scaleX = pop.value
-                        scaleY = pop.value
+                        translationY = floatY()
+                        transformOrigin = TransformOrigin(0.5f, 1f)
+                        scaleX = pop.value * (1f + SQUASH_X * squash.value)
+                        scaleY = pop.value * (1f - SQUASH_Y * squash.value)
                     },
                 ) {
                     Jitter(enabled = restless && bound, modifier = Modifier.fillMaxSize()) {
@@ -550,12 +593,35 @@ private fun Stage(
                         )
                     }
                 }
-                if (teaser) {
-                    PsstBalloon(
-                        text = stringResource(if (replying) R.string.psst_reply else R.string.psst_invite),
-                        replying = replying,
-                        onTap = { tapTeaser(false) },
-                        modifier = Modifier.align(Alignment.TopEnd).padding(top = spacing.sm),
+                if (teaser && taps < ProgressRules.TEASER_TAPS || bursting) {
+                    Box(Modifier.matchParentSize().graphicsLayer { translationY = floatY() }) {
+                        if (!bursting) {
+                            PsstBubble(
+                                text = stringResource(R.string.psst_invite),
+                                taps = taps,
+                                shake = taps,
+                                accent = accent,
+                                onTap = { tapTeaser(false) },
+                                modifier = Modifier.align(Alignment.TopEnd).padding(top = spacing.sm),
+                            )
+                        }
+                        // Qualified: the Column's scoped overload would shadow it here.
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = bursting,
+                            enter = if (reduceMotion) fadeIn(tween(BURST_FADE_MS)) else fadeIn(tween(BURST_POP_IN_MS)) + scaleIn(spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium), initialScale = BURST_FROM),
+                            exit = fadeOut(tween(BURST_FADE_MS)),
+                            modifier = Modifier.align(Alignment.TopCenter),
+                        ) {
+                            PsstBurst(stringResource(R.string.psst_reply))
+                        }
+                    }
+                }
+                if (flash.value > 0f) {
+                    val core = MaterialTheme.demonColors.inkHighlight
+                    Box(
+                        Modifier.matchParentSize().drawBehind {
+                            drawRect(Brush.radialGradient(listOf(core, accent, Color.Transparent), radius = size.maxDimension * 0.7f), alpha = flash.value)
+                        },
                     )
                 }
             }

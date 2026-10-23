@@ -37,10 +37,6 @@ data class DemonColors(
     val stageHome: StageGradient,
     val stageSol: StageGradient,
     val stageVenus: StageGradient,
-    /** The Psst balloon (ADR-0036). */
-    val psstViolet: Color,
-    val psstVioletDeep: Color,
-    val psstHalo: Color,
 ) {
     /** The only place an accent is resolved to a color; UI never branches on demon id. */
     fun accent(accent: DemonAccent): Color = when (accent) {
@@ -75,9 +71,6 @@ internal val DefaultDemonColors = DemonColors(
     stageHome = StageGradient(Palette.stageHomeGlow, Palette.stageHomeMid, Palette.surfaceContainerLowest),
     stageSol = StageGradient(Palette.stageSolGlow, Palette.stageSolMid, Palette.background),
     stageVenus = StageGradient(Palette.stageVenusGlow, Palette.stageVenusMid, Palette.background),
-    psstViolet = Palette.psstViolet,
-    psstVioletDeep = Palette.psstVioletDeep,
-    psstHalo = Palette.psstHalo,
 )
 
 val LocalDemonColors = staticCompositionLocalOf { DefaultDemonColors }

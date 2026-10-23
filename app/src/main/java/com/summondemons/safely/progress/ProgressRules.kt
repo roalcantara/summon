@@ -73,9 +73,17 @@ object ProgressRules {
         record.revealed && (record.revealPending.codex || record.revealPending.battle)
 
 
-    /** The "Psst" balloon shows (ADR-0036): bound since an earlier day, lore read. */
+    /** The "Psst" bubble shows (ADR-0036): bound since an earlier day, lore read, not yet burst today. */
     fun teaserEligible(record: DemonRecord, today: Long): Boolean =
-        record.bound && (record.boundDay ?: Long.MIN_VALUE) < today && !dossierUnread(record)
+        record.bound && (record.boundDay ?: Long.MIN_VALUE) < today && !dossierUnread(record) &&
+            record.teaserOpenedDay != today
+
+    /** Taps that burst the "Psst" bubble (ADR-0036, amended). */
+    const val TEASER_TAPS = 3
+
+    /** The third tap burst the bubble: none for this demon until tomorrow. */
+    fun openTeaser(p: Progress, id: String, day: Long): Progress =
+        p.copy(demons = p.demons + (id to p.record(id).copy(teaserOpenedDay = day)))
     /**
      * No summon was ever committed: the intro's Summon glows (ADR-0033). A revealed demon also
      * counts as summoned, since a reset of the daily limit clears [Progress.lastSummonDay].

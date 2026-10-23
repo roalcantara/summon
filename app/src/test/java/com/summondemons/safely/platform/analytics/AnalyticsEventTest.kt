@@ -42,8 +42,12 @@ class AnalyticsEventTest {
             AnalyticsEvent.TeaserShown("asmodeus", 4).let { it.name to it.params() },
         )
         assertEquals(
-            "teaser_tap" to mapOf("demon" to "astaroth", "target" to "demon", "repeat" to "true"),
-            AnalyticsEvent.TeaserTap("astaroth", onDemon = true, repeat = true).let { it.name to it.params() },
+            "teaser_tap" to mapOf("demon" to "astaroth", "target" to "demon", "step" to "2"),
+            AnalyticsEvent.TeaserTap("astaroth", onDemon = true, step = 2).let { it.name to it.params() },
+        )
+        assertEquals(
+            "teaser_open" to mapOf("demon" to "asmodeus"),
+            AnalyticsEvent.TeaserOpen("asmodeus").let { it.name to it.params() },
         )
     }
 }

@@ -36,7 +36,8 @@ Reports lag about 2 days; never read a day earlier than 2 days ago.
 - **Lenient share:** `device_check(mode=lenient)` / all `device_check`.
 - **Rituals per active player-day:** `ritual_start` count / active player-days, for users on day 3+.
 - **Teaser tap rate:** users with ≥ 1 `teaser_tap` / users with ≥ 1 `teaser_shown`, over the v1 window.
-- **Return tappers:** users tapping on ≥ 2 different days (`repeat = true` or `teaser_tap` across separate days) / all tappers.
+- **Open rate:** users with ≥ 1 `teaser_open` (third tap) / users with ≥ 1 `teaser_tap`.
+- **Return openers:** users with `teaser_open` on ≥ 2 different days / all openers (the bubble comes back the next day).
 
 ## Targets
 
@@ -118,7 +119,7 @@ as **low confidence** and decide nothing on them except alarms.
 - [ ] TelemetryDeck dashboard has these insights saved: active users (daily), retention by install
       week (D1/D7/D30), ritual funnel (`ritual_start` → `direction_locked` → `line_result` line 1
       sealed → `ritual_end` completed), crack rate, lenient share, `ritual_end` by phase.
-- [ ] TelemetryDeck dashboard has a teaser insight (shown → tap funnel) saved.
+- [ ] TelemetryDeck dashboard has a teaser insight (shown → tap → open funnel) saved.
 - [ ] Play Console access for the evaluator.
 
 ### B. Each report

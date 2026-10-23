@@ -43,6 +43,8 @@
     <string name="quote_next_summon">Next summon in %1$d h</string>
     <string name="psst_invite">Psst… come closer.</string>
     <string name="psst_reply">Heh heh heh… Come back soon… if you dare, mortal.</string>
+    <!-- The "Psst" bubble's state for screen readers: taps so far of 3 (ADR-0036). -->
+    <string name="psst_progress" translatable="false">%1$d/3</string>
     <string name="cd_summon">Summon %1$s</string>
     <plurals name="cd_cooling">
         <item quantity="one">Circle cooling. Next summon in %1$d hour.</item>

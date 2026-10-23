@@ -18,3 +18,16 @@ playbook's rule decides v1.1's lever.
 - Tapping a bound demon now does something (PRODUCT.md updated).
 - `DemonRecord.boundDay` is stored from now on; old saves load (null counts as earlier).
 - When v1.1 ships real content, the balloon becomes its entry point.
+
+## Amendment 2026-10-23: three taps that burst
+The single-tap balloon read as a chat bubble pasted onto the art, and one tap gave no build-up.
+Stitch variations did not help; a playable prototype ("Psst, three taps") settled it:
+- A parchment comic bubble with accent action ticks and three seal pips floats with the demon.
+- Three taps (bubble or demon), each with a stronger shake, flash and haptic; the third bursts like
+  a summon (flash, sunburst, spiky reply bubble). The reply floats 10 s.
+- After the burst the demon has no bubble until tomorrow (`DemonRecord.teaserOpenedDay`), so "come
+  back soon" is literal and returning is measurable.
+- Events: `teaser_tap` carries `step` (1–3) instead of `repeat`; `teaser_open` marks the burst. The
+  playbook adds the open rate and return openers.
+- Risk: a chest-like build-up promises loot and pays with a joke; watch whether openers return the
+  next day.

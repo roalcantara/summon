@@ -171,7 +171,8 @@ One cue across the game: a soft **breathing glow** (accent colour, 1.6 s period;
 |---|---|---|
 | `PrimaryActionButton` | Main CTA (**Awesome!**, **Stay**, Allow microphone) | `text`, `onClick`, `enabled`, `tone`; gold container, bold label, soft glow |
 | `RibbonBanner` | "New Demon Received!" on the Grimoire celebration; "Seal broken!" on Home | `text`; primary container color |
-| `PsstBalloon` | Speech balloon by a bound demon's head (ADR-0036): invites tap or shows reply | `text`, `replying`, `onTap`, `modifier`; violet fill (`psstViolet`, `psstVioletDeep`), gold rim (`primary`), attention glow with faint green halo (`psstHalo`), tail at bottom-start; `name` typography, capped font scale, auto-size down, max 3 lines; `Role.Button`, polite live region |
+| `PsstBubble` | Comic speech bubble by a bound demon's head (ADR-0036, amended): the invite and three seal pips | `text`, `taps`, `shake`, `onTap`, `modifier`; `parchmentLight` fill, `parchmentDark` highlight, `surfaceContainerLowest` outline, `parchmentInk` text, accent action ticks breathing (fast after tap 2; steady with reduced motion), pips lit in the accent; `name` typography, capped font scale, auto-size down, max 3 lines; `Role.Button` with state "n/3" |
+| `PsstBurst` | Spiky burst bubble with the reply after the third tap (ADR-0036, amended) | `text`, `modifier`; same fill, outline and ink as `PsstBubble`; springs in (fades in with reduced motion), polite live region |
 | `RotatingSunburstBackground` | Rays behind the demon during the Grimoire celebration | `color`, `rotating` |
 | `InkedSigil` | The demon's vector sigil | `sigil` (raw), `inkProgress` 0–1, `ringProgress` 0–1, `rimText`, `accent`, `micLevel` (glow), `ghostAlpha`, `flash` (group, color, duration: seal flare / crack drain) |
 | `CueChip` | One-line cue | `text`, `tone` (neutral / safe / error), `shake` |
@@ -277,8 +278,4 @@ breach screen).
 
 ## Gaps
 
-
-### Optional Stitch art
-
-- **Psst call to action:** under review; Stitch prompt for the balloon pair in `docs/superpowers/specs/2026-10-23-psst-cta-stitch-prompts.md`.
 All gaps closed. Stage backgrounds (`stage_home`, `stage_sol`, `stage_venus`), Home grimoire (`ic_home_grimoire`), Asmodeus scene art (`demon_asmodeus_full`), and the chant intro card art (`chant_intro_singer`, `chant_intro_banner`, `chant_summon_button`, `chant_summon_button_pressed`) have been processed and integrated into `app/src/main/res/drawable-nodpi/`.
