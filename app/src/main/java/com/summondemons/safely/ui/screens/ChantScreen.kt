@@ -24,8 +24,11 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import com.summondemons.safely.R
+import com.summondemons.safely.data.DemonCatalog
+import com.summondemons.safely.ritual.RitualState
 import com.summondemons.safely.ritual.RitualUiState
 import com.summondemons.safely.ritual.TurnDirection
 import com.summondemons.safely.ritual.UiRecord
@@ -33,6 +36,7 @@ import com.summondemons.safely.ui.components.StageBackground
 import com.summondemons.safely.ui.fx.SigilFlash
 import com.summondemons.safely.ui.fx.rememberAttention
 import com.summondemons.safely.ui.theme.Stage
+import com.summondemons.safely.ui.theme.SummonDemonsSafelyTheme
 import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.stage
@@ -156,3 +160,23 @@ internal fun ChantBackdrop(stage: Stage, landscape: Boolean, modifier: Modifier)
         }
     }
 }
+
+@Preview(name = "Landscape", device = "spec:parent=pixel_5,orientation=landscape")
+@Composable
+private fun ChantScreenPreview() {
+    val demon = DemonCatalog.all.first()
+    SummonDemonsSafelyTheme {
+        ChantScreen(
+            state = RitualUiState(
+                demon = demon,
+                ritual = RitualState.start(demon.ritualHeading, demon.chantPhrases),
+                azimuth = demon.ritualHeading,
+            ),
+            flash = null,
+            showClose = true,
+            onClose = {},
+            debug = null,
+        )
+    }
+}
+

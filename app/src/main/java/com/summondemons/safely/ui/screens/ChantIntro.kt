@@ -46,13 +46,16 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.summondemons.safely.R
 import com.summondemons.safely.data.Demon
+import com.summondemons.safely.data.DemonCatalog
 import com.summondemons.safely.ui.components.ParchmentRibbon
 import com.summondemons.safely.ui.fx.attentionGlow
 import com.summondemons.safely.ui.fx.rememberAttention
+import com.summondemons.safely.ui.theme.SummonDemonsSafelyTheme
 import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.fontScaleCapped
 import com.summondemons.safely.ui.theme.spacing
@@ -152,7 +155,7 @@ private fun Slab(accent: Color, glowSummon: Boolean, onSummon: () -> Unit, modif
 private fun Rules(accent: Color, modifier: Modifier) {
     val spacing = MaterialTheme.spacing
     Box(modifier.padding(horizontal = spacing.sm), contentAlignment = Alignment.CenterStart) {
-        Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(spacing.md)) {
+        Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.SpaceEvenly) {
             Rule(1, accent, R.string.intro_direction_title, R.string.intro_direction_body) { CheckIcon() }
             Rule(2, accent, R.string.intro_chant_title, R.string.intro_chant_body) { SealsIcon(accent) }
             Rule(3, accent, R.string.intro_lines_title, R.string.intro_lines_body) { LinesIcon() }
@@ -303,3 +306,19 @@ private fun FocusIcon(accent: Color) {
         )
     }
 }
+
+@Preview(name = "Landscape", device = "spec:parent=pixel_5,orientation=landscape")
+@Preview(name = "Portrait")
+@Composable
+private fun ChantIntroPreview() {
+    val demon = DemonCatalog.all.first()
+    SummonDemonsSafelyTheme {
+        ChantIntro(
+            demon = demon,
+            onSummon = {},
+            showClose = true,
+            onClose = {},
+        )
+    }
+}
+
