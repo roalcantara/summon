@@ -112,7 +112,7 @@ fun PsstBubble(text: String, taps: Int, shake: Int, accent: Color, onTap: () -> 
                 style = MaterialTheme.textRoles.name.copy(fontSize = fontSize, textAlign = TextAlign.Center),
                 color = colors.parchmentInk,
                 maxLines = 3,
-                autoSize = TextAutoSize.StepBased(minFontSize = MinSize, maxFontSize = fontSize),
+                autoSize = TextAutoSize.StepBased(minFontSize = MinSize.fontScaleCapped(), maxFontSize = fontSize),
                 modifier = Modifier.clearAndSetSemantics { },
             )
             Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)) {
@@ -149,7 +149,7 @@ fun PsstBurst(text: String, modifier: Modifier = Modifier) {
             style = MaterialTheme.textRoles.name.copy(fontSize = fontSize, textAlign = TextAlign.Center),
             color = colors.parchmentInk,
             maxLines = 3,
-            autoSize = TextAutoSize.StepBased(minFontSize = MinSize, maxFontSize = fontSize),
+            autoSize = TextAutoSize.StepBased(minFontSize = MinSize.fontScaleCapped(), maxFontSize = fontSize),
         )
     }
 }

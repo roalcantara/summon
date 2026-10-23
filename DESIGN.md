@@ -152,7 +152,7 @@ dark palette carries the RPG feel.
 ### Text sizing (ADR-0033)
 
 - **Body text:** Scales fully with system font scale. Where it can overflow, its container scrolls.
-- **Words on fixed art or HUD slots:** Scale up to 1.3× (`TextUnit.fontScaleCapped()`), then auto-size down to fit.
+- **Words on fixed art or HUD slots:** Scale up to 1.3× (`TextUnit.fontScaleCapped()`), then auto-size down to fit. The auto-size minimum is capped the same way, or at large font scales it would exceed the capped maximum and the text would clip.
 - **Labels in one row:** Share one size: the largest at which all fit.
 - **One-line labels:** Never wrap: `maxLines = 1`, `softWrap = false`, shrink to fit.
 - The primary action of a screen is never inside a scrolling region and never off-screen.

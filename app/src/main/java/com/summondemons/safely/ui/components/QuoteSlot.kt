@@ -142,7 +142,7 @@ private fun SpeechBubble(quote: String, accent: Color) {
             textAlign = TextAlign.Center,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
-            autoSize = TextAutoSize.StepBased(minFontSize = QuoteMinSize, maxFontSize = QuoteSize),
+            autoSize = TextAutoSize.StepBased(minFontSize = QuoteMinSize.fontScaleCapped(), maxFontSize = QuoteSize),
             modifier = Modifier.padding(horizontal = MaterialTheme.spacing.lg, vertical = MaterialTheme.spacing.sm),
         )
     }
@@ -209,7 +209,7 @@ private fun CoolingCue(accent: Color, hours: Int, shake: Int, onTap: () -> Unit)
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
                     softWrap = false,
-                    autoSize = TextAutoSize.StepBased(minFontSize = CueMinSize, maxFontSize = cueSize),
+                    autoSize = TextAutoSize.StepBased(minFontSize = CueMinSize.fontScaleCapped(), maxFontSize = cueSize),
                 )
                 Text(
                     stringResource(R.string.quote_next_summon, hours).upper(),
@@ -217,7 +217,7 @@ private fun CoolingCue(accent: Color, hours: Int, shake: Int, onTap: () -> Unit)
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
                     softWrap = false,
-                    autoSize = TextAutoSize.StepBased(minFontSize = CueMinSize, maxFontSize = SmallCueSize.fontScaleCapped()),
+                    autoSize = TextAutoSize.StepBased(minFontSize = CueMinSize.fontScaleCapped(), maxFontSize = SmallCueSize.fontScaleCapped()),
                 )
             }
         }

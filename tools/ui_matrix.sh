@@ -18,7 +18,8 @@ PKG=com.summondemons.safely
 LABEL=${1:-"$(adb shell getprop ro.product.model | tr -d '\r')-run"}
 LANG_CODE=${2:-en}
 OUT="build/ui-matrix/$LABEL"
-FONT_SCALES=(1.0 1.3 2.0)
+# UI_MATRIX_FONTS="2.0" limits a re-run to some font scales.
+read -r -a FONT_SCALES <<< "${UI_MATRIX_FONTS:-1.0 1.3 2.0}"
 RES=app/src/main/res
 case "$LANG_CODE" in
   en) VALUES=values ;;
@@ -90,19 +91,24 @@ EOF
 shot() { adb exec-out screencap -p > "$dir/$1.png"; echo "    $1"; }
 back() { adb shell input keyevent KEYCODE_BACK; sleep 1.2; }
 
-# True while the Settings or Debug sheet is up (their titles are text nodes; the gear is a
-# content description, so Home never matches).
+# True while the Settings or Debug sheet is up: a sheet title is shown (text nodes; the gear is a
+# content description, so Home never matches), or the app's screen is dumped without its gear (a
+# modal sheet hides the screen below, and a long sheet may have scrolled its title away). A failed
+# dump reads as closed, so close_sheets never backs out of the screen.
 sheet_open() {
   adb shell uiautomator dump /sdcard/ui_matrix.xml >/dev/null 2>&1 || true
   adb exec-out cat /sdcard/ui_matrix.xml > "$TMP/ui.xml" 2>/dev/null || true
   python3 -I - "$TMP/ui.xml" "$(str settings_title)" "$(str debug_chip)" <<'EOF'
 import sys, xml.etree.ElementTree as ET
-titles = {t.casefold() for t in sys.argv[2:]}
+gear, titles = sys.argv[2].casefold(), {t.casefold() for t in sys.argv[2:]}
 try:
-    found = any(n.get("text", "").casefold() in titles for n in ET.parse(sys.argv[1]).iter("node"))
+    nodes = list(ET.parse(sys.argv[1]).iter("node"))
 except ET.ParseError:
-    found = False
-sys.exit(0 if found else 1)
+    sys.exit(1)
+ours = [n for n in nodes if n.get("package") == "com.summondemons.safely"]
+titled = any(n.get("text", "").casefold() in titles for n in nodes)
+gearless = bool(ours) and not any(n.get("content-desc", "").casefold() == gear for n in ours)
+sys.exit(0 if titled or gearless else 1)
 EOF
 }
 
@@ -115,7 +121,8 @@ close_sheets() {
 # Settings → Debug controls, then [actions], then close the sheet.
 debug_sheet() {
   local ok=0
-  if tap "$(str settings_title)" && tap "$(str debug_controls)"; then "$@" || ok=1; else ok=1; fi
+  # Debug controls sit below the fold of Settings at large font sizes: scroll for them.
+  if tap "$(str settings_title)" && tap "$(str debug_controls)" 0 scroll; then "$@" || ok=1; else ok=1; fi
   close_sheets
   return $ok
 }

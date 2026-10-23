@@ -290,7 +290,7 @@ internal fun ChantNamePlate(name: String, accent: Color) {
             color = accent,
             maxLines = 1,
             softWrap = false,
-            autoSize = TextAutoSize.StepBased(minFontSize = NameMinSize, maxFontSize = maxSize),
+            autoSize = TextAutoSize.StepBased(minFontSize = NameMinSize.fontScaleCapped(), maxFontSize = maxSize),
         )
     }
 }
@@ -412,7 +412,7 @@ internal fun DirectionPillView(pill: DirectionPill, target: Float, modifier: Mod
         color = color,
         maxLines = 1,
         softWrap = false,
-        autoSize = TextAutoSize.StepBased(minFontSize = PillMinSize, maxFontSize = PillTextSize.fontScaleCapped()),
+        autoSize = TextAutoSize.StepBased(minFontSize = PillMinSize.fontScaleCapped(), maxFontSize = PillTextSize.fontScaleCapped()),
         modifier = modifier
             .graphicsLayer { alpha = blink?.value ?: 1f }
             .background(colors.surfaceContainerLowest.copy(alpha = CHIP_ALPHA), CircleShape)

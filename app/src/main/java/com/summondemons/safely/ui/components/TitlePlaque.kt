@@ -101,7 +101,7 @@ fun TitlePlaque(title: String, modifier: Modifier = Modifier) {
             color = gold,
             maxLines = 1,
             softWrap = false,
-            autoSize = TextAutoSize.StepBased(minFontSize = TitleMinSize, maxFontSize = TitleSize.fontScaleCapped()),
+            autoSize = TextAutoSize.StepBased(minFontSize = TitleMinSize.fontScaleCapped(), maxFontSize = TitleSize.fontScaleCapped()),
             modifier = Modifier.semantics { heading() },
         )
     }

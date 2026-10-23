@@ -217,7 +217,7 @@ private fun SummonButton(accent: Color, glow: Boolean, onClick: () -> Unit) {
             modifier = Modifier.padding(horizontal = MaterialTheme.spacing.xl),
             maxLines = 1,
             softWrap = false,
-            autoSize = TextAutoSize.StepBased(minFontSize = ArtLabelMinSize, maxFontSize = SummonLabelSize.fontScaleCapped()),
+            autoSize = TextAutoSize.StepBased(minFontSize = ArtLabelMinSize.fontScaleCapped(), maxFontSize = SummonLabelSize.fontScaleCapped()),
         )
     }
 }
