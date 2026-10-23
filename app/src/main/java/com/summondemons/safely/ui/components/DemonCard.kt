@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInRoot
+import com.summondemons.safely.ui.theme.fontScaleCapped
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.painterResource
@@ -149,7 +150,7 @@ private fun CardHeader(demon: Demon, bound: Boolean, side: CardSide, onFlip: () 
                 .background(colors.surfaceContainerLow, CircleShape),
             contentAlignment = Alignment.Center,
         ) {
-            Text(demon.number.toString(), style = roles.name.copy(fontSize = NumberSize), color = metal)
+            Text(demon.number.toString(), style = roles.name.copy(fontSize = NumberSize.fontScaleCapped()), color = metal)
         }
         Column(Modifier.weight(1f)) {
             Text(

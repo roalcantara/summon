@@ -1,5 +1,7 @@
 package com.summondemons.safely.ui.components
 
+import androidx.compose.foundation.text.TextAutoSize
+import com.summondemons.safely.ui.theme.fontScaleCapped
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -35,6 +37,7 @@ private val TitlePadding = 38.dp // chamfer + diamond + gap on each side
 private val DiamondOffset = 27.dp // diamond centre from each end
 private val DiamondRadius = 3.5.dp
 private val TitleSize = 20.sp
+private val TitleMinSize = 12.sp
 private const val FILL_ALPHA = 0.94f
 private const val INNER_LINE_ALPHA = 0.45f
 
@@ -94,9 +97,11 @@ fun TitlePlaque(title: String, modifier: Modifier = Modifier) {
     ) {
         Text(
             title.upper(),
-            style = MaterialTheme.textRoles.name.copy(fontSize = TitleSize, letterSpacing = 0.08.em),
+            style = MaterialTheme.textRoles.name.copy(fontSize = TitleSize.fontScaleCapped(), letterSpacing = 0.08.em),
             color = gold,
             maxLines = 1,
+            softWrap = false,
+            autoSize = TextAutoSize.StepBased(minFontSize = TitleMinSize, maxFontSize = TitleSize.fontScaleCapped()),
             modifier = Modifier.semantics { heading() },
         )
     }
