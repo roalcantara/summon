@@ -47,6 +47,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -68,6 +69,7 @@ import com.summondemons.safely.ui.fx.ParticleField
 import com.summondemons.safely.ui.fx.ParticleStyle
 import com.summondemons.safely.ui.theme.PillShape
 import com.summondemons.safely.ui.theme.Stage
+import com.summondemons.safely.ui.theme.SummonDemonsSafelyTheme
 import com.summondemons.safely.ui.theme.demonColors
 import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.textRoles
@@ -275,5 +277,23 @@ private fun DustPuff(modifier: Modifier) {
         scale(DUST_START + (DUST_END - DUST_START) * p) {
             drawOval(Brush.radialGradient(listOf(color.copy(alpha = DUST_ALPHA), Color.Transparent)), alpha = 1f - p)
         }
+    }
+}
+
+@Preview
+@Composable
+private fun HomeScreenPreview() {
+    SummonDemonsSafelyTheme {
+        HomeScreen(
+            boundCount = 1,
+            demonCount = 2,
+            courtHouses = setOf(House.Sol),
+            restlessAccent = DemonAccent.Asmodeus,
+            showHint = true,
+            escaped = emptyList(),
+            onOpen = {},
+            onDismissEscape = {},
+            onMenu = {},
+        )
     }
 }
