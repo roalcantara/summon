@@ -62,3 +62,20 @@ done (code steps completed and verified via unit tests; device checks not run: n
 
 ## Reviewer device pass (2026-10-23)
 Run by the reviewer on the S24, limited to the checks that decide a change (operator decision). Not run: 1.3/1.4, 2.1, 2.3, 4.x, 5.1/5.2, 6.x, 7.2, 7.4, 8.1/8.2/8.4; these are folded into the post-Psst `ui_matrix.sh` run and a short manual pass (TODO `FPdv`).
+
+## Single device pass after analytics and Psst (2026-10-23, S24, reviewer)
+`tools/ui_matrix.sh` over fonts 1.0 / 1.3 / 2.0 × densities 420 / 483 (runs `s24-final`, `s24-final2`,
+`s24-final3` under `build/ui-matrix/`): every screen in every configuration captured.
+
+| Check | Result | Evidence / fix |
+|---|---|---|
+| Matrix: Home, Grimoire front/back/bound/cool, intro, chant | pass after fixes | Contact sheets `build/final-pass/sheet-*.png` |
+| Direction pill at font 2.0, density 483 | **fixed** | Arrow / ✓ clipped: autosize minimums now capped like the maxima (`6065691`) |
+| Settings at fonts 1.3 / 2.0 | **fixed** | Half-open sheet hid the analytics switch: opens fully expanded (`6065691`) |
+| ui_matrix.sh at large fonts | **fixed** | Scrolls for Debug controls; detects a sheet whose title scrolled away; `UI_MATRIX_FONTS` |
+| 2.1 Escape banner, system Back | pass | Banner dismissed, app stays on Home (dump before/after) |
+| 4.1 Paused chip amber | pass | `build/final-pass/pa2.png`: chip, mic, PAUSED amber like pill and ring |
+| 6.1 / 6.3 Reduce motion | pass | Freshly revealed dossier lines crisp 0.4 s after the flip (`rm2.png`); dossier button steady |
+| 7.4 Focus outline | **fixed** | The 2 dp gold ring vanished on gilded art: light 3 dp ring 4 dp outside (inside the edge in the clipping quote slot); demon cut-out and summon/cooling cues now have one too (`g5`, `g6c`, `sumfc`) |
+| 7.2 TalkBack order | not run | TalkBack would not attach via `settings` on this device; manual check left to the operator |
+| 8.1 Home hop feel | not run | Needs the operator's eyes |

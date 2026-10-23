@@ -554,6 +554,7 @@ private fun Stage(
             }
         }
     }
+    val cutoutInteraction = remember { MutableInteractionSource() }
     val floatY: () -> Float = { if (reduceMotion) 0f else sin(time / 1_000f * 2f * PI.toFloat() / FLOAT_PERIOD_S) * floatPx }
     Column(
         modifier
@@ -595,8 +596,9 @@ private fun Stage(
                             accent = accent,
                             modifier = Modifier
                                 .fillMaxSize()
+                                .focusRing(cutoutInteraction, MaterialTheme.shapes.medium)
                                 .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
+                                    interactionSource = cutoutInteraction,
                                     indication = null,
                                     enabled = !bound || party || teaser,
                                     // A button only while it acts; a bound portrait is not a disabled control.

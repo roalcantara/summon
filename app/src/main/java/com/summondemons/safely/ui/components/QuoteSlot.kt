@@ -13,8 +13,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,9 +27,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -160,6 +162,7 @@ private fun SummonCue(demon: Demon, accent: Color, onTap: () -> Unit) {
         )
     }
     val label = stringResource(R.string.cd_summon, demon.name)
+    val interaction = remember { MutableInteractionSource() }
     DashedBubble(
         color = accent.copy(alpha = BORDER_ALPHA),
         modifier = Modifier
@@ -170,7 +173,8 @@ private fun SummonCue(demon: Demon, accent: Color, onTap: () -> Unit) {
                 scaleX = s
                 scaleY = s
             }
-            .clickable(onClick = onTap)
+            .focusRing(interaction, MaterialTheme.shapes.medium, inside = true)
+            .clickable(interaction, LocalIndication.current, onClick = onTap)
             .clearAndSetSemantics {
                 contentDescription = label
                 role = Role.Button
@@ -186,12 +190,14 @@ private fun CoolingCue(accent: Color, hours: Int, shake: Int, onTap: () -> Unit)
     val colors = MaterialTheme.colorScheme
     val offset = rememberShake(shake)
     val label = pluralStringResource(R.plurals.cd_cooling, hours, hours)
+    val interaction = remember { MutableInteractionSource() }
     DashedBubble(
         color = colors.outlineVariant,
         modifier = Modifier
             .fillMaxWidth()
             .graphicsLayer { translationX = offset.value.dp.toPx() }
-            .clickable(onClick = onTap)
+            .focusRing(interaction, MaterialTheme.shapes.medium, inside = true)
+            .clickable(interaction, LocalIndication.current, onClick = onTap)
             .clearAndSetSemantics {
                 contentDescription = label
                 liveRegion = LiveRegionMode.Polite
