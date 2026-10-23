@@ -577,20 +577,23 @@ internal fun FeedbackSlot(slot: SlotContent, accent: Color, micLevel: Float, pau
     ) {
         when (slot) {
             SlotContent.Empty -> Unit
-            SlotContent.Meter -> Chip(colors.outlineVariant) {
-                // Listening (or paused) as a labelled state, never bare bars that read as "•••••".
-                Icon(painterResource(R.drawable.ic_mic), contentDescription = null, tint = if (paused) colors.outline else accent, modifier = Modifier.size(MicSize))
-                VoiceMeter(if (paused) 0f else micLevel, if (paused) colors.outline else accent, Modifier.size(MeterWidth, MeterHeight))
-                Text(
-                    stringResource(if (paused) R.string.chant_paused else R.string.chant_listening).upper(),
-                    style = style,
-                    color = if (paused) colors.outline else colors.onSurfaceVariant,
-                    maxLines = 1,
-                    softWrap = false,
-                    // Visual only: the slot is a live region, and announcing "Listening" after every
-                    // line (or "Paused" next to the pill's own description) would only add noise.
-                    modifier = Modifier.clearAndSetSemantics { },
-                )
+            SlotContent.Meter -> {
+                val tint = if (paused) colors.primary else accent
+                Chip(if (paused) colors.primary else colors.outlineVariant) {
+                    // Listening (or paused) as a labelled state, never bare bars that read as "•••••".
+                    Icon(painterResource(R.drawable.ic_mic), contentDescription = null, tint = tint, modifier = Modifier.size(MicSize))
+                    VoiceMeter(if (paused) 0f else micLevel, tint, Modifier.size(MeterWidth, MeterHeight))
+                    Text(
+                        stringResource(if (paused) R.string.chant_paused else R.string.chant_listening).upper(),
+                        style = style,
+                        color = if (paused) colors.primary else colors.onSurfaceVariant,
+                        maxLines = 1,
+                        softWrap = false,
+                        // Visual only: the slot is a live region, and announcing "Listening" after every
+                        // line (or "Paused" next to the pill's own description) would only add noise.
+                        modifier = Modifier.clearAndSetSemantics { },
+                    )
+                }
             }
             SlotContent.Locked -> Chip(colors.outlineVariant) {
                 Icon(painterResource(R.drawable.ic_lock), contentDescription = stringResource(R.string.chant_a11y_locked), tint = colors.outline, modifier = Modifier.size(LockSize))
