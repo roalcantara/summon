@@ -197,3 +197,20 @@ Executed `docs/superpowers/plans/2026-10-22-chant-screen-polish.md`:
   chant screen, so the chant screen at 2.0× has not been captured yet. The 1.0× seeking shot
   showed the current word emphasised while the sigil held the attention (two cues); fixed in
   the review commit. Still to capture: chant screen seeking and chanting at 2.0× (S24 and emulator).
+
+## Chant screen axis (2026-10-23, ADR-0029 amended)
+
+Executed `docs/superpowers/plans/2026-10-23-chant-screen-axis.md`:
+- Removed top bar: ?/D buttons, slot, and ✕ now sit in a single 48 dp HUD row (`HudRow`) over the right column.
+- Sigil stack (`SigilStack`) centres name plate, sigil, and pill with equal 16 dp gaps and ≥ 24 dp air above and below (`stackLayout`).
+- Common horizontal axis: sigil centre, vertical I–IV track centre, and phrase (`AxisLine` via `phraseTop`) align on the content box's vertical middle.
+- Verified via `tools/ui_matrix.sh s24-axis en` and inspected on device:
+  - `build/ui-matrix/s24-axis/font1.0-dpi420/chant-seeking.png`
+  - `build/ui-matrix/s24-axis/font1.0-dpi420/chant-chanting.png`
+  - `build/ui-matrix/s24-axis/font1.3-dpi420/chant-seeking.png`
+  - `build/ui-matrix/s24-axis/font1.3-dpi420/chant-chanting.png`
+  - `build/ui-matrix/s24-axis/font2.0-dpi420/chant-seeking.png`
+  - `build/ui-matrix/s24-axis/font2.0-dpi420/chant-chanting.png`
+  - `build/ui-matrix/s24-axis/font1.0-dpi483/chant-seeking.png`
+  - `build/ui-matrix/s24-axis/font1.0-dpi483/chant-chanting.png`
+  At font 1.0, 1.3, and 2.0: ?/D, slot chip, and ✕ sit aligned in the HUD row; the sigil, track, and phrase share the vertical middle axis; at font 2.0 the sigil shrinks automatically leaving spacing intact without clipping.

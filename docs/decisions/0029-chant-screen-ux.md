@@ -1,6 +1,6 @@
 # ADR-0029: Chant screen UX: one place per fact, split layout in the Stitch style
 
-- **Status:** Accepted; amended 2026-10-22 (polish)
+- **Status:** Accepted; amended 2026-10-22 (polish), amended 2026-10-23 (one axis)
 - **Date:** 2026-10-18 (decided 2026-10-19 after the device comparison)
 - **Amends:** ADR-0019 (chant screen), ADR-0020 (direction in the sigil), ADR-0024 (status column)
 - **Spec:** `docs/superpowers/specs/2026-10-18-chant-screen-ux-design.md`
@@ -58,3 +58,9 @@ all as wide as the sigil; the I–IV seals become a vertical progress track betw
 the slot's idle meter is a labelled mic chip (LISTENING / PAUSED), top-aligned with the name
 plate, with the phrase centred below it. The top bar keeps only "?" (and "D") and ✕.
 The sigil breathes while seeking and wavering; the phrase has a halo while chanting; ADR-0033.
+
+## Amendment (2026-10-23): one axis
+
+No top bar: ?/D · slot · ✕ form the HUD row at the top of the right column. The stack (name plate,
+sigil, pill) is one group centred in its column (16 dp gaps, ≥ 24 dp air); the sigil, the track and
+the phrase are centred on the content box's vertical middle. Spec 2026-10-23.
