@@ -73,9 +73,13 @@ object ProgressRules {
         record.revealed && (record.revealPending.codex || record.revealPending.battle)
 
 
-    /** The "Psst" bubble shows (ADR-0036): bound since an earlier day, lore read. */
+    /**
+     * The "Psst" bubble shows (ADR-0036, amended 2026-10-23): bound and his new lore read, from the
+     * summon day on. [today] is kept for the rule's callers and future day-based variants.
+     */
+    @Suppress("UNUSED_PARAMETER")
     fun teaserEligible(record: DemonRecord, today: Long): Boolean =
-        record.bound && (record.boundDay ?: Long.MIN_VALUE) < today && !dossierUnread(record)
+        record.bound && !dossierUnread(record)
 
     /** Taps that burst the "Psst" bubble (ADR-0036, amended). */
     const val TEASER_TAPS = 3

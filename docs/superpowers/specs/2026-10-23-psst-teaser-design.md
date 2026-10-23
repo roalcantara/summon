@@ -12,9 +12,9 @@ new). Before building it, measure whether players want more from their demons. A
 demon's head invites a tap; the tap gets an in-character "not yet", and the taps are counted.
 
 ## Behaviour
-- **Eligible:** the shown demon is bound, was summoned on an earlier day (`boundDay < today`; a
-  record without `boundDay`, saved before this change, counts as earlier), has no unread lore
-  (`!ProgressRules.dossierUnread`), and there is no celebration on screen.
+- **Eligible:** the shown demon is bound, has no unread lore (`!ProgressRules.dossierUnread`), and
+  there is no celebration on screen. From the summon day on (amended 2026-10-23: waiting a day hid
+  it from testers, and release builds cannot skip ahead).
 - **Invitation:** "Psst… come closer." in a comic speech bubble by his head (top right of his
   art), tail toward him, floating with him. Under the line, three empty seal pips. Action ticks in
   his accent colour breathe at two corners (the screen's one attention glow; steady with reduce

@@ -213,11 +213,11 @@ class ProgressRulesTest {
     }
 
     @Test
-    fun theTeaserWaitsForTheNextDayAndForTheLoreToBeRead() {
+    fun theTeaserShowsOnceTheLoreIsReadFromTheSummonDayOn() {
         var p = commitSummon(Progress(), "asmodeus", 10, flawless = false)
-        assertFalse(teaserEligible(p.record("asmodeus"), today = 11)) // lore still unread
+        assertFalse(teaserEligible(p.record("asmodeus"), today = 10)) // lore still unread
         p = consumeReveal(consumeReveal(p, "asmodeus", Reveal.Codex), "asmodeus", Reveal.Battle)
-        assertFalse(teaserEligible(p.record("asmodeus"), today = 10)) // summoned today
+        assertTrue(teaserEligible(p.record("asmodeus"), today = 10)) // the summon day itself
         assertTrue(teaserEligible(p.record("asmodeus"), today = 11))
         assertFalse(teaserEligible(DemonRecord(), today = 11)) // unbound
         assertTrue(teaserEligible(DemonRecord(bound = true, revealed = true), today = 11)) // old save, no boundDay

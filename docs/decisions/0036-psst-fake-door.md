@@ -32,3 +32,8 @@ Stitch variations did not help; a playable prototype ("Psst, three taps") settle
   playbook adds the open rate and return openers.
 - Risk: a chest-like build-up promises loot and pays with a joke; watch whether openers return the
   next day.
+
+## Amendment 2026-10-23: from the summon day
+The bubble no longer waits for the day after the summon: it shows as soon as the new demon's lore is
+read (the dossier's glow comes first, ADR-0033). Testers on release builds, which cannot skip a day,
+never saw it on their first session. `boundDay` is still stored for analytics (`days_since_summon`).
