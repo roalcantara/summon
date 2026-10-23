@@ -6,7 +6,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
@@ -31,15 +33,16 @@ fun FlipCard(side: CardSide, modifier: Modifier = Modifier, front: @Composable (
         }
         return
     }
-    val angle by animateFloatAsState(if (side == CardSide.Front) 0f else 180f, tween(FLIP_MS), label = "cardFlip")
+    val angle = animateFloatAsState(if (side == CardSide.Front) 0f else 180f, tween(FLIP_MS), label = "cardFlip")
+    val showFront by remember { derivedStateOf { angle.value <= 90f } }
     val density = LocalDensity.current.density
     Box(
         modifier.graphicsLayer {
-            rotationY = angle
+            rotationY = angle.value
             cameraDistance = CAMERA_DISTANCE * density
         },
     ) {
-        if (angle <= 90f) {
+        if (showFront) {
             Box(Modifier.fillMaxSize()) { front() }
         } else {
             // Un-mirror the back face.

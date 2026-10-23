@@ -327,9 +327,9 @@ private fun SealMark(numeral: String, look: SealLook, accent: Color, paused: Boo
     val breath = if (current && !paused && !reduceMotion) {
         rememberInfiniteTransition(label = "seal").animateFloat(
             1f, BREATH_MIN, infiniteRepeatable(tween(if (checking) BREATH_HALF_MS / 3 else BREATH_HALF_MS), RepeatMode.Reverse), label = "sealBreath",
-        ).value
+        )
     } else {
-        1f
+        null
     }
     val pulse = remember { Animatable(1f) }
     LaunchedEffect(look) {
@@ -353,7 +353,7 @@ private fun SealMark(numeral: String, look: SealLook, accent: Color, paused: Boo
     }
     Box(
         modifier.graphicsLayer {
-            alpha = breath
+            alpha = breath?.value ?: 1f
             scaleX = pulse.value
             scaleY = pulse.value
         },
@@ -401,9 +401,9 @@ internal fun DirectionPillView(pill: DirectionPill, target: Float, modifier: Mod
     val blink = if (pill.look == PillLook.Paused && !reduceMotion) {
         rememberInfiniteTransition(label = "pill").animateFloat(
             1f, BLINK_MIN, infiniteRepeatable(tween(BLINK_HALF_MS), RepeatMode.Reverse), label = "pillBlink",
-        ).value
+        )
     } else {
-        1f
+        null
     }
     Text(
         label,
@@ -413,7 +413,7 @@ internal fun DirectionPillView(pill: DirectionPill, target: Float, modifier: Mod
         softWrap = false,
         autoSize = TextAutoSize.StepBased(minFontSize = PillMinSize, maxFontSize = PillTextSize.fontScaleCapped()),
         modifier = modifier
-            .graphicsLayer { alpha = blink }
+            .graphicsLayer { alpha = blink?.value ?: 1f }
             .background(colors.surfaceContainerLowest.copy(alpha = CHIP_ALPHA), CircleShape)
             .border(PillBorder, color, CircleShape)
             .padding(horizontal = MaterialTheme.spacing.md, vertical = MaterialTheme.spacing.xs)
@@ -432,23 +432,24 @@ internal fun EdgeChevrons(turn: TurnDirection, paused: Boolean, modifier: Modifi
     val colors = MaterialTheme.colorScheme
     val color = if (paused) colors.primary else colors.onSurfaceVariant
     val phase = if (LocalReduceMotion.current) {
-        -1f
+        null
     } else {
         rememberInfiniteTransition(label = "chevrons").animateFloat(
             0f, 1f, infiniteRepeatable(tween(CHEVRON_CYCLE_MS, easing = LinearEasing)), label = "chevronPhase",
-        ).value
+        )
     }
     val right = turn == TurnDirection.Right
     Canvas(modifier.size(ChevronWidth, ChevronHeight)) {
         val stroke = ChevronStroke.toPx()
+        val p = phase?.value ?: -1f
         val count = 3
         val each = size.height / count
         val depth = size.width - stroke
         repeat(count) { i ->
             // The wave runs in the turning direction: top to bottom for right, bottom to top for left.
             val k = if (right) i else count - 1 - i
-            val alpha = if (phase < 0f) 1f else {
-                val d = ((phase * count - k) % count + count) % count
+            val alpha = if (p < 0f) 1f else {
+                val d = ((p * count - k) % count + count) % count
                 lerp(1f, CHEVRON_MIN_ALPHA, (d / count * 2f).coerceAtMost(1f))
             }
             val top = i * each + stroke
@@ -648,23 +649,30 @@ private fun Chip(edge: Color, content: @Composable RowScope.() -> Unit) {
 @Composable
 private fun CheckingMeter(color: Color) {
     val level = if (LocalReduceMotion.current) {
-        CHECKING_LEVEL
+        null
     } else {
         rememberInfiniteTransition(label = "checking").animateFloat(
             METER_FLOOR, 1f, infiniteRepeatable(tween(CHECKING_HALF_MS), RepeatMode.Reverse), label = "checkingLevel",
-        ).value
+        )
     }
-    VoiceMeter(level, color, Modifier.size(MeterWidth, MeterHeight))
+    MeterBars({ level?.value ?: CHECKING_LEVEL }, color, Modifier.size(MeterWidth, MeterHeight))
 }
 
 /** Five ember bars that follow the mic level. Shows that the mic hears you; decides nothing. */
 @Composable
 fun VoiceMeter(level: Float, color: Color, modifier: Modifier = Modifier) {
-    val animated by animateFloatAsState(level.coerceIn(0f, 1f), tween(METER_TWEEN_MS), label = "meter")
+    val animated = animateFloatAsState(level.coerceIn(0f, 1f), tween(METER_TWEEN_MS), label = "meter")
+    MeterBars({ animated.value }, color, modifier)
+}
+
+/** The bars; [level] is read while drawing, so a moving level redraws without recomposing. */
+@Composable
+private fun MeterBars(level: () -> Float, color: Color, modifier: Modifier) {
     Canvas(modifier) {
+        val l = level()
         val bar = size.width / (METER_HEIGHTS.size * 2 - 1)
         METER_HEIGHTS.forEachIndexed { i, h ->
-            val height = size.height * (METER_FLOOR + animated * h * (1f - METER_FLOOR))
+            val height = size.height * (METER_FLOOR + l * h * (1f - METER_FLOOR))
             drawRoundRect(
                 color,
                 topLeft = Offset(i * 2 * bar, (size.height - height) / 2f),
