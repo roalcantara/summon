@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
@@ -154,12 +155,19 @@ private fun Slab(accent: Color, glowSummon: Boolean, onSummon: () -> Unit, modif
 @Composable
 private fun Rules(accent: Color, modifier: Modifier) {
     val spacing = MaterialTheme.spacing
-    Box(modifier.padding(horizontal = spacing.sm), contentAlignment = Alignment.CenterStart) {
-        Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.SpaceEvenly) {
-            Rule(1, accent, R.string.intro_direction_title, R.string.intro_direction_body) { CheckIcon() }
-            Rule(2, accent, R.string.intro_chant_title, R.string.intro_chant_body) { SealsIcon(accent) }
-            Rule(3, accent, R.string.intro_lines_title, R.string.intro_lines_body) { LinesIcon() }
-            Rule(4, accent, R.string.intro_focus_title, R.string.intro_focus_body) { FocusIcon(accent) }
+    BoxWithConstraints(modifier.padding(horizontal = spacing.sm)) {
+        // At least as tall as the slab, so SpaceBetween spreads the rules over it: rule 1's top on the
+        // ribbon's line, rule 4's bottom on Summon's (the slab's md inset = xs here + sm per rule).
+        // Taller (large font sizes) it scrolls, and the sm around each rule keeps ≥ 16 dp between them.
+        Column(
+            Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).heightIn(min = maxHeight).padding(vertical = spacing.xs),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            val rule = Modifier.padding(vertical = spacing.sm)
+            Box(rule) { Rule(1, accent, R.string.intro_direction_title, R.string.intro_direction_body) { CheckIcon() } }
+            Box(rule) { Rule(2, accent, R.string.intro_chant_title, R.string.intro_chant_body) { SealsIcon(accent) } }
+            Box(rule) { Rule(3, accent, R.string.intro_lines_title, R.string.intro_lines_body) { LinesIcon() } }
+            Box(rule) { Rule(4, accent, R.string.intro_focus_title, R.string.intro_focus_body) { FocusIcon(accent) } }
         }
     }
 }
