@@ -53,6 +53,10 @@ object ProgressRules {
         )
     }
 
+    /** Demons bound in [before] that [after] shows escaped (unbound with the banner queued). */
+    fun newlyEscaped(before: Progress, after: Progress): List<String> =
+        after.demons.filter { (id, r) -> !r.bound && r.escapeBannerPending && before.record(id).bound }.keys.sorted()
+
     fun consumeReveal(p: Progress, id: String, what: Reveal): Progress {
         val record = p.record(id)
         val pending = when (what) {

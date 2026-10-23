@@ -8,6 +8,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import com.summondemons.safely.data.House
+import com.summondemons.safely.platform.analytics.Analytics
+import com.summondemons.safely.platform.analytics.AnalyticsEvent
+import com.summondemons.safely.platform.analytics.NoAnalytics
+import com.summondemons.safely.platform.analytics.RecordingAnalytics
 import com.summondemons.safely.progress.InMemoryProgressStore
 import com.summondemons.safely.progress.Progress
 import com.summondemons.safely.progress.ProgressRules
@@ -42,8 +46,8 @@ class GameViewModelTest {
     private fun boundOn(day: Long, id: String = "asmodeus", flawless: Boolean = false) =
         ProgressRules.commitSummon(Progress(), id, day, flawless)
 
-    private fun vm(store: InMemoryProgressStore, saved: SavedStateHandle = SavedStateHandle()) =
-        GameViewModel(store, clock, debug, saved, listOf("asmodeus", "astaroth"))
+    private fun vm(store: InMemoryProgressStore, saved: SavedStateHandle = SavedStateHandle(), analytics: Analytics = NoAnalytics) =
+        GameViewModel(store, clock, debug, saved, listOf("asmodeus", "astaroth"), analytics = analytics)
 
     private fun TestScope.observe(vm: GameViewModel) = backgroundScope.launch { vm.uiState.collect {} }
 
@@ -251,5 +255,14 @@ class GameViewModelTest {
         assertTrue(record.flawless)
         assertEquals(dayNPlus1, record.lastVisitDay)
         assertEquals(dayNPlus1, progress.lastSummonDay)
+    }
+
+    @Test
+    fun anEscapeIsReportedOnce() = runTest(dispatcher) {
+        val analytics = RecordingAnalytics()
+        val store = InMemoryProgressStore(boundOn(day0 - 3))
+        val vm = vm(store, analytics = analytics)
+        observe(vm); runCurrent()
+        assertEquals(listOf<AnalyticsEvent>(AnalyticsEvent.DemonEscaped("asmodeus")), analytics.events)
     }
 }

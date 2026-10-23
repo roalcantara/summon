@@ -12,6 +12,7 @@ import com.summondemons.safely.progress.ProgressRules.unsummon
 import com.summondemons.safely.progress.ProgressRules.visit
 import com.summondemons.safely.progress.ProgressRules.dossierUnread
 import com.summondemons.safely.progress.ProgressRules.neverSummoned
+import com.summondemons.safely.progress.ProgressRules.newlyEscaped
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
@@ -192,5 +193,14 @@ class ProgressRulesTest {
     fun aResetDailyLimitDoesNotMakeTheFirstSummonGlowAgain() {
         val summoned = commitSummon(Progress(), "astaroth", 3, flawless = false)
         assertFalse(neverSummoned(summoned.copy(lastSummonDay = null)))
+    }
+
+    @Test
+    fun newlyEscapedListsOnlyDemonsThatJustSlippedTheirSeal() {
+        val bound = commitSummon(Progress(), "asmodeus", 10, flawless = false)
+        val escaped = evaluate(bound, 13)
+        assertEquals(listOf("asmodeus"), newlyEscaped(bound, escaped))
+        assertEquals(emptyList<String>(), newlyEscaped(escaped, escaped))
+        assertEquals(emptyList<String>(), newlyEscaped(Progress(), bound))
     }
 }

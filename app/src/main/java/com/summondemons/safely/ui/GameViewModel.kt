@@ -21,6 +21,9 @@ import com.summondemons.safely.time.DebugSettingsStore
 import com.summondemons.safely.time.GameClock
 import com.summondemons.safely.time.epochDay
 import com.summondemons.safely.time.hoursToMidnight
+import com.summondemons.safely.platform.analytics.Analytics
+import com.summondemons.safely.platform.analytics.AnalyticsEvent
+import com.summondemons.safely.platform.analytics.NoAnalytics
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -66,6 +69,7 @@ class GameViewModel(
     private val debug: DebugSettingsStore,
     private val savedState: SavedStateHandle,
     private val demonIds: List<String> = DemonCatalog.ids,
+    private val analytics: Analytics = NoAnalytics,
 ) : ViewModel() {
 
     private data class Session(val celebration: Celebration? = null, val openSecret: Boolean = false)
@@ -104,6 +108,15 @@ class GameViewModel(
             store.update { ProgressRules.evaluate(it, today()) }
             // Keeps time-derived state right while the app stays open across midnight (§1).
             time.map { it.now.epochDay() }.distinctUntilChanged().drop(1).collect { day -> update { ProgressRules.evaluate(it, day) } }
+        }
+
+        // Escapes, as the stored progress changes (first load included): ADR-0035.
+        viewModelScope.launch {
+            var previous: Progress? = null
+            stored.filterNotNull().collect { now ->
+                previous?.let { before -> ProgressRules.newlyEscaped(before, now).forEach { analytics.track(AnalyticsEvent.DemonEscaped(it)) } }
+                previous = now
+            }
         }
     }
 
@@ -188,7 +201,7 @@ class GameViewModel(
     companion object {
         const val KEY_SELECTED = "selectedDemon"
 
-        fun factory(store: ProgressStore, clock: GameClock, debug: DebugSettingsStore): ViewModelProvider.Factory =
-            viewModelFactory { initializer { GameViewModel(store, clock, debug, createSavedStateHandle()) } }
+        fun factory(store: ProgressStore, clock: GameClock, debug: DebugSettingsStore, analytics: Analytics = NoAnalytics): ViewModelProvider.Factory =
+            viewModelFactory { initializer { GameViewModel(store, clock, debug, createSavedStateHandle(), analytics = analytics) } }
     }
 }
