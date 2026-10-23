@@ -67,6 +67,8 @@ import com.summondemons.safely.ui.components.StageBackground
 import com.summondemons.safely.ui.fx.LocalReduceMotion
 import com.summondemons.safely.ui.fx.ParticleField
 import com.summondemons.safely.ui.fx.ParticleStyle
+import com.summondemons.safely.ui.fx.attentionHalo
+import com.summondemons.safely.ui.fx.rememberAttention
 import com.summondemons.safely.ui.theme.PillShape
 import com.summondemons.safely.ui.theme.Stage
 import com.summondemons.safely.ui.theme.SummonDemonsSafelyTheme
@@ -85,6 +87,8 @@ private const val OPEN_REDUCED_MS = 150L
 private const val OPEN_CHIME_VOLUME = 0.5f
 private const val DAIS_BOTTOM_FRACTION = 0.22f
 private const val DAIS_WIDTH_FRACTION = 0.86f
+/** The count's distance from the bottom safe edge, as a share of the screen (scales like the dais). */
+private const val COUNT_BOTTOM_FRACTION = 0.08f
 private const val ROSE_TILT_DEG = 64f
 /** In units of density; tune on device so the rose reads as a floor. */
 private const val ROSE_CAMERA_DISTANCE = 12f
@@ -101,6 +105,8 @@ private val DaisHeight = 260.dp
 private val RoseDrop = 90.dp
 private val GrimoireWidth = 180.dp
 private val GrimoireHeight = 210.dp
+/** Empty space between the grimoire art's base and the bottom of its frame. */
+private val GrimoireArtInset = 44.dp
 private val DustWidth = 256.dp
 private val DustHeight = 160.dp
 
@@ -183,14 +189,27 @@ fun HomeScreen(
             )
         }
 
-        Column(
-            Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = spacing.xl),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(spacing.md),
-        ) {
-            Text(pluralStringResource(R.plurals.home_bound, demonCount, boundCount, demonCount).upper(), style = MaterialTheme.textRoles.meta)
-            if (showHint) CueChip(stringResource(R.string.home_hint), CueTone.Neutral, Modifier.minimumInteractiveComponentSize().clickable(onClick = open))
+        // The hint belongs to the book: 12 dp under the art's base (the art sits GrimoireArtInset above
+        // its frame's bottom, room for the hop; the 48 dp target adds ~8 dp above the chip), still while
+        // the book bobs, glowing until first used.
+        if (showHint) {
+            CueChip(
+                stringResource(R.string.home_hint),
+                CueTone.Neutral,
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .offset(y = maxHeight * (1f - DAIS_BOTTOM_FRACTION) - GrimoireArtInset + spacing.xs)
+                    .minimumInteractiveComponentSize()
+                    .attentionHalo(rememberAttention(true), lockAccent) // on the chip itself, inside the 48 dp target
+                    .clickable(onClick = open),
+            )
         }
+        // The count on its own line, centred in the band under the rose; it never moves with the hint.
+        Text(
+            pluralStringResource(R.plurals.home_bound, demonCount, boundCount, demonCount).upper(),
+            style = MaterialTheme.textRoles.meta,
+            modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = maxHeight * COUNT_BOTTOM_FRACTION),
+        )
 
         MenuButton(onMenu, Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(spacing.sm))
         if (escaped.isNotEmpty()) EscapeBanner(escaped, onDismissEscape)

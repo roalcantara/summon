@@ -11,9 +11,13 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.unit.dp
 
 /** Half a breath: 1.6 s in and out; [FAST_HALF_MS] while wavering (ADR-0033). */
 private const val HALF_MS = 800
@@ -57,6 +61,27 @@ fun Modifier.attentionGlow(level: State<Float>, color: Color): Modifier = drawBe
             Brush.radialGradient(listOf(color.copy(alpha = GLOW_ALPHA * strength), Color.Transparent), center, radius),
             radius,
             center,
+        )
+    }
+}
+
+/** The halo's rings: how far each reaches past the element, and its strength at full breath. */
+private val HaloRings = listOf(3f to 0.38f, 6f to 0.22f, 10f to 0.1f)
+
+/**
+ * The attention glow for pill-shaped elements (chips, ADR-0033): soft rings that follow the pill's
+ * outline, where a radial glow would hide under an opaque chip. As strong as [level].
+ */
+fun Modifier.attentionHalo(level: State<Float>, color: Color): Modifier = drawBehind {
+    val strength = level.value
+    if (strength <= 0f) return@drawBehind
+    HaloRings.forEach { (reachDp, alpha) ->
+        val reach = reachDp.dp.toPx()
+        drawRoundRect(
+            color = color.copy(alpha = alpha * strength),
+            topLeft = Offset(-reach, -reach),
+            size = Size(size.width + 2 * reach, size.height + 2 * reach),
+            cornerRadius = CornerRadius(size.height / 2f + reach),
         )
     }
 }
