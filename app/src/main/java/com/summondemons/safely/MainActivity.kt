@@ -20,6 +20,11 @@ class MainActivity : ComponentActivity() {
         super.attachBaseContext(AppLocale.wrap(newBase))
     }
 
+    override fun onStart() {
+        super.onStart()
+        (application as SummonApp).graph.reportOpen()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splash = installSplashScreen()
         // Dark theme only: light-on-dark system bar icons regardless of system setting.

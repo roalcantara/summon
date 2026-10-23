@@ -759,4 +759,18 @@ Entry format:
 - **Status:** new (2026-10-22)
 - **English (9):** Listening
 - **Translations:** es: "Oyendo" (6) · pt-BR: "Ouvindo" (7) · it: "Ascolto" (7) · fr: "J’écoute" (8)
+
+### en/es/pt-BR/it/fr · settings_analytics
+
+- **Status:** new (2026-10-23)
+- **English (27):** Share anonymous usage data
+- **Translations:** es: "Datos de uso anónimos" (22) · pt-BR: "Dados de uso anônimos" (22) · it: "Dati d’uso anonimi" (18) · fr: "Données d’usage anonymes" (24)
+- **Lost:** None: concise toggle label, all shorter than English.
+
+### en/es/pt-BR/it/fr · settings_analytics_hint
+
+- **Status:** new (2026-10-23)
+- **English (28):** No audio, no personal data.
+- **Translations:** es: "Sin audio ni datos tuyos." (26) · pt-BR: "Sem áudio, sem dados seus." (26) · it: "Niente audio né dati tuoi." (26) · fr: "Ni audio ni données perso." (26)
+- **Lost:** None: concise hint, all shorter than English.
 - **Lost:** None: concise present state on the mic chip, all shorter than English.

@@ -61,7 +61,7 @@ import com.summondemons.safely.ui.screens.RitualScreen
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavController()) {
-    val factory = remember(graph) { GameViewModel.factory(graph.progressStore, graph.clock, graph.debugSettings) }
+    val factory = remember(graph) { GameViewModel.factory(graph.progressStore, graph.clock, graph.debugSettings, analytics = graph.analytics) }
     val game: GameViewModel = viewModel(factory = factory) // activity-scoped
     val state by game.uiState.collectAsStateWithLifecycle()
     val appContext = LocalContext.current.applicationContext
@@ -120,7 +120,7 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
                             if (demon == null) {
                                 LaunchedEffect(Unit) { navController.popBackStack() }
                             } else {
-                                RitualDestination(demon, game, state, appContext, navController)
+                                RitualDestination(demon, game, state, appContext, navController, graph)
                             }
                         }
                     }
@@ -128,11 +128,17 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
             }
         }
         if (settingsOpen) {
+            var analyticsOn by remember { mutableStateOf(graph.analyticsSettings.enabled) }
             SettingsSheet(
                 language = AppLocale.get(appContext),
                 onLanguage = { tag ->
                     AppLocale.set(appContext, tag)
                     activity?.recreate()
+                },
+                analyticsEnabled = analyticsOn,
+                onAnalytics = {
+                    graph.analyticsSettings.enabled = it
+                    analyticsOn = it
                 },
                 onDismiss = { settingsOpen = false },
                 onDebug = if (BuildConfig.DEBUG) ({ settingsOpen = false; debugOpen = true }) else null,
@@ -191,6 +197,7 @@ private fun RitualDestination(
     state: GameUiState,
     appContext: android.content.Context,
     navController: NavHostController,
+    graph: AppGraph,
 ) {
     val ritualFactory = remember(demon) {
         // The day the ritual started spends the summon, even if the climax lands after midnight (§1).
@@ -220,6 +227,7 @@ private fun RitualDestination(
             },
             // Before every ritual; "?" on the chant screen reopens it (ADR-0021).
             showIntro = true,
+            analytics = graph.analytics,
         )
     }
     val ritual: RitualViewModel = viewModel(factory = ritualFactory)

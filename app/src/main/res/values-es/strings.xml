@@ -21,6 +21,8 @@
     <string name="settings_title">Ajustes</string>
     <string name="settings_language">Idioma</string>
     <string name="settings_language_device">Del teléfono</string>
+    <string name="settings_analytics">Datos de uso anónimos</string>
+    <string name="settings_analytics_hint">Sin audio ni datos tuyos.</string>
     <string name="escape_banner">¡Sello roto!</string>
     <string name="escape_one">¡%1$s escapó de su sello en tu ausencia!</string>
     <string name="escape_all">¡Los dos escaparon de sus sellos en tu ausencia!</string>

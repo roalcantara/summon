@@ -23,6 +23,8 @@
     <string name="settings_title">Settings</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_device">Phone language</string>
+    <string name="settings_analytics">Share anonymous usage data</string>
+    <string name="settings_analytics_hint">No audio, no personal data.</string>
     <string name="escape_banner">Seal broken!</string>
     <string name="escape_one">%1$s slipped his seal while you were away!</string>
     <string name="escape_all">Both spirits slipped their seals while you were away!</string>

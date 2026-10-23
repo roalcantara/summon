@@ -1,5 +1,10 @@
 package com.summondemons.safely.ui.components
 
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material3.Switch
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -24,10 +29,17 @@ import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.textRoles
 import com.summondemons.safely.ui.theme.upper
 
-/** Settings (RC): the app language only, for now, plus Debug in debug builds. Languages are named in their own tongue. */
+/** Settings (RC): language, anonymous analytics switch, plus Debug in debug builds. */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun SettingsSheet(language: String?, onLanguage: (String?) -> Unit, onDismiss: () -> Unit, onDebug: (() -> Unit)? = null) {
+fun SettingsSheet(
+    language: String?,
+    onLanguage: (String?) -> Unit,
+    analyticsEnabled: Boolean,
+    onAnalytics: (Boolean) -> Unit,
+    onDismiss: () -> Unit,
+    onDebug: (() -> Unit)? = null,
+) {
     val spacing = MaterialTheme.spacing
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
         Column(
@@ -51,6 +63,17 @@ fun SettingsSheet(language: String?, onLanguage: (String?) -> Unit, onDismiss: (
                         label = { Text(tag?.let(AppLocale::nativeName) ?: stringResource(R.string.settings_language_device)) },
                     )
                 }
+            }
+            Row(
+                Modifier.fillMaxWidth().toggleable(value = analyticsEnabled, role = Role.Switch, onValueChange = onAnalytics),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(spacing.md),
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.settings_analytics), style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.settings_analytics_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = analyticsEnabled, onCheckedChange = null)
             }
             // Debug builds only: the debug controls live under the menu (one gear on every screen)
             if (onDebug != null) {

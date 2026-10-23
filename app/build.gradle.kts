@@ -17,6 +17,10 @@ val hasUploadKey = listOf(
     "SUMMON_UPLOAD_STORE_FILE", "SUMMON_UPLOAD_STORE_PASSWORD",
     "SUMMON_UPLOAD_KEY_ALIAS", "SUMMON_UPLOAD_KEY_PASSWORD",
 ).all { !signingValue(it).isNullOrBlank() }
+// Analytics (ADR-0035): like the upload key, from the environment or local.properties; never in git.
+val telemetryDeckAppId = signingValue("SUMMON_TELEMETRYDECK_APP_ID").orEmpty()
+val telemetryDeckTestMode = signingValue("SUMMON_TELEMETRYDECK_TEST_MODE") == "true"
+if (telemetryDeckAppId.isBlank()) logger.warn("SUMMON_TELEMETRYDECK_APP_ID not set: release builds send no analytics.")
 
 android {
     namespace = "com.summondemons.safely"
@@ -40,6 +44,8 @@ android {
                 arguments += listOf("-DCMAKE_BUILD_TYPE=Release", "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON")
             }
         }
+        buildConfigField("String", "TELEMETRYDECK_APP_ID", "\"$telemetryDeckAppId\"")
+        buildConfigField("boolean", "TELEMETRYDECK_TEST_MODE", "$telemetryDeckTestMode")
     }
     signingConfigs {
         if (hasUploadKey) {
@@ -135,6 +141,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.core.splashscreen)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+    implementation(libs.telemetrydeck)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)
