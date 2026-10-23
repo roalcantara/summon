@@ -759,6 +759,7 @@ Entry format:
 - **Status:** new (2026-10-22)
 - **English (9):** Listening
 - **Translations:** es: "Oyendo" (6) · pt-BR: "Ouvindo" (7) · it: "Ascolto" (7) · fr: "J’écoute" (8)
+- **Lost:** None: concise present state on the mic chip, all shorter than English.
 
 ### en/es/pt-BR/it/fr · settings_analytics
 
@@ -773,4 +774,3 @@ Entry format:
 - **English (28):** No audio, no personal data.
 - **Translations:** es: "Sin audio ni datos tuyos." (26) · pt-BR: "Sem áudio, sem dados seus." (26) · it: "Niente audio né dati tuoi." (26) · fr: "Ni audio ni données perso." (26)
 - **Lost:** None: concise hint, all shorter than English.
-- **Lost:** None: concise present state on the mic chip, all shorter than English.
