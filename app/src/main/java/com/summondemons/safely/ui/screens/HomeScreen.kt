@@ -1,4 +1,5 @@
 package com.summondemons.safely.ui.screens
+import androidx.activity.compose.BackHandler
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
@@ -243,6 +244,7 @@ private fun CourtChip(houses: Set<House>) {
 
 @Composable
 private fun BoxScope.EscapeBanner(escaped: List<Demon>, onDismiss: () -> Unit) {
+    BackHandler(onBack = onDismiss)
     val colors = MaterialTheme.colorScheme
     val spacing = MaterialTheme.spacing
     val reduceMotion = LocalReduceMotion.current

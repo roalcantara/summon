@@ -376,8 +376,17 @@ fun GrimoireScreen(
 
         // Fixed above the pages: the header, the arrows over the stage, the celebration banner.
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
-            // Like system back (BackHandler above), the header's back arrow dismisses the celebration first.
-            GrimoireHeader({ if (party != null) onDismissCelebration() else onBack() }, onMenu)
+            // Like system back (the BackHandlers above): dismiss the celebration, else turn the card to its front, else leave.
+            GrimoireHeader(
+                {
+                    when {
+                        party != null -> onDismissCelebration()
+                        side == CardSide.Back -> side = CardSide.Front
+                        else -> onBack()
+                    }
+                },
+                onMenu,
+            )
             BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
                 val cardHeight = cardHeightIn(maxHeight)
                 Column(Modifier.fillMaxSize()) {
