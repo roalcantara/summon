@@ -29,38 +29,38 @@ triage. No finding is a true release blocker; the five "Blockers" are either per
 
 ## Triage
 
-| Finding | Disposition | Reason |
-|---|---|---|
-| R1-1 | Verify (task 7) | Likely false positive; prove with a dump |
-| R1-2 | Won't fix | Moot at targetSdk 37 |
-| R1-3, R1-4, R1-5, R1-6 / R2-1..R2-4 | Fix, task 1 | Confirmed: `.value` of an infinite transition read in composition |
-| R2-5 | Fix, task 1 | Confirmed: `angle` read in composition; `Path()` allocated per beam per frame |
-| R2-14 | Fix (derivedStateOf part), task 1; spec part deferred | Face switch recomposes per frame; spring retune is taste |
-| R3-1 | Fix, task 2 | No `BackHandler` for the escape banner: Back exits the app |
-| R3-2 | Fix, task 2 | Header `←` ignores `CardSide.Back`, unlike system Back (line 248) |
-| R3-3 | Fix, task 3 | Intro ✕ lacks the 16 dp the chant HUD ✕ has |
-| R3-4 | Fix, task 3 | Icon shows an error state the game does not have |
-| R3-5 | Fix, task 4 | Violates ADR-0029 §5 |
-| R3-6, R3-7 | Fix, task 5 | Fixed-size art slots without `fontScaleCapped()` (ADR-0033) |
-| R3-8 | Fix, task 5 | Settings sheet cannot scroll at 2.0× |
-| R1-12 | Fix, task 5 | Possible double bottom inset in Settings and Debug sheets |
-| R2-8, R2-13, R1-17 / R2-9 | Fix, task 6 | Reduce motion not honoured |
-| R1-7, R1-18 | Fix, task 7 | TalkBack reads content before the navigation HUD |
-| R1-8 | Fix, task 7 | Home hint chip is a live region and has no button role |
-| R1-9 | Fix, task 7 | No focus indication on `StageArrow` and the intro Summon for keyboard/D-pad |
-| R1-10 | Fix, task 7 | `DemonCutout` has no button role |
-| R1-11 | Fix, task 7 | Text `←` does not mirror in RTL |
-| R2-10, R2-11, R2-12 | Fix, task 8 | Cheap expressive-motion wins at the peak moments |
-| R2-18 | Fix, task 8 | Summon gets a light haptic, like the heading lock |
-| R1-14 / R3-9 | Fix, task 8 | Off-grid 6 dp / 10 dp spacing |
-| R1-16 | Fix, task 8 | Unused import |
-| R1-19 | Fix, task 8 | Open badge resets on recreation |
-| R3-10 | Fix, task 8 | Selected badge header too light at 10 sp |
-| R2-6 | Deferred | Screen-transition motion is a design decision (needs an ADR); M effort |
-| R1-13 / R3-11 | Deferred | Typography token consolidation: M effort, no player-visible change |
-| R1-15 | Deferred | Font-scale previews: ui_matrix already covers font scales |
-| R2-15, R2-16, R2-17 | Deferred | Feel tuning; judge on device after v1 |
-| R2-7 | Won't fix | False: off-screen pages are not composed |
+| Finding | Disposition | Reason | Outcome |
+|---|---|---|---|
+| R1-1 | Verify (task 7) | Likely false positive; prove with a dump | Verified, no change |
+| R1-2 | Won't fix | Moot at targetSdk 37 | Won't fix |
+| R1-3, R1-4, R1-5, R1-6 / R2-1..R2-4 | Fix, task 1 | Confirmed: `.value` of an infinite transition read in composition | Fixed 03425fb |
+| R2-5 | Fix, task 1 | Confirmed: `angle` read in composition; `Path()` allocated per beam per frame | Fixed 03425fb |
+| R2-14 | Fix (derivedStateOf part), task 1; spec part deferred | Face switch recomposes per frame; spring retune is taste | Fixed 03425fb |
+| R3-1 | Fix, task 2 | No `BackHandler` for the escape banner: Back exits the app | Fixed e0b2102 |
+| R3-2 | Fix, task 2 | Header `←` ignores `CardSide.Back`, unlike system Back (line 248) | Fixed e0b2102 |
+| R3-3 | Fix, task 3 | Intro ✕ lacks the 16 dp the chant HUD ✕ has | Fixed c42fe16 |
+| R3-4 | Fix, task 3 | Icon shows an error state the game does not have | Fixed c42fe16 |
+| R3-5 | Fix, task 4 | Violates ADR-0029 §5 | Fixed 8f95367 |
+| R3-6, R3-7 | Fix, task 5 | Fixed-size art slots without `fontScaleCapped()` (ADR-0033) | Fixed a1d3291 |
+| R3-8 | Fix, task 5 | Settings sheet cannot scroll at 2.0× | Fixed a1d3291 |
+| R1-12 | Fix, task 5 | Possible double bottom inset in Settings and Debug sheets | Verified, no change |
+| R2-8, R2-13, R1-17 / R2-9 | Fix, task 6 | Reduce motion not honoured | Fixed f1503c6 |
+| R1-7, R1-18 | Fix, task 7 | TalkBack reads content before the navigation HUD | Fixed d2786e6 |
+| R1-8 | Fix, task 7 | Home hint chip is a live region and has no button role | Fixed d2786e6 |
+| R1-9 | Fix, task 7 | No focus indication on `StageArrow` and the intro Summon for keyboard/D-pad | Fixed d2786e6 |
+| R1-10 | Fix, task 7 | `DemonCutout` has no button role | Fixed d2786e6 |
+| R1-11 | Fix, task 7 | Text `←` does not mirror in RTL | Fixed d2786e6 |
+| R2-10, R2-11, R2-12 | Fix, task 8 | Cheap expressive-motion wins at the peak moments | Fixed d340c9a |
+| R2-18 | Fix, task 8 | Summon gets a light haptic, like the heading lock | Fixed d340c9a |
+| R1-14 / R3-9 | Fix, task 8 | Off-grid 6 dp / 10 dp spacing | Fixed d340c9a |
+| R1-16 | Fix, task 8 | Unused import | Fixed d340c9a |
+| R1-19 | Fix, task 8 | Open badge resets on recreation | Fixed d340c9a |
+| R3-10 | Fix, task 8 | Selected badge header too light at 10 sp | Fixed d340c9a |
+| R2-6 | Deferred | Screen-transition motion is a design decision (needs an ADR); M effort | Deferred |
+| R1-13 / R3-11 | Deferred | Typography token consolidation: M effort, no player-visible change | Deferred |
+| R1-15 | Deferred | Font-scale previews: ui_matrix already covers font scales | Deferred |
+| R2-15, R2-16, R2-17 | Deferred | Feel tuning; judge on device after v1 | Deferred |
+| R2-7 | Won't fix | False: off-screen pages are not composed | Won't fix |
 
 Deferred items go to `TODO.md` as one entry ("Final-pass deferred motion/typography items") pointing
 here.

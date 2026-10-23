@@ -84,3 +84,8 @@
   - **Priority**: high
   - **Created**: 2026-10-23 08:00
   - **Tags**: release
+
+- [ ] FPdf **-** Final-pass deferred items: NavHost transitions (needs ADR), typography tokens, font-scale previews, sigil ring spring harmony (spec 2026-10-23-final-pass-fixes §Triage)
+  - **Priority**: medium
+  - **Created**: 2026-10-23 15:00
+  - **Tags**: post-release
