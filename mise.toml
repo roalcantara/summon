@@ -29,3 +29,25 @@ python3 -I tools/gen_icons.py "${args[@]}"
 [ "${usage_open:-false}" = "true" ] && open "${usage_preview}"
 if [ "${usage_install:-false}" = "true" ]; then ./gradlew installDebug -q; fi
 '''
+
+# Play upload (ADR-0017). The script is tools/release_bundle.sh.
+[tasks."release:bundle"]
+description = """Build the signed release App Bundle for a Play Console upload: bump versionCode \
+by one (Play never accepts a code twice, internal testing included), run the unit tests, \
+./gradlew bundleRelease, then verify it: jarsigner, signer = the upload key in the keystore, \
+manifest version, not debuggable; prints the .aab path, size, SHA-256 and permissions. Needs the \
+SUMMON_UPLOAD_* values (env or local.properties) and no uncommitted tracked changes. Undoes the \
+bump if anything fails; leaves a successful bump uncommitted. --no-bump rebuilds at the current \
+code (only if never uploaded); --name also sets versionName."""
+alias = "bundle"
+usage = '''
+flag "--no-bump" help="Keep the current versionCode (only if it was never uploaded)"
+flag "--name <versionName>" help="Also set versionName, e.g. 1.0.1"
+'''
+run = '''
+set -euo pipefail
+args=()
+[ "${usage_no_bump:-false}" = "true" ] && args+=(--no-bump)
+[ -n "${usage_name:-}" ] && args+=(--name "${usage_name}")
+tools/release_bundle.sh ${args[@]+"${args[@]}"}  # empty-safe under set -u (bash 3.2)
+'''
