@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Icon
@@ -87,16 +88,32 @@ fun ChantScreen(
         val phraseGlow = rememberAttention(attention == Attention.Phrase)
         val parts = ChantParts(
             buttons = { CornerButtons(onHelp, debug) },
+            close = if (showClose) {
+                {
+                    IconButton(onClick = onClose) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_close),
+                            contentDescription = stringResource(R.string.action_abort),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            } else {
+                null
+            },
             name = { ChantNamePlate(demon.name, accent) },
             track = { SealTrack(screen.seals, accent, screen.drifting, screen.checking) },
             pill = { DirectionPillView(screen.pill, demon.ritualHeading) },
             sigil = { ChantSigil(state, screen, accent, flash, sigilGlow, Modifier.fillMaxSize().onSizeChanged { sigilPx = it.width }) },
             slot = { if (blocker == null) FeedbackSlot(screen.slot, accent, state.micLevel, screen.drifting) },
             line = { m ->
+                val reserved = LineReservedTop
                 if (blocker != null) {
-                    Box(m, contentAlignment = Alignment.Center) { blocker() }
+                    Box(m.padding(top = reserved), contentAlignment = Alignment.Center) { blocker() }
                 } else {
-                    ChantLine(screen.words, screen.gated, screen.drifting, screen.lockFraction, accent, phraseGlow, emphasize = attention == Attention.Phrase, onPhraseSize = { phraseSp = it }, modifier = m.onSizeChanged { box = it })
+                    AxisLine(reservedTop = reserved, modifier = m.onSizeChanged { box = it }) {
+                        ChantLine(screen.words, screen.gated, screen.drifting, screen.lockFraction, accent, phraseGlow, emphasize = attention == Attention.Phrase, onPhraseSize = { phraseSp = it }, modifier = Modifier.fillMaxWidth())
+                    }
                 }
             },
         )
@@ -112,15 +129,6 @@ fun ChantScreen(
                     .safeDrawingPadding()
                     .padding(horizontal = MaterialTheme.spacing.xs),
             )
-        }
-        if (showClose) {
-            IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).safeDrawingPadding().padding(MaterialTheme.spacing.lg)) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_close),
-                    contentDescription = stringResource(R.string.action_abort),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
         }
     }
 

@@ -7,18 +7,28 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 
-/**
- * The sigil's diameter in a stack of name plate, sigil and pill (spec 2026-10-22 polish §2): all
- * the height the plate, the pill (null when hidden) and the gaps leave, capped by the width.
- */
-internal fun stackDiameter(width: Int, height: Int, nameHeight: Int, pillHeight: Int?, gap: Int): Int {
-    val pillRow = pillHeight?.let { it + gap } ?: 0
-    return minOf(width, height - nameHeight - gap - pillRow).coerceAtLeast(0)
-}
+/** The left stack's sigil diameter and the group's top (spec 2026-10-23 §4). */
+internal data class StackLayout(val diameter: Int, val top: Int)
 
 /**
- * Name plate over sigil over direction pill, top-aligned and centred, all as wide as the sigil,
- * which takes the height the other two leave ([stackDiameter]).
+ * Name plate, sigil and pill as one group centred in the column: [gap] between them, at least
+ * [air] above and below; the sigil takes what is left, capped by the width. A hidden pill
+ * (null) gives up its row and gap.
+ */
+internal fun stackLayout(width: Int, height: Int, nameHeight: Int, pillHeight: Int?, gap: Int, air: Int): StackLayout {
+    val pillRow = pillHeight?.let { it + gap } ?: 0
+    val fixed = nameHeight + gap + pillRow
+    val d = minOf(width, height - 2 * air - fixed).coerceAtLeast(0)
+    return StackLayout(d, ((height - fixed - d) / 2).coerceAtLeast(0))
+}
+
+/** Top of a phrase [height] tall, centred on [axis] but kept inside [top]..[bottom] (spec §6). */
+internal fun phraseTop(axis: Int, top: Int, bottom: Int, height: Int): Int =
+    (axis - height / 2).coerceAtMost(bottom - height).coerceAtLeast(top)
+
+/**
+ * Name plate over sigil over direction pill, one group centred in the column (spec 2026-10-23 §4),
+ * all as wide as the sigil, which takes the height the other two leave ([stackLayout]).
  */
 @Composable
 internal fun SigilStack(
@@ -26,6 +36,7 @@ internal fun SigilStack(
     sigil: @Composable () -> Unit,
     pill: @Composable () -> Unit,
     gap: Dp,
+    air: Dp,
     modifier: Modifier = Modifier,
 ) {
     // The pill's row stays reserved once it has been seen: when it hides (climax) the sigil must
@@ -36,24 +47,45 @@ internal fun SigilStack(
         val nameM = names.first()
         val pillM = pills.firstOrNull()
         pillM?.let { reservedPill[0] = it.maxIntrinsicHeight(constraints.maxWidth) }
-        val d = stackDiameter(
+        val nameH = nameM.maxIntrinsicHeight(constraints.maxWidth)
+        val s = stackLayout(
             width = constraints.maxWidth,
             height = constraints.maxHeight,
-            nameHeight = nameM.maxIntrinsicHeight(constraints.maxWidth),
+            nameHeight = nameH,
             pillHeight = reservedPill[0].takeIf { it > 0 },
             gap = gapPx,
+            air = air.roundToPx(),
         )
+        val d = s.diameter
         val n = nameM.measure(Constraints.fixedWidth(d))
-        val s = sigils.first().measure(Constraints.fixed(d, d))
+        val sg = sigils.first().measure(Constraints.fixed(d, d))
         val p = pillM?.measure(Constraints.fixedWidth(d))
         layout(constraints.maxWidth, constraints.maxHeight) {
             val x = (constraints.maxWidth - d) / 2
-            var y = 0
+            var y = s.top
             n.place(x, y)
-            y += n.height + gapPx
-            s.place(x, y)
+            y += nameH + gapPx
+            sg.place(x, y)
             y += d + gapPx
             p?.place(x, y)
+        }
+    }
+}
+
+/**
+ * Lays [content] (the phrase, auto-sized) in the space from [reservedTop] to the bottom, then
+ * places it with its centre on this box's vertical middle, the screen's axis, as far as that
+ * space allows ([phraseTop]). [content] must wrap its height (no fillMaxSize).
+ */
+@Composable
+internal fun AxisLine(reservedTop: Dp, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Layout(content = content, modifier = modifier) { measurables, constraints ->
+        val top = reservedTop.roundToPx()
+        val room = (constraints.maxHeight - top).coerceAtLeast(0)
+        val placeable = measurables.first().measure(Constraints(maxWidth = constraints.maxWidth, maxHeight = room))
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            val y = phraseTop(axis = constraints.maxHeight / 2, top = top, bottom = constraints.maxHeight, height = placeable.height)
+            placeable.place((constraints.maxWidth - placeable.width) / 2, y)
         }
     }
 }

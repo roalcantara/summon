@@ -710,7 +710,7 @@ internal fun ChantLine(
         },
         contentAlignment = Alignment.Center,
     ) {
-        Phrase(words, accent, emphasize, onPhraseSize, Modifier.fillMaxSize().graphicsLayer { this.alpha = alpha })
+        Phrase(words, accent, emphasize, onPhraseSize, Modifier.fillMaxWidth().graphicsLayer { this.alpha = alpha })
     }
 }
 
