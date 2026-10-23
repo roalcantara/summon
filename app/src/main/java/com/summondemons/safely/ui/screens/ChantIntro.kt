@@ -117,7 +117,7 @@ fun ChantIntro(
             }
         }
         if (showClose) {
-            IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).safeDrawingPadding()) {
+            IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).safeDrawingPadding().padding(spacing.lg)) {
                 Icon(
                     painter = painterResource(R.drawable.ic_close),
                     contentDescription = stringResource(R.string.intro_close),
@@ -166,7 +166,7 @@ private fun Rules(accent: Color, modifier: Modifier) {
             val rule = Modifier.padding(vertical = spacing.sm)
             Box(rule) { Rule(1, accent, R.string.intro_direction_title, R.string.intro_direction_body) { CheckIcon() } }
             Box(rule) { Rule(2, accent, R.string.intro_chant_title, R.string.intro_chant_body) { SealsIcon(accent) } }
-            Box(rule) { Rule(3, accent, R.string.intro_lines_title, R.string.intro_lines_body) { LinesIcon() } }
+            Box(rule) { Rule(3, accent, R.string.intro_lines_title, R.string.intro_lines_body) { LinesIcon(accent) } }
             Box(rule) { Rule(4, accent, R.string.intro_focus_title, R.string.intro_focus_body) { FocusIcon(accent) } }
         }
     }
@@ -259,29 +259,20 @@ private fun CheckIcon() {
     }
 }
 
+/** What the line shows: a green line under the words heard, the accent line with its halo under the current one. */
 @Composable
-private fun LinesIcon() {
+private fun LinesIcon(accent: Color) {
     val safe = MaterialTheme.demonColors.ritualSafe
-    val error = MaterialTheme.colorScheme.error
     Canvas(Modifier.size(RuleIcon, RuleIcon * 0.7f)) {
         val w = size.height * 0.12f
-        drawLine(safe, Offset(0f, size.height * 0.3f), Offset(size.width * 0.42f, size.height * 0.3f), w, StrokeCap.Round)
-        val path = Path().apply {
-            val y = size.height * 0.72f
-            moveTo(size.width * 0.55f, y)
-            var x = size.width * 0.55f
-            var up = true
-            val step = size.width * 0.11f
-            while (x < size.width) {
-                val next = minOf(x + step, size.width)
-                quadraticTo((x + next) / 2f, if (up) y - w * 1.5f else y + w * 1.5f, next, y)
-                x = next
-                up = !up
-            }
-        }
-        drawPath(path, error, style = Stroke(w * 0.8f, cap = StrokeCap.Round))
+        val y = size.height * 0.5f
+        drawLine(safe, Offset(0f, y), Offset(size.width * 0.42f, y), w, StrokeCap.Round)
+        drawLine(accent.copy(alpha = LINES_HALO_ALPHA), Offset(size.width * 0.55f, y), Offset(size.width, y), w * 3f, StrokeCap.Round)
+        drawLine(accent, Offset(size.width * 0.55f, y), Offset(size.width, y), w, StrokeCap.Round)
     }
 }
+
+private const val LINES_HALO_ALPHA = 0.3f
 
 /** Four small seals, the first lit and the second under way: "a finished line lights its seal". */
 @Composable
