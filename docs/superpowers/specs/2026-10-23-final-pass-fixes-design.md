@@ -31,7 +31,7 @@ triage. No finding is a true release blocker; the five "Blockers" are either per
 
 | Finding | Disposition | Reason | Outcome |
 |---|---|---|---|
-| R1-1 | Verify (task 7) | Likely false positive; prove with a dump | Verified, no change |
+| R1-1 | Verify (task 7) | Likely false positive; prove with a dump | Pending device check (code unchanged) |
 | R1-2 | Won't fix | Moot at targetSdk 37 | Won't fix |
 | R1-3, R1-4, R1-5, R1-6 / R2-1..R2-4 | Fix, task 1 | Confirmed: `.value` of an infinite transition read in composition | Fixed 03425fb |
 | R2-5 | Fix, task 1 | Confirmed: `angle` read in composition; `Path()` allocated per beam per frame | Fixed 03425fb |
@@ -43,7 +43,7 @@ triage. No finding is a true release blocker; the five "Blockers" are either per
 | R3-5 | Fix, task 4 | Violates ADR-0029 §5 | Fixed 8f95367 |
 | R3-6, R3-7 | Fix, task 5 | Fixed-size art slots without `fontScaleCapped()` (ADR-0033) | Fixed a1d3291 |
 | R3-8 | Fix, task 5 | Settings sheet cannot scroll at 2.0× | Fixed a1d3291 |
-| R1-12 | Fix, task 5 | Possible double bottom inset in Settings and Debug sheets | Verified, no change |
+| R1-12 | Fix, task 5 | Possible double bottom inset in Settings and Debug sheets | Pending device check (code unchanged) |
 | R2-8, R2-13, R1-17 / R2-9 | Fix, task 6 | Reduce motion not honoured | Fixed f1503c6 |
 | R1-7, R1-18 | Fix, task 7 | TalkBack reads content before the navigation HUD | Fixed d2786e6 |
 | R1-8 | Fix, task 7 | Home hint chip is a live region and has no button role | Fixed d2786e6 |

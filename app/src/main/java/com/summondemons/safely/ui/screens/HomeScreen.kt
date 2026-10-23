@@ -1,6 +1,6 @@
 package com.summondemons.safely.ui.screens
-import androidx.activity.compose.BackHandler
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -192,7 +192,7 @@ fun HomeScreen(
         }
 
         // The hint belongs to the book: 12 dp under the art's base (the art sits GrimoireArtInset above
-        // its frame's bottom, room for the hop; the 48 dp target adds ~8 dp above the chip), still while
+        // its frame's bottom, room for the hop; the 48 dp target adds ~6 dp above the chip), still while
         // the book bobs, glowing until first used.
         if (showHint) {
             CueChip(

@@ -512,7 +512,8 @@ private fun Stage(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null,
                                     enabled = !bound || party,
-                                    role = Role.Button,
+                                    // A button only while it acts; a bound portrait is not a disabled control.
+                                    role = if (!bound || party) Role.Button else null,
                                     onClick = onPrimary,
                                 )
                                 .semantics { contentDescription = label },

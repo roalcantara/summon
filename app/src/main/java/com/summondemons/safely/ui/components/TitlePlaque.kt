@@ -1,12 +1,11 @@
 package com.summondemons.safely.ui.components
 
-import androidx.compose.foundation.text.TextAutoSize
-import com.summondemons.safely.ui.theme.fontScaleCapped
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +26,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import com.summondemons.safely.ui.theme.fontScaleCapped
 import com.summondemons.safely.ui.theme.textRoles
 import com.summondemons.safely.ui.theme.upper
 
@@ -37,7 +37,7 @@ private val TitlePadding = 38.dp // chamfer + diamond + gap on each side
 private val DiamondOffset = 27.dp // diamond centre from each end
 private val DiamondRadius = 3.5.dp
 private val TitleSize = 20.sp
-private val TitleMinSize = 12.sp
+private val TitleMinSize = 8.sp
 private const val FILL_ALPHA = 0.94f
 private const val INNER_LINE_ALPHA = 0.45f
 
