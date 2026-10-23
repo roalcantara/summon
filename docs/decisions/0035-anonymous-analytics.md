@@ -21,3 +21,16 @@ is one class.
 - `INTERNET` permission; privacy policy and Play Data safety updated; no consent banner (no
   advertising or device IDs).
 - The app ID comes from `SUMMON_TELEMETRYDECK_APP_ID` (environment or local.properties).
+
+## Amendment 2026-10-23: v1 ships without an analytics provider
+TelemetryDeck no longer offers a free plan. Rather than delay the release for a vendor decision,
+v1 ships with **no analytics**: the TelemetryDeck SDK, its sink and the `INTERNET` permission are
+removed, release builds use `NoAnalytics`, and Settings hides the "Share anonymous usage data"
+switch while no provider is wired (`AppGraph.analyticsWired`). Debug builds still log the events
+to Logcat. The typed events, the opt-out gate and the instance ID stay, so v1.1 adds one sink.
+- Play Data safety for v1: **no data collected**. The privacy policy says so.
+- v1 is judged from Play Console data only (installs, retained installers, ratings, vitals); the
+  in-game metrics and the Psst test wait for v1.1.
+- Choosing the provider is v1.1 work (TODO). Candidates as of 2026-10-23: PostHog Cloud (1M free
+  events/month, anonymous events, funnels and retention), Firebase Analytics (free, but device IDs to
+  declare), Aptabase (private, but no retention or funnels).

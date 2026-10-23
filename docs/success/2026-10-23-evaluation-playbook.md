@@ -5,6 +5,9 @@
 - Events: `docs/superpowers/specs/2026-10-23-analytics-design.md`
 - Audience: whoever runs the evaluation (a person or an agent). Everything needed to run it is here.
 
+> **v1 ships without analytics** (ADR-0035, amended 2026-10-23). Judge v1 with the Play Console rows
+> only; every TelemetryDeck/in-game metric below (and the Psst test) applies once v1.1 wires a provider.
+
 ## What is being tested
 
 | Experiment | Hypothesis |

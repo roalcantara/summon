@@ -36,7 +36,8 @@ import com.summondemons.safely.ui.theme.upper
 fun SettingsSheet(
     language: String?,
     onLanguage: (String?) -> Unit,
-    analyticsEnabled: Boolean,
+    /** Null hides the switch: no analytics provider is wired up (v1 release builds, ADR-0035). */
+    analyticsEnabled: Boolean?,
     onAnalytics: (Boolean) -> Unit,
     onDismiss: () -> Unit,
     onDebug: (() -> Unit)? = null,
@@ -70,7 +71,7 @@ fun SettingsSheet(
                     )
                 }
             }
-            Row(
+            if (analyticsEnabled != null) Row(
                 Modifier.fillMaxWidth().toggleable(value = analyticsEnabled, role = Role.Switch, onValueChange = onAnalytics),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(spacing.md),

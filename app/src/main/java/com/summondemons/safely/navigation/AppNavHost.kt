@@ -137,7 +137,7 @@ fun AppNavHost(graph: AppGraph, navController: NavHostController = rememberNavCo
                     AppLocale.set(appContext, tag)
                     activity?.recreate()
                 },
-                analyticsEnabled = analyticsOn,
+                analyticsEnabled = analyticsOn.takeIf { graph.analyticsWired },
                 onAnalytics = {
                     graph.analyticsSettings.enabled = it
                     analyticsOn = it

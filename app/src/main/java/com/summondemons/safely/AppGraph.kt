@@ -1,6 +1,5 @@
 package com.summondemons.safely
 
-import android.app.Application
 import android.content.Context
 import com.summondemons.safely.platform.DataStoreDebugSettingsStore
 import com.summondemons.safely.platform.SystemGameClock
@@ -11,7 +10,6 @@ import com.summondemons.safely.platform.analytics.ForegroundOpens
 import com.summondemons.safely.platform.analytics.GatedAnalytics
 import com.summondemons.safely.platform.analytics.LogAnalytics
 import com.summondemons.safely.platform.analytics.NoAnalytics
-import com.summondemons.safely.platform.analytics.TelemetryDeckAnalytics
 import com.summondemons.safely.platform.progressStore
 import com.summondemons.safely.progress.ProgressStore
 import com.summondemons.safely.time.DebugSettingsStore
@@ -32,16 +30,13 @@ class AppGraph(context: Context) {
     val debugSettings: DebugSettingsStore = debugStore ?: NoDebugSettings
     val clock: GameClock = SystemGameClock(appContext, debugSettings.settings)
     val analyticsSettings = AnalyticsSettings(appContext)
-    private val sink: Analytics = when {
-        BuildConfig.DEBUG -> LogAnalytics
-        BuildConfig.TELEMETRYDECK_APP_ID.isBlank() -> NoAnalytics
-        else -> TelemetryDeckAnalytics(
-            appContext as Application,
-            BuildConfig.TELEMETRYDECK_APP_ID,
-            analyticsSettings.instanceId,
-            BuildConfig.TELEMETRYDECK_TEST_MODE,
-        )
-    }
+    /**
+     * v1 ships without an analytics provider (ADR-0035, amended): release builds send nothing and
+     * hide the switch; debug builds log the events to Logcat. v1.1 adds the release sink here.
+     */
+    private val sink: Analytics = if (BuildConfig.DEBUG) LogAnalytics else NoAnalytics
+    /** Whether events go anywhere, so Settings shows the opt-out switch only when it controls something. */
+    val analyticsWired: Boolean = sink !== NoAnalytics
     val analytics: Analytics = GatedAnalytics(sink) { analyticsSettings.enabled }
 
     /** Days since this install, for `app_open` (first install time from the package manager). */

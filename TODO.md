@@ -88,6 +88,7 @@
 - [ ] FPdf **-** Final-pass deferred items: NavHost transitions (needs ADR), typography tokens, font-scale previews, sigil ring spring harmony (spec 2026-10-23-final-pass-fixes §Triage)
 - [x] FPdv **-** After analytics + Psst land: full `tools/ui_matrix.sh` (set the app to the run's language first) plus the final-pass device checks still open (paused amber chip, escape-banner Back, reduce motion, focus outline, TalkBack order, Home hop feel; report `docs/superpowers/plans/2026-10-23-final-pass-fixes-report.md`). Done 2026-10-23; TalkBack order and the hop feel left to the operator (TODO `FPop`)
 - [ ] FPop **-** Operator by hand on the S24: TalkBack order (Grimoire: back, title, menu before the card; chant: ?, D, slot, ✕ before the phrase) and the Home grimoire hop (smooth, not floaty)
+- [ ] AnPv **-** v1.1: choose an analytics provider (PostHog Cloud favoured; Firebase, Aptabase) with real v1 volumes, add its sink in `AppGraph`, restore `INTERNET`, update privacy policy, Data safety and the playbook (ADR-0035 amendment)
   - **Priority**: medium
   - **Created**: 2026-10-23 15:00
   - **Tags**: post-release
