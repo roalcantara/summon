@@ -62,6 +62,7 @@ import com.summondemons.safely.data.Demon
 import com.summondemons.safely.ui.fx.LocalReduceMotion
 import com.summondemons.safely.ui.fx.rememberShake
 import com.summondemons.safely.ui.theme.demonColors
+import com.summondemons.safely.ui.theme.fontScaleCapped
 import com.summondemons.safely.ui.theme.spacing
 import com.summondemons.safely.ui.theme.textRoles
 import com.summondemons.safely.ui.theme.upper
@@ -87,6 +88,7 @@ private val QuoteMinSize = 8.sp
 /** Three lines + padding must fit the 72 dp slot; relative, so it shrinks with the quote. */
 private val QuoteLineHeight = 1.2.em
 private val SmallCueSize = 10.sp
+private val CueMinSize = 7.sp
 private val DashOn = 6.dp
 private val DashOff = 4.dp
 
@@ -198,11 +200,24 @@ private fun CoolingCue(accent: Color, hours: Int, shake: Int, onTap: () -> Unit)
         Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(MaterialTheme.spacing.sm).clip(CircleShape).background(accent.copy(alpha = DOT_ALPHA)))
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(stringResource(R.string.quote_cooling).upper(), style = MaterialTheme.textRoles.cue, color = colors.onSurfaceVariant)
+                // Words in the fixed 72 dp slot (ADR-0033): one line each, at most 1.3×, shrinking to fit
+                // (at 2.0× the " h" used to wrap onto a third line the slot clipped).
+                val cueSize = MaterialTheme.textRoles.cue.fontSize.fontScaleCapped()
+                Text(
+                    stringResource(R.string.quote_cooling).upper(),
+                    style = MaterialTheme.textRoles.cue.copy(fontSize = cueSize),
+                    color = colors.onSurfaceVariant,
+                    maxLines = 1,
+                    softWrap = false,
+                    autoSize = TextAutoSize.StepBased(minFontSize = CueMinSize, maxFontSize = cueSize),
+                )
                 Text(
                     stringResource(R.string.quote_next_summon, hours).upper(),
-                    style = MaterialTheme.textRoles.cue.copy(fontSize = SmallCueSize),
+                    style = MaterialTheme.textRoles.cue.copy(fontSize = SmallCueSize.fontScaleCapped()),
                     color = colors.onSurfaceVariant,
+                    maxLines = 1,
+                    softWrap = false,
+                    autoSize = TextAutoSize.StepBased(minFontSize = CueMinSize, maxFontSize = SmallCueSize.fontScaleCapped()),
                 )
             }
         }
