@@ -30,9 +30,9 @@ class GameSounds(context: Context) {
 
     /** The Psst reply's laugh (ADR-0036), only if `res/raw/demon_laugh` was added. */
     fun playLaughIfPresent() {
+        if (released) return
         laughId?.let { pool.play(it, LAUGH_VOLUME, LAUGH_VOLUME, 1, 0, 1f) }
     }
-
 
     fun play(cue: Cue, volume: Float = 1f) {
         if (released) return

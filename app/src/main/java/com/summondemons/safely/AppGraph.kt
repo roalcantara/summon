@@ -1,16 +1,17 @@
 package com.summondemons.safely
 
 import android.app.Application
+import android.content.Context
+import com.summondemons.safely.platform.DataStoreDebugSettingsStore
+import com.summondemons.safely.platform.SystemGameClock
 import com.summondemons.safely.platform.analytics.Analytics
 import com.summondemons.safely.platform.analytics.AnalyticsEvent
 import com.summondemons.safely.platform.analytics.AnalyticsSettings
+import com.summondemons.safely.platform.analytics.ForegroundOpens
 import com.summondemons.safely.platform.analytics.GatedAnalytics
 import com.summondemons.safely.platform.analytics.LogAnalytics
 import com.summondemons.safely.platform.analytics.NoAnalytics
 import com.summondemons.safely.platform.analytics.TelemetryDeckAnalytics
-import android.content.Context
-import com.summondemons.safely.platform.DataStoreDebugSettingsStore
-import com.summondemons.safely.platform.SystemGameClock
 import com.summondemons.safely.platform.progressStore
 import com.summondemons.safely.progress.ProgressStore
 import com.summondemons.safely.time.DebugSettingsStore
@@ -49,15 +50,15 @@ class AppGraph(context: Context) {
         return java.util.concurrent.TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - installed)
     }
 
-    private var lastOpenMs = 0L
+    private val opens = ForegroundOpens()
 
-    /** `app_open` at start and on returns to the foreground after 30 minutes away. */
+    /** `app_open` at start and on returns to the foreground after 30 minutes away (activity onStart). */
     fun reportOpen() {
-        val now = System.currentTimeMillis()
-        if (now - lastOpenMs < 30 * 60_000L) return
-        lastOpenMs = now
-        analytics.track(AnalyticsEvent.AppOpen(daysSinceInstall()))
+        if (opens.onStart(System.currentTimeMillis())) analytics.track(AnalyticsEvent.AppOpen(daysSinceInstall()))
     }
+
+    /** The activity left the foreground (onStop): the time away counts from here. */
+    fun reportStop() = opens.onStop(System.currentTimeMillis())
 
     /** Returns once progress (and, in debug builds, the debug settings) have loaded. */
     suspend fun awaitReady() {

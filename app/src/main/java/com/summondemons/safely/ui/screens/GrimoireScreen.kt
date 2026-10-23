@@ -542,7 +542,7 @@ private fun Stage(
                                     enabled = !bound || party || teaser,
                                     // A button only while it acts; a bound portrait is not a disabled control.
                                     role = if (!bound || party || teaser) Role.Button else null,
-                                    onClick = { if (teaser && !party) tapTeaser(true) else onPrimary() },
+                                    onClick = { if (teaser) tapTeaser(true) else onPrimary() },
                                 )
                                 .semantics { contentDescription = label },
                             silhouette = if (bound) 0f else 1f,

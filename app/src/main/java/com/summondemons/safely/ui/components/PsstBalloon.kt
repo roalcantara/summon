@@ -33,6 +33,8 @@ import com.summondemons.safely.ui.theme.textRoles
 private val BalloonMaxWidth = 128.dp
 private val Tail = 12.dp
 private val Rim = 2.dp
+/** The corner of a one-line balloon; a wrapped reply keeps it instead of turning into a stadium. */
+private val Corner = 18.dp
 private val TextSize = 13.sp
 private val TextMinSize = 8.sp
 
@@ -54,7 +56,7 @@ fun PsstBalloon(text: String, replying: Boolean, onTap: () -> Unit, modifier: Mo
             .drawBehind {
                 val tail = Tail.toPx()
                 val body = Size(size.width, size.height - tail)
-                val radius = body.height / 2f
+                val radius = minOf(body.height / 2f, Corner.toPx())
                 val path = Path().apply {
                     addRoundRect(androidx.compose.ui.geometry.RoundRect(0f, 0f, body.width, body.height, radius, radius))
                     moveTo(radius * 0.6f, body.height - 1f)

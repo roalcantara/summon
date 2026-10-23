@@ -158,13 +158,13 @@ class RitualViewModel(
         introClosedTick = ticks
     }
 
-    /** "?" on the chant screen: show the intro card again. */
-
     /** An answer from the permission dialog (not the resume re-check): reported, then applied. */
     fun onPermissionAnswer(granted: Boolean, permanent: Boolean) {
         analytics.track(AnalyticsEvent.MicPermission(granted, permanent))
         onMicPermission(granted)
     }
+
+    /** "?" on the chant screen: show the intro card again. */
     fun openIntro() = state.update { it.copy(introVisible = true) }
 
     private var lastUi: UiRecord? = null
