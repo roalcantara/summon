@@ -34,4 +34,16 @@ class AnalyticsEventTest {
         assertEquals("load_error", AnalyticsEvent.DeviceCheck(false, "load: UnsatisfiedLinkError").params()["reason"])
         assertEquals("other", AnalyticsEvent.DeviceCheck(false, "anything else").params()["reason"])
     }
+
+    @Test
+    fun teaserEvents() {
+        assertEquals(
+            "teaser_shown" to mapOf("demon" to "asmodeus", "days_since_summon" to "3-6"),
+            AnalyticsEvent.TeaserShown("asmodeus", 4).let { it.name to it.params() },
+        )
+        assertEquals(
+            "teaser_tap" to mapOf("demon" to "astaroth", "target" to "demon", "repeat" to "true"),
+            AnalyticsEvent.TeaserTap("astaroth", onDemon = true, repeat = true).let { it.name to it.params() },
+        )
+    }
 }

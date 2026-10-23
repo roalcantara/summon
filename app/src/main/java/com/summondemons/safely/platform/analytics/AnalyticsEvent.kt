@@ -73,6 +73,16 @@ sealed interface AnalyticsEvent {
             },
         )
     }
+
+    data class TeaserShown(val demon: String, val daysSinceSummon: Long) : AnalyticsEvent {
+        override val name = "teaser_shown"
+        override fun params() = mapOf("demon" to demon, "days_since_summon" to Buckets.daysSinceInstall(daysSinceSummon))
+    }
+
+    data class TeaserTap(val demon: String, val onDemon: Boolean, val repeat: Boolean) : AnalyticsEvent {
+        override val name = "teaser_tap"
+        override fun params() = mapOf("demon" to demon, "target" to if (onDemon) "demon" else "balloon", "repeat" to repeat.toString())
+    }
 }
 
 private fun mode(whisper: Boolean) = if (whisper) "whisper" else "lenient"
