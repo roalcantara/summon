@@ -280,5 +280,5 @@ breach screen).
 
 ### Optional Stitch art
 
-- **Psst balloon:** A small ornate speech balloon in dark fantasy RPG style, deep violet parchment texture with a weathered gold rim and a curly tail pointing bottom-left, transparent background, clean vector or PNG asset for demon banter dialogues.
+- **Psst call to action:** under review; ten Stitch directions in `docs/superpowers/specs/2026-10-23-psst-cta-stitch-prompts.md`.
 All gaps closed. Stage backgrounds (`stage_home`, `stage_sol`, `stage_venus`), Home grimoire (`ic_home_grimoire`), Asmodeus scene art (`demon_asmodeus_full`), and the chant intro card art (`chant_intro_singer`, `chant_intro_banner`, `chant_summon_button`, `chant_summon_button_pressed`) have been processed and integrated into `app/src/main/res/drawable-nodpi/`.
