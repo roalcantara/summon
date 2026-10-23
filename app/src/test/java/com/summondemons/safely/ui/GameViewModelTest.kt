@@ -265,4 +265,21 @@ class GameViewModelTest {
         observe(vm); runCurrent()
         assertEquals(listOf<AnalyticsEvent>(AnalyticsEvent.DemonEscaped("asmodeus")), analytics.events)
     }
+
+    @Test
+    fun theTeaserIsReportedOncePerDayAndRepeatsAreMarked() = runTest(dispatcher) {
+        val analytics = RecordingAnalytics()
+        val vm = vm(InMemoryProgressStore(boundOn(day0 - 2)), analytics = analytics)
+        observe(vm); runCurrent()
+        vm.teaserShown("asmodeus"); vm.teaserShown("asmodeus")
+        vm.teaserTapped("asmodeus", onDemon = false); vm.teaserTapped("asmodeus", onDemon = true)
+        assertEquals(
+            listOf(
+                AnalyticsEvent.TeaserShown("asmodeus", 2),
+                AnalyticsEvent.TeaserTap("asmodeus", onDemon = false, repeat = false),
+                AnalyticsEvent.TeaserTap("asmodeus", onDemon = true, repeat = true),
+            ),
+            analytics.events.filter { it is AnalyticsEvent.TeaserShown || it is AnalyticsEvent.TeaserTap },
+        )
+    }
 }
