@@ -171,6 +171,7 @@ One cue across the game: a soft **breathing glow** (accent colour, 1.6 s period;
 |---|---|---|
 | `PrimaryActionButton` | Main CTA (**Awesome!**, **Stay**, Allow microphone) | `text`, `onClick`, `enabled`, `tone`; gold container, bold label, soft glow |
 | `RibbonBanner` | "New Demon Received!" on the Grimoire celebration; "Seal broken!" on Home | `text`; primary container color |
+| `PsstBalloon` | Speech balloon by a bound demon's head (ADR-0036): invites tap or shows reply | `text`, `replying`, `onTap`, `modifier`; violet fill (`psstViolet`, `psstVioletDeep`), gold rim (`primary`), attention glow with faint green halo (`psstHalo`), tail at bottom-start; `name` typography, capped font scale, auto-size down, max 3 lines; `Role.Button`, polite live region |
 | `RotatingSunburstBackground` | Rays behind the demon during the Grimoire celebration | `color`, `rotating` |
 | `InkedSigil` | The demon's vector sigil | `sigil` (raw), `inkProgress` 0–1, `ringProgress` 0–1, `rimText`, `accent`, `micLevel` (glow), `ghostAlpha`, `flash` (group, color, duration: seal flare / crack drain) |
 | `CueChip` | One-line cue | `text`, `tone` (neutral / safe / error), `shake` |
@@ -276,4 +277,8 @@ breach screen).
 
 ## Gaps
 
+
+### Optional Stitch art
+
+- **Psst balloon:** A small ornate speech balloon in dark fantasy RPG style, deep violet parchment texture with a weathered gold rim and a curly tail pointing bottom-left, transparent background, clean vector or PNG asset for demon banter dialogues.
 All gaps closed. Stage backgrounds (`stage_home`, `stage_sol`, `stage_venus`), Home grimoire (`ic_home_grimoire`), Asmodeus scene art (`demon_asmodeus_full`), and the chant intro card art (`chant_intro_singer`, `chant_intro_banner`, `chant_summon_button`, `chant_summon_button_pressed`) have been processed and integrated into `app/src/main/res/drawable-nodpi/`.

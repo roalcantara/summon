@@ -35,6 +35,8 @@ Reports lag about 2 days; never read a day earlier than 2 days ago.
 - **Crack rate:** `line_result(cracked)` / all `line_result`.
 - **Lenient share:** `device_check(mode=lenient)` / all `device_check`.
 - **Rituals per active player-day:** `ritual_start` count / active player-days, for users on day 3+.
+- **Teaser tap rate:** users with ≥ 1 `teaser_tap` / users with ≥ 1 `teaser_shown`, over the v1 window.
+- **Return tappers:** users tapping on ≥ 2 different days (`repeat = true` or `teaser_tap` across separate days) / all tappers.
 
 ## Targets
 
@@ -51,6 +53,7 @@ Reports lag about 2 days; never read a day earlier than 2 days ago.
 | Ritual | Abandoned in `chanting` or `wavering` | ≤ 40 % of abandons | > 50 % |
 | Device | Lenient share | ≤ 20 % | > 35 % |
 | Retention (v1) | D1 / D7 / D30 | ≥ 35 % / ≥ 12 % / ≥ 5 % | D1 < 25 %, D7 < 8 % |
+| Interest | Teaser tap rate | ≥ 20 % | < 5 % |
 | Engagement (v1.1) | Rituals per active player-day (day 3+) | ≥ 0.4 | < 0.2 |
 | Retention (v1.1) | D7 vs v1 | + 5 points, significant (see Method) | no significant change |
 
@@ -100,6 +103,9 @@ as **low confidence** and decide nothing on them except alarms.
 | D7 < 8 % with healthy funnel | Confirms ADR-0034's diagnosis: ship v1.1 as planned. |
 | v1.1: D7 + 5 points, significant, and rituals per active player-day ≥ 0.4 | v1.1 succeeds: proceed with "Next" items (reminder, daily line, rewarded ads). |
 | v1.1: no significant change | Stop adding features; look at where day-3+ players drop (funnel, rituals per day), and revisit the daily loop. |
+| Teaser tap rate ≥ 20 % | New demon content (lore over days, daily lines) is v1.1's lever. |
+| Teaser tap rate 5–20 % | Build it and test another hook. |
+| Teaser tap rate < 5 % | Rethink v1.1. |
 
 ## Checklists
 
@@ -112,6 +118,7 @@ as **low confidence** and decide nothing on them except alarms.
 - [ ] TelemetryDeck dashboard has these insights saved: active users (daily), retention by install
       week (D1/D7/D30), ritual funnel (`ritual_start` → `direction_locked` → `line_result` line 1
       sealed → `ritual_end` completed), crack rate, lenient share, `ritual_end` by phase.
+- [ ] TelemetryDeck dashboard has a teaser insight (shown → tap funnel) saved.
 - [ ] Play Console access for the evaluator.
 
 ### B. Each report
